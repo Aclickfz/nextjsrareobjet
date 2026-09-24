@@ -9,7 +9,7 @@ export default async function NewProductPage() {
     <>
       <div className="page-head"><div><h2>Add product</h2><p>Upload a photo and place the item in a category.</p></div></div>
       <div className="panel">
-      <form className="admin-form" action={saveProductAction} encType="multipart/form-data">
+      <form className="admin-form" action={saveProductAction}>
         <div className="form-grid">
           <label>Name<input name="name" required /></label>
           <label>Slug<input name="slug" placeholder="Auto from name" /></label>

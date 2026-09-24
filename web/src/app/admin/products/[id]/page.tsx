@@ -14,7 +14,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
     <>
       <div className="page-head"><div><h2>Edit product</h2><p>{String(product.name)}</p></div></div>
       <div className="panel">
-      <form className="admin-form" action={saveProductAction} encType="multipart/form-data">
+      <form className="admin-form" action={saveProductAction}>
         <input type="hidden" name="id" value={String(product.id)} />
         <div className="form-grid">
           <label>Name<input name="name" defaultValue={String(product.name)} required /></label>

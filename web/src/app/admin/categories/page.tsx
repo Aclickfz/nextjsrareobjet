@@ -20,7 +20,7 @@ export default async function CategoriesAdminPage({ searchParams }: { searchPara
       </div>
       <div className="panel">
         <div className="panel-head"><h3>{editing ? `Edit ${editing.name}` : 'New category'}</h3></div>
-        <form className="admin-form" action={saveCategoryAction} encType="multipart/form-data">
+        <form className="admin-form" action={saveCategoryAction}>
           {editing ? <input type="hidden" name="id" value={editing.id} /> : null}
           {editing?.image ? <input type="hidden" name="image" value={editing.image} /> : null}
           <div className="form-grid">
