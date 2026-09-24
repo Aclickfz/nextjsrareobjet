@@ -1,0 +1,142 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "tt-font";
+}
+
+html,
+body {
+    overflow-x: hidden;
+    max-width: 100%;
+    color: var(--black-color);
+    background: var(--white-color);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+@font-face {
+    font-family: "tt-font";
+    font-display: swap;
+    src: url("tt-norms-pro-cufonfonts/TT%20Norms%20Pro%20Regular.otf") format("opentype");
+    font-weight: 400;
+    /* src: url("../css/tt-norms-pro-cufonfonts/TT\ Norms\ Pro\ ExtraLight.otf"); */
+}
+
+:root {
+    --black-color: #101010;
+    --white-color: #fff;
+    --main-color: #212844;
+    --surface-color: #f8f8f6;
+    --muted-color: #6b6b68;
+    --border-color: #e7e5e0;
+    --accent-color: #b97a56;
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --shadow-soft: 0 10px 30px rgba(16, 16, 16, 0.08);
+    --transition-fast: 180ms ease;
+}
+
+h1,
+h3 {
+    font-family: "Merriweather", serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+    margin-bottom: 0 !important;
+}
+
+ul {
+    margin-bottom: 0 !important;
+    padding-left: 0 !important;
+}
+
+li {
+    list-style: none !important;
+}
+
+a {
+    text-decoration: none !important;
+}
+
+button {
+    border: none;
+    outline: none;
+    background-color: transparent;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 3px solid var(--accent-color);
+    outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
+
+.global_btn {
+    background-color: var(--white-color);
+    color: var(--black-color);
+    font-size: 18px;
+    padding: 8px 30px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.global_btn:hover {
+    background-color: var(--main-color);
+    color: var(--white-color);
+    transition: .3s ease;
+}
+
+.global_section {
+    padding: 0 5rem;
+}
+
+@media(max-width:1200px) {
+    .global_section {
+        padding: 0 2rem;
+    }
+}
+
+@media(max-width:992px) {
+    .global_section {
+        padding: 0 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .global_section {
+        padding: 0 0rem;
+    }
+
+    .global_btn {
+        font-size: 16px;
+        padding: 8px 22px;
+    }
+}
+
+@font-face {
+    font-family: "tt-font";
+    src: url("tt-norms-pro-cufonfonts/TT%20Norms%20Pro%20Medium.otf") format("opentype");
+    font-weight: 500 700;
+    font-display: swap;
+}
