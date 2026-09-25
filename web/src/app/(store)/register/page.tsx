@@ -1,28 +1,18 @@
+import { redirectIfAuthenticated, safeNextPath } from '@/lib/auth';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { AuthShell } from '@/components/account/AuthShell';
 import { RegisterForm } from '@/components/account/AuthForms';
 
 export const metadata: Metadata = { title: 'Create account', description: 'Create your JustAclick account to save favourites and manage your shopping experience.' };
 
-export default async function RegisterPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
+export default async function RegisterPage({ searchParams }: { searchParams: Promise<{ next?: string; verified?: string; reset?: string }> }) {
   const { next } = await searchParams;
-  const back = next === '/checkout' ? '/checkout' : '';
-  return (
-    <main id="main-content" tabIndex={-1}>
-      <section className="global_section sign_wrapper sign_wrapper--center">
-        <div className="container">
-          <div className="sign_wrapper__content">
-            <div className="sign_intro">
-              <span className="sign_eyebrow">Join JustAclick</span>
-              <h1>Create an account</h1>
-            </div>
-            <RegisterForm next={back} />
-            <div className="sign--up">
-              <p>Already registered? <Link href={back ? `/login?next=${back}` : '/login'}>Sign in</Link></p>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-  );
+  const back = safeNextPath(next || '');
+  await redirectIfAuthenticated(back);
+  return <AuthShell mode="register" title="Make yourself at home." description="Create your account for saved favourites and effortless order tracking.">
+    <RegisterForm next={back} />
+    <div className="auth-switch">Already have an account? <Link href={back ? `/login?next=${encodeURIComponent(back)}` : '/login'}>Sign in</Link></div>
+    <p className="auth-secondary">Need a new link? <Link href={`/verify-email?next=${encodeURIComponent(back)}`}>Resend verification</Link></p>
+  </AuthShell>;
 }

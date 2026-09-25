@@ -23,6 +23,7 @@ export async function toggleWishlistAction(productId: number) {
     await getPool().execute('INSERT INTO wishlists (user_id, product_id) VALUES (:uid, :pid)', { uid: user.id, pid: productId });
   }
   revalidatePath('/account/wishlist');
+  return { message: existing.length ? 'Removed from your favourites.' : 'Added to your favourites.' };
 }
 
 export async function listWishlist() {

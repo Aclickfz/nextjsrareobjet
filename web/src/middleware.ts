@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server';
 
 export function middleware(request: Request) {
   const response = NextResponse.next();
+  const pathname = new URL(request.url).pathname;
+  if (['/verify-email', '/reset-password'].includes(pathname)) {
+    response.headers.set('Referrer-Policy', 'no-referrer');
+    response.headers.set('Cache-Control', 'no-store');
+  }
   const sid = request.headers.get('cookie')?.match(/(?:^|; )sid=([^;]+)/);
   if (!sid) {
     const bytes = new Uint8Array(24);

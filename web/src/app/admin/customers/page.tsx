@@ -1,3 +1,4 @@
+import { ActionForm } from '@/components/ui/ActionForm';
 import { saveCustomerAction } from '@/actions/admin.actions';
 import { query } from '@/lib/db';
 
@@ -16,12 +17,12 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
       <>
         <div className="page-head"><div><h2>{customer.name}</h2><p>{customer.email}</p></div></div>
         <div className="panel">
-        <form className="admin-form" action={saveCustomerAction}>
+        <ActionForm className="admin-form" action={saveCustomerAction} success="Customer saved.">
           <input type="hidden" name="id" value={customer.id} />
           <label>Phone<input name="phone" defaultValue={customer.phone || ''} /></label>
           <label>Notes<textarea name="notes" defaultValue={customer.notes || ''} /></label>
           <button type="submit">Save customer</button>
-        </form>
+        </ActionForm>
         </div>
       </>
     );

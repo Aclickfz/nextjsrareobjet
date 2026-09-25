@@ -1,5 +1,7 @@
 # Hostinger Node.js deploy
 
+For verification and password-reset emails through Hostinger SMTP, follow [AUTH.md](AUTH.md). Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, and `AUTH_EMAIL_FROM` in the application's server environment. No Resend API key is needed.
+
 The app in this folder is a Next.js Node server. Do not upload it as a static site.
 
 1. In hPanel, create a Node.js application with Node 18 or newer.

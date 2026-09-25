@@ -5,6 +5,10 @@ import Link from 'next/link';
 import { removeItemAction, updateQtyAction } from '@/actions/cart.actions';
 import { placeOrderAction } from '@/actions/order.actions';
 import { imgSrc, money } from '@/lib/utils';
+import { ActionFeedback, useToast } from '@/components/ui/ToastProvider';
+import { ActionForm } from '@/components/ui/ActionForm';
+import { isRedirectError } from 'next/dist/client/components/redirect-error';
+import { getURLFromRedirectError } from 'next/dist/client/components/redirect';
 
 type Item = {
   id: number;
@@ -42,16 +46,14 @@ export function CartView({ items, subtotal, shipping, total }: { items: Item[]; 
                       <p>{money(item.price)}</p>
                     </div>
                     <div className="cart-line__actions">
-                      <form action={updateQtyAction.bind(null, item.id, item.qty)}>
                         <div className="cart-quantity__num">
-                          <button formAction={updateQtyAction.bind(null, item.id, Math.max(1, item.qty - 1))} type="submit" aria-label="Decrease quantity">−</button>
+                          <ActionForm action={updateQtyAction.bind(null, item.id, Math.max(1, item.qty - 1))} success="Cart quantity updated."><button disabled={item.qty <= 1} type="submit" aria-label="Decrease quantity">−</button></ActionForm>
                           <input readOnly value={item.qty} aria-label="Quantity" />
-                          <button formAction={updateQtyAction.bind(null, item.id, item.qty + 1)} type="submit" aria-label="Increase quantity">+</button>
+                          <ActionForm action={updateQtyAction.bind(null, item.id, item.qty + 1)} success="Cart quantity updated."><button type="submit" aria-label="Increase quantity">+</button></ActionForm>
                         </div>
-                      </form>
-                      <form action={removeItemAction.bind(null, item.id)}>
+                      <ActionForm action={removeItemAction.bind(null, item.id)} success="Item removed from your cart.">
                         <button type="submit" className="cart-remove">Remove</button>
-                      </form>
+                      </ActionForm>
                     </div>
                   </div>
                   <div className="cart_total"><h6>{money(item.line_total)}</h6></div>
@@ -77,7 +79,17 @@ export function CartView({ items, subtotal, shipping, total }: { items: Item[]; 
 }
 
 export function CheckoutForm({ total, shipping, subtotal }: { total: number; shipping: number; subtotal: number }) {
-  const [state, action, pending] = useActionState(placeOrderAction, undefined);
+  const toast = useToast();
+  const [state, action, pending] = useActionState(async (previous: { error?: string } | undefined, data: FormData) => {
+    try { return await placeOrderAction(previous, data); }
+    catch (error) {
+      if (isRedirectError(error)) {
+        if (getURLFromRedirectError(error)?.startsWith('/account/orders/')) toast('Your order has been placed.');
+        throw error;
+      }
+      return { error: 'Could not place your order. Please try again.' };
+    }
+  }, undefined);
   return (
     <section className="payment_wrapper global_section">
       <div className="container">
@@ -104,9 +116,9 @@ export function CheckoutForm({ total, shipping, subtotal }: { total: number; shi
                   </div>
                   <p>Payment method: Cash on delivery</p>
                   <div className="form_input">
-                    <button className="global_btn" disabled={pending}>submit</button>
+                    <button className="global_btn" disabled={pending}>{pending ? 'Placing order...' : 'Place order'}</button>
                   </div>
-                  {state?.error ? <p className="ui-status" role="status">{state.error}</p> : null}
+                  <ActionFeedback state={state} />
                 </div>
               </form>
             </div>

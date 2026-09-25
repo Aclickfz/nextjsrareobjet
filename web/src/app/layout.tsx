@@ -5,6 +5,7 @@ import { HeaderCounts, StoreScripts } from '@/components/layout/StoreScripts';
 import { getCart } from '@/actions/cart.actions';
 import { currentUser } from '@/lib/auth';
 import { query } from '@/lib/db';
+import { ToastProvider } from '@/components/ui/ToastProvider';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
@@ -41,7 +42,9 @@ const styles = [
   '/assets/css/blogs.css',
   '/assets/css/blog_details.css',
   '/assets/css/contract.css',
-  '/assets/css/whishlist.css'
+  '/assets/css/whishlist.css',
+  '/assets/css/auth-modern.css',
+  '/assets/css/account.css'
 ];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -52,7 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" href="/assets/images/Logo/favicon/favicon.ico" />
         <meta name="theme-color" content="#303e34" />
       </head>
-      <body>{children}</body>
+      <body><ToastProvider>{children}</ToastProvider></body>
     </html>
   );
 }

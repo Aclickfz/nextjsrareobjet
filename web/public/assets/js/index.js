@@ -1,6 +1,8 @@
 /* Shared storefront interactions. Customer data is never stored by this script. */
 window.SiteUI = {
     status(container, message) {
+        window.dispatchEvent(new CustomEvent('site:toast', { detail: { message, tone: 'info' } }));
+        if (!container) return;
         let status = container.querySelector(':scope > .ui-status');
         if (!status) {
             status = document.createElement('p');
@@ -205,6 +207,7 @@ function bootSiteUI() {
         if (new URL(link.href).pathname === location.pathname) link.setAttribute('aria-current', 'page');
     });
     document.querySelectorAll('input[type="password"]').forEach(input => {
+        if (input.closest('.auth-password, .password-field')) return;
         const wrapper = document.createElement('div');
         wrapper.className = 'password-field';
         input.before(wrapper);
@@ -307,7 +310,7 @@ function bootSiteUI() {
         document.querySelectorAll('.vertical_img button').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
     }));
     const wishlist = document.querySelector('.whishlist_content');
-    if (wishlist && !window.JustAclick) {
+    if (wishlist && !window.JustAclick && !wishlist.querySelector('[data-react-action]')) {
         const updateCount = () => {
             const count = wishlist.querySelectorAll('.whishlist-box').length;
             document.querySelector('.whishlist_header__left p').textContent = `${count} ${count === 1 ? 'item' : 'items'}`;
@@ -325,11 +328,13 @@ function bootSiteUI() {
     }
     if (!window.JustAclick) {
     document.querySelectorAll('.order-now > a, .order-now > button').forEach(button => button.addEventListener('click', event => {
+        if (button.closest('[data-react-action]')) return;
         if (button.tagName === 'A' && button.getAttribute('href') !== '#') return;
         event.preventDefault();
         SiteUI.status(button.parentElement, 'Online ordering is currently unavailable. Please contact us for help with this product.');
     }));
     document.querySelectorAll('.catalog-heart').forEach(button => button.addEventListener('click', () => {
+        if (button.hasAttribute('data-react-action')) return;
         SiteUI.status(document.querySelector('.product_box__content'), 'Saving favourites is currently unavailable. Please try again later.');
     }));
     }

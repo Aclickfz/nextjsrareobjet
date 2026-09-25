@@ -1,3 +1,4 @@
+import { ActionForm } from '@/components/ui/ActionForm';
 import Link from 'next/link';
 import { logoutAction, requireAdmin } from '@/actions/auth.actions';
 
@@ -24,7 +25,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="nav-label">Shop flow</div>
         <Link href="/admin/orders">Orders</Link>
         <Link href="/admin/customers">Customers</Link>
-        <form action={logoutAction}><button type="submit">Log out</button></form>
+        <ActionForm action={logoutAction} success="You have been signed out." successPath="/"><button type="submit">Log out</button></ActionForm>
       </aside>
       <main className="admin-main">{children}</main>
     </div>

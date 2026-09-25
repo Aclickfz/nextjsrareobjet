@@ -1,6 +1,9 @@
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 import { query } from './db';
+import { redirect } from 'next/navigation';
+import { safeNextPath } from './auth-validation';
+export { safeNextPath } from './auth-validation';
 
 export type SessionUser = {
   id: number;
@@ -9,6 +12,7 @@ export type SessionUser = {
   role: string;
   phone: string | null;
   notes: string | null;
+  session_version: number;
 };
 
 const cookieBase = {
@@ -18,11 +22,16 @@ const cookieBase = {
   path: '/'
 };
 
-export function signToken(user: { id: number; role: string; email: string; name: string }) {
+function secret() {
+  if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is required');
+  return process.env.JWT_SECRET;
+}
+
+export function signToken(user: { id: number; session_version: number }) {
   return jwt.sign(
-    { id: user.id, role: user.role, email: user.email, name: user.name },
-    process.env.JWT_SECRET || 'dev-secret',
-    { expiresIn: '7d' }
+    { id: user.id, version: user.session_version },
+    secret(),
+    { expiresIn: '7d', algorithm: 'HS256' }
   );
 }
 
@@ -41,10 +50,9 @@ export async function getSessionId() {
   return jar.get('sid')?.value || '';
 }
 
-export function safeNextPath(value: FormDataEntryValue | null) {
-  const next = String(value || '');
-  if (next.startsWith('/') && !next.startsWith('//') && !next.startsWith('/admin')) return next;
-  return '';
+export async function redirectIfAuthenticated(next = '') {
+  const user = await currentUser();
+  if (user) redirect(user.role === 'admin' ? '/admin/dashboard' : safeNextPath(next) || '/account/orders');
 }
 
 export async function currentUser(): Promise<SessionUser | null> {
@@ -52,10 +60,11 @@ export async function currentUser(): Promise<SessionUser | null> {
   const token = jar.get('token')?.value;
   if (!token) return null;
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret') as { id: number };
+    const payload = jwt.verify(token, secret(), { algorithms: ['HS256'] }) as { id: number; version: number };
+    if (!Number.isSafeInteger(payload.id) || !Number.isSafeInteger(payload.version)) return null;
     const rows = await query<SessionUser[]>(
-      'SELECT id, name, email, role, phone, notes FROM users WHERE id = :id LIMIT 1',
-      { id: payload.id }
+      'SELECT id, name, email, role, phone, notes, session_version FROM users WHERE id = :id AND session_version = :version AND email_verified_at IS NOT NULL LIMIT 1',
+      { id: payload.id, version: payload.version }
     );
     return rows[0] || null;
   } catch {

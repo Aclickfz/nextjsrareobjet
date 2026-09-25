@@ -23,6 +23,7 @@ export async function loadOrder(orderId: number, userId: number | null, isAdmin:
   invoice_number?: string;
   items: { product_id: number; qty: number; name_snapshot: string; price_snapshot: number; line_total: number; image?: string }[];
 } | null> {
+  if (!isAdmin && !userId) return null;
   const params: Record<string, unknown> = { id: orderId };
   let sql = `SELECT o.*, u.name AS customer_name, u.email AS customer_email, u.phone AS customer_phone,
       inv.invoice_number, inv.issued_at

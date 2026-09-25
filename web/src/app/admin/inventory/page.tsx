@@ -1,3 +1,4 @@
+import { ActionForm } from '@/components/ui/ActionForm';
 import { adjustStockAction } from '@/actions/admin.actions';
 import { query } from '@/lib/db';
 
@@ -15,14 +16,14 @@ export default async function InventoryPage() {
   return (
     <>
       <div className="page-head"><div><h2>Inventory</h2><p>Adjust stock. Every change is stored in the history below.</p></div></div>
-      <form className="admin-form" action={adjustStockAction} style={{ marginBottom: 24 }}>
+      <ActionForm className="admin-form" action={adjustStockAction} style={{ marginBottom: 24 }} success="Stock updated.">
         <label>Product
           <select name="product_id">{products.map((product) => <option key={product.id} value={product.id}>{product.name}</option>)}</select>
         </label>
         <label>Change<input name="change_qty" type="number" required /></label>
         <label>Note<input name="note" /></label>
         <button type="submit">Adjust</button>
-      </form>
+      </ActionForm>
       <table className="admin-table">
         <thead><tr><th>Product</th><th>SKU</th><th>Stock</th></tr></thead>
         <tbody>{products.map((product) => <tr key={product.id}><td>{product.name}</td><td>{product.sku}</td><td>{product.stock_qty}</td></tr>)}</tbody>

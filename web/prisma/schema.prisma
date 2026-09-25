@@ -18,6 +18,8 @@ model User {
   role          String   @default("customer")
   phone         String?
   notes         String?  @db.Text
+  emailVerifiedAt DateTime? @map("email_verified_at")
+  sessionVersion Int @default(0) @map("session_version")
   createdAt     DateTime @default(now()) @map("created_at")
 
   @@map("users")

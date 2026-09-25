@@ -1,3 +1,4 @@
+import { ActionForm } from '@/components/ui/ActionForm';
 import { saveProductAction } from '@/actions/admin.actions';
 import { query } from '@/lib/db';
 
@@ -9,7 +10,7 @@ export default async function NewProductPage() {
     <>
       <div className="page-head"><div><h2>Add product</h2><p>Upload a photo and place the item in a category.</p></div></div>
       <div className="panel">
-      <form className="admin-form" action={saveProductAction}>
+      <ActionForm className="admin-form" action={saveProductAction} success="Product saved." successPath="/admin/products">
         <div className="form-grid">
           <label>Name<input name="name" required /></label>
           <label>Slug<input name="slug" placeholder="Auto from name" /></label>
@@ -31,7 +32,7 @@ export default async function NewProductPage() {
         <label>Description<textarea name="description" rows={4} /></label>
         <label>Product image<input name="image" type="file" accept="image/*" /></label>
         <button type="submit">Save product</button>
-      </form>
+      </ActionForm>
       </div>
     </>
   );

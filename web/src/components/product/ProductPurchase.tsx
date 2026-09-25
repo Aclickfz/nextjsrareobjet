@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { addToCartAction } from '@/actions/cart.actions';
 import { imgSrc, money } from '@/lib/utils';
+import { useToast } from '@/components/ui/ToastProvider';
 
 type Product = {
   id: number;
@@ -19,16 +20,19 @@ export function ProductPurchase({ product }: { product: Product }) {
   const images = product.images?.length ? product.images : [{ path: '/assets/images/img2.jpeg' }];
   const [active, setActive] = useState(0);
   const [qty, setQty] = useState(1);
-  const [message, setMessage] = useState('');
+  const toast = useToast();
+  const [pending, setPending] = useState(false);
 
   async function add(buyNow: boolean) {
+    if (pending) return;
+    setPending(true);
     try {
       await addToCartAction(product.id, qty, buyNow);
-      if (!buyNow) setMessage('Added to cart');
+      if (!buyNow) toast('Added to your cart.');
     } catch (error) {
       if (isRedirectError(error)) throw error;
-      setMessage(error instanceof Error ? error.message : 'Could not add to cart');
-    }
+      toast('Could not add this item. Check the available quantity and try again.', 'error');
+    } finally { setPending(false); }
   }
 
   return (
@@ -72,11 +76,10 @@ export function ProductPurchase({ product }: { product: Product }) {
                   </div>
                 </div>
               </div>
-              <div className="order-now">
-                <button type="button" className="global_btn" onClick={() => add(false)}><i className="bx bxs-shopping-bag" /> add to cart</button>
-                <button type="button" className="global_btn" onClick={() => add(true)}><i className="bx bxs-cart-alt" /> buy now</button>
+              <div className="order-now" data-react-action="true">
+                <button type="button" className="global_btn" disabled={pending || product.stock_qty < 1} onClick={() => add(false)}><i className="bx bxs-shopping-bag" /> {pending ? 'Adding...' : 'Add to cart'}</button>
+                <button type="button" className="global_btn" disabled={pending || product.stock_qty < 1} onClick={() => add(true)}><i className="bx bxs-cart-alt" /> Buy now</button>
               </div>
-              {message ? <p className="ui-status" role="status">{message}</p> : null}
             </div>
           </div>
         </div>

@@ -1,3 +1,4 @@
+import { ActionForm } from '@/components/ui/ActionForm';
 import { notFound } from 'next/navigation';
 import { saveProductAction } from '@/actions/admin.actions';
 import { query } from '@/lib/db';
@@ -14,7 +15,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
     <>
       <div className="page-head"><div><h2>Edit product</h2><p>{String(product.name)}</p></div></div>
       <div className="panel">
-      <form className="admin-form" action={saveProductAction}>
+      <ActionForm className="admin-form" action={saveProductAction} success="Product saved." successPath="/admin/products">
         <input type="hidden" name="id" value={String(product.id)} />
         <div className="form-grid">
           <label>Name<input name="name" defaultValue={String(product.name)} required /></label>
@@ -43,7 +44,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
         </label>
         <label>Replace image<input name="image" type="file" accept="image/*" /></label>
         <button type="submit">Save product</button>
-      </form>
+      </ActionForm>
       </div>
     </>
   );

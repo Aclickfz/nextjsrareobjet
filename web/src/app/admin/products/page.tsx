@@ -1,3 +1,4 @@
+import { ActionForm } from '@/components/ui/ActionForm';
 import Link from 'next/link';
 import { query } from '@/lib/db';
 import { imgSrc, money } from '@/lib/utils';
@@ -58,7 +59,7 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
                   <div className="row-actions">
                     <Link href={`/admin/products/${product.id}`}>Edit</Link>
                     {product.is_active ? (
-                      <form action={deactivateProductAction}><input type="hidden" name="id" value={product.id} /><button className="danger" type="submit">Hide</button></form>
+                      <ActionForm action={deactivateProductAction} success="Product hidden."><input type="hidden" name="id" value={product.id} /><button className="danger" type="submit">Hide</button></ActionForm>
                     ) : null}
                   </div>
                 </td>

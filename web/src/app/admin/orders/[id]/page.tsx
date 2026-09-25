@@ -1,3 +1,4 @@
+import { ActionForm } from '@/components/ui/ActionForm';
 import { notFound } from 'next/navigation';
 import { orderStatusAction } from '@/actions/admin.actions';
 import { loadOrder } from '@/services/order.service';
@@ -23,11 +24,11 @@ export default async function AdminOrderPage({ params }: { params: Promise<{ id:
       <p><strong>Total {money(Number(order.total))}</strong> including shipping {money(Number(order.shipping))}</p>
       <div className="order-actions">
       {next.map((status) => (
-        <form key={status} action={orderStatusAction}>
+        <ActionForm key={status} action={orderStatusAction} success="Order status updated.">
           <input type="hidden" name="id" value={String(order.id)} />
           <input type="hidden" name="status" value={status} />
           <button type="submit">Mark {status}</button>
-        </form>
+        </ActionForm>
       ))}
       </div>
     </>
