@@ -27,8 +27,11 @@ export function ProductPurchase({ product }: { product: Product }) {
     if (pending) return;
     setPending(true);
     try {
-      await addToCartAction(product.id, qty, buyNow);
-      if (!buyNow) toast('Added to your cart.');
+      const result = await addToCartAction(product.id, qty, buyNow);
+      if (!buyNow) {
+        if (result.alreadyAdded) toast('Already added to cart. Use + or - in your cart to change the quantity.', 'info');
+        else toast('Added to your cart.');
+      }
     } catch (error) {
       if (isRedirectError(error)) throw error;
       toast('Could not add this item. Check the available quantity and try again.', 'error');
@@ -65,6 +68,7 @@ export function ProductPurchase({ product }: { product: Product }) {
               {product.description ? <p>{product.description}</p> : null}
               <p>{product.stock_qty > 0 ? `${product.stock_qty} in stock` : 'Out of stock'}</p>
               <div className="purchase_type">
+                <p>Size: Small</p>
                 <div className="purchase_type__select">
                   <h6>quantity:</h6>
                   <div className="purchase--input">

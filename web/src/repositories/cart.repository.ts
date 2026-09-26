@@ -24,9 +24,9 @@ export async function getOrCreateCart(userId: number | null, sessionId: string) 
 
 export async function loadCart(cartId: number) {
   const items = await query<
-    { id: number; qty: number; product_id: number; name: string; slug: string; price: number; stock_qty: number; is_active: number }[]
+    { id: number; qty: number; size: string | null; product_id: number; name: string; slug: string; price: number; stock_qty: number; is_active: number }[]
   >(
-    `SELECT ci.id, ci.qty, ci.product_id, p.name, p.slug, p.price, p.stock_qty, p.is_active
+    `SELECT ci.id, ci.qty, ci.size, ci.product_id, p.name, p.slug, p.price, p.stock_qty, p.is_active
      FROM cart_items ci JOIN products p ON p.id = ci.product_id
      WHERE ci.cart_id = :cartId ORDER BY ci.id DESC`,
     { cartId }
@@ -49,7 +49,7 @@ export async function loadCart(cartId: number) {
     const line_total = price * item.qty;
     subtotal += line_total;
     count += item.qty;
-    return { id: item.id, product_id: item.product_id, qty: item.qty, price, line_total, product: byId[item.product_id] };
+    return { id: item.id, product_id: item.product_id, qty: item.qty, size: item.size, price, line_total, product: byId[item.product_id] };
   });
   const shipping = shippingFlat(mapped.length);
   return { items: mapped, count, subtotal, shipping, total: subtotal + shipping };
@@ -66,17 +66,20 @@ export async function addCartItem(cartId: number, productId: number, qty: number
     'SELECT id, qty FROM cart_items WHERE cart_id = :cartId AND product_id = :pid LIMIT 1',
     { cartId, pid: productId }
   );
-  const nextQty = (existing[0]?.qty || 0) + qty;
-  if (nextQty > product.stock_qty) throw new Error(`Only ${product.stock_qty} left`);
-  if (existing.length) {
-    await getPool().execute('UPDATE cart_items SET qty = :qty WHERE id = :id', { qty: nextQty, id: existing[0].id });
-  } else {
-    await getPool().execute('INSERT INTO cart_items (cart_id, product_id, qty) VALUES (:cartId, :pid, :qty)', {
+  if (existing.length) return { alreadyAdded: true };
+  if (qty > product.stock_qty) throw new Error(`Only ${product.stock_qty} left`);
+  try {
+    await getPool().execute("INSERT INTO cart_items (cart_id, product_id, qty, size) VALUES (:cartId, :pid, :qty, 'Small')", {
       cartId,
       pid: productId,
       qty
     });
+  } catch (error) {
+    // A simultaneous add can reach the unique cart/product key first.
+    if ((error as { code?: string }).code === 'ER_DUP_ENTRY') return { alreadyAdded: true };
+    throw error;
   }
+  return { alreadyAdded: false };
 }
 
 export async function updateCartItem(cartId: number, itemId: number, qty: number) {
@@ -109,8 +112,8 @@ export async function mergeGuestCart(userId: number, sessionId: string) {
     const [created] = await getPool().execute<ResultSetHeader>('INSERT INTO carts (user_id) VALUES (:uid)', { uid: userId });
     userCartId = created.insertId;
   }
-  const items = await query<{ product_id: number; qty: number }[]>(
-    'SELECT product_id, qty FROM cart_items WHERE cart_id = :id',
+  const items = await query<{ product_id: number; qty: number; size: string | null }[]>(
+    'SELECT product_id, qty, size FROM cart_items WHERE cart_id = :id',
     { id: guest[0].id }
   );
   for (const item of items) {
@@ -119,12 +122,14 @@ export async function mergeGuestCart(userId: number, sessionId: string) {
       { cid: userCartId, pid: item.product_id }
     );
     if (existing.length) {
-      await getPool().execute('UPDATE cart_items SET qty = :qty WHERE id = :id', {
+      await getPool().execute('UPDATE cart_items SET qty = :qty, size = COALESCE(:size, size) WHERE id = :id', {
+        size: item.size,
         qty: existing[0].qty + item.qty,
         id: existing[0].id
       });
     } else {
-      await getPool().execute('INSERT INTO cart_items (cart_id, product_id, qty) VALUES (:cid, :pid, :qty)', {
+      await getPool().execute('INSERT INTO cart_items (cart_id, product_id, qty, size) VALUES (:cid, :pid, :qty, :size)', {
+        size: item.size,
         cid: userCartId,
         pid: item.product_id,
         qty: item.qty

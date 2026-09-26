@@ -36,9 +36,10 @@ export async function getCart() {
 
 export async function addToCartAction(productId: number, qty: number, buyNow = false) {
   const cart = await cartContext(true);
-  await addCartItem(cart.id, productId, Math.max(1, qty));
+  const result = await addCartItem(cart.id, productId, Math.max(1, qty));
   revalidatePath('/cart');
   if (buyNow) redirect('/checkout');
+  return result;
 }
 
 export async function updateQtyAction(itemId: number, qty: number) {

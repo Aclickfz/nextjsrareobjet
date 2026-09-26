@@ -3,12 +3,14 @@
 import Link from 'next/link';
 import { imgSrc, money } from '@/lib/utils';
 import { WishlistButton } from './WishlistButton';
+import { AddToCartButton } from './AddToCartButton';
 
 type CardProduct = {
   id: number;
   name: string;
   slug: string;
   price: number;
+  stock_qty: number;
   badge?: string | null;
   grade_label?: string | null;
   images?: { path: string }[];
@@ -70,6 +72,10 @@ export function ProductGrid({
                       <Link href={`/products/${product.slug}`}>{product.name}</Link>
                       <span>{money(product.price)}</span>
                       {product.grade_label ? <p>{product.grade_label}</p> : null}
+                      <div className="catalog-cart-action">
+                        <small className="catalog-size">Size: Small</small>
+                        <AddToCartButton productId={product.id} productName={product.name} stockQty={product.stock_qty} />
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -13,6 +13,7 @@ import { getURLFromRedirectError } from 'next/dist/client/components/redirect';
 type Item = {
   id: number;
   qty: number;
+  size: string | null;
   price: number;
   line_total: number;
   product: { name: string; slug: string; images?: { path: string }[] };
@@ -44,6 +45,7 @@ export function CartView({ items, subtotal, shipping, total }: { items: Item[]; 
                     <div className="cart-line__title">
                       <Link href={`/products/${item.product.slug}`}>{item.product.name}</Link>
                       <p>{money(item.price)}</p>
+                      {item.size ? <p>Size: {item.size}</p> : null}
                     </div>
                     <div className="cart-line__actions">
                         <div className="cart-quantity__num">

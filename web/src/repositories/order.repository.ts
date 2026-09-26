@@ -108,7 +108,7 @@ export async function placeOrder(userId: number, cart: { id: number }, payload: 
         {
           order_id: orderId,
           product_id: item.product_id,
-          name_snapshot: item.product.name,
+          name_snapshot: item.size ? `${item.product.name} (Size: ${item.size})` : item.product.name,
           price_snapshot: item.price,
           qty: item.qty,
           line_total: item.line_total

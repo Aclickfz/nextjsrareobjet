@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS cart_items (
   cart_id INT NOT NULL,
   product_id INT NOT NULL,
   qty INT NOT NULL,
+  size VARCHAR(20) NULL,
   UNIQUE KEY uniq_cart_line (cart_id, product_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
