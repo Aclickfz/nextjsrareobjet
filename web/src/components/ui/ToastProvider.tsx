@@ -20,7 +20,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     if (!message) return;
     const id = ++sequence.current;
     setItems(items => [...items.slice(-3), { id, message, tone }]);
-    timers.current.set(id, setTimeout(() => dismiss(id), tone === 'error' ? 12000 : 7000));
+    timers.current.set(id, setTimeout(() => dismiss(id), 3000));
   }, [dismiss]);
   useEffect(() => {
     const activeTimers = timers.current;
