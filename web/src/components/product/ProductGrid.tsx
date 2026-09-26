@@ -73,7 +73,6 @@ export function ProductGrid({
                       <span>{money(product.price)}</span>
                       {product.grade_label ? <p>{product.grade_label}</p> : null}
                       <div className="catalog-cart-action">
-                        <small className="catalog-size">Size: Small</small>
                         <AddToCartButton productId={product.id} productName={product.name} stockQty={product.stock_qty} />
                       </div>
                     </div>

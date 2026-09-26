@@ -68,7 +68,6 @@ export function ProductPurchase({ product }: { product: Product }) {
               {product.description ? <p>{product.description}</p> : null}
               <p>{product.stock_qty > 0 ? `${product.stock_qty} in stock` : 'Out of stock'}</p>
               <div className="purchase_type">
-                <p>Size: Small</p>
                 <div className="purchase_type__select">
                   <h6>quantity:</h6>
                   <div className="purchase--input">

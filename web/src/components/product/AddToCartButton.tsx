@@ -23,7 +23,7 @@ export function AddToCartButton({ productId, productName, stockQty }: {
     try {
       const result = await addToCartAction(productId, 1);
       if (result.alreadyAdded) toast('Already added to cart. Use + or - in your cart to change the quantity.', 'info');
-      else toast('Added to your cart. Size: Small.');
+      else toast('Added to your cart.');
       router.refresh();
     } catch {
       toast('Could not add this item. Check the available quantity and try again.', 'error');
@@ -40,7 +40,7 @@ export function AddToCartButton({ productId, productName, stockQty }: {
       data-react-action="true"
       disabled={pending || unavailable}
       aria-busy={pending}
-      aria-label={unavailable ? `${productName} is out of stock` : `Add ${productName}, size Small, to cart`}
+      aria-label={unavailable ? `${productName} is out of stock` : `Add ${productName} to cart`}
       onClick={add}
     >
       <i className="bx bx-cart-add" aria-hidden="true" />

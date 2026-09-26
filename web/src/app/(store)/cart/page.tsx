@@ -10,8 +10,8 @@ export default async function CartPage() {
       <section className="cart_banner">
         <div className="container">
           <div className="cart_banner__content">
-            <p>Shopping</p>
-            <h1>Your cart</h1>
+            <p style={{ color: '#fff' }}>Shopping</p>
+            <h1 style={{ color: '#fff' }}>Your cart</h1>
           </div>
         </div>
       </section>

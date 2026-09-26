@@ -55,13 +55,6 @@
     margin-top: 12px;
 }
 
-.catalog-size {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 12px;
-    color: #555;
-}
-
 .catalog-add-cart {
     display: inline-flex;
     align-items: center;
