@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ProductExtras } from '@/components/product/ProductExtras';
 import { ProductPurchase } from '@/components/product/ProductPurchase';
-import { getProduct } from '@/services/product.service';
+import { getProduct, listProducts } from '@/services/product.service';
 import { imgSrc } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
@@ -35,12 +35,20 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     product = null;
   }
   if (!product || !product.is_active) notFound();
+  let related: Awaited<ReturnType<typeof listProducts>>['products'] = [];
+  if (product.category_slug) {
+    try {
+      related = (await listProducts({ category: product.category_slug, excludeId: product.id, limit: 4 })).products;
+    } catch {
+      related = [];
+    }
+  }
   const image = imgSrc(product.images?.[0]?.path);
   const url = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/products/${product.slug}`;
   return (
     <main id="main-content" tabIndex={-1}>
       <ProductPurchase product={product} />
-      <ProductExtras />
+      <ProductExtras products={related} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

@@ -5,6 +5,32 @@ import { clearCart, loadCart } from './cart.repository';
 
 type CartPayload = Awaited<ReturnType<typeof loadCart>>;
 
+export async function ensureOrderTrackingColumns() {
+  const columns = await query<{ COLUMN_NAME: string }[]>(
+    `SELECT COLUMN_NAME FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'orders' AND COLUMN_NAME IN ('tracking_number', 'carrier')`
+  );
+  const names = new Set(columns.map((column) => column.COLUMN_NAME));
+  if (!names.has('tracking_number')) {
+    await query('ALTER TABLE orders ADD COLUMN tracking_number VARCHAR(80) NULL');
+  }
+  if (!names.has('carrier')) {
+    await query('ALTER TABLE orders ADD COLUMN carrier VARCHAR(80) NULL');
+  }
+}
+
+export async function findOrderForTracking(orderNumber: string, postalCode: string) {
+  await ensureOrderTrackingColumns();
+  const rows = await query<Record<string, unknown>[]>(
+    `SELECT o.order_number, o.status, o.created_at, o.city, o.postal_code, o.tracking_number, o.carrier, o.total
+     FROM orders o
+     WHERE o.order_number = :orderNumber AND o.postal_code = :postalCode
+     LIMIT 1`,
+    { orderNumber, postalCode }
+  );
+  return rows[0] || null;
+}
+
 export async function loadOrder(orderId: number, userId: number | null, isAdmin: boolean): Promise<{
   id: number;
   subtotal: number;

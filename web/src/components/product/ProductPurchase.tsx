@@ -1,18 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { addToCartAction } from '@/actions/cart.actions';
 import { imgSrc, money } from '@/lib/utils';
 import { useToast } from '@/components/ui/ToastProvider';
+import { WishlistButton } from './WishlistButton';
+import { rememberRecent } from './RecentsList';
 
 type Product = {
   id: number;
+  slug?: string;
   name: string;
   price: number;
+  compare_at_price?: number | null;
   description: string | null;
   stock_qty: number;
   sku: string | null;
+  badge?: string | null;
+  grade_label?: string | null;
+  category_name?: string | null;
+  category_slug?: string | null;
   images?: { path: string }[];
 };
 
@@ -22,6 +31,17 @@ export function ProductPurchase({ product }: { product: Product }) {
   const [qty, setQty] = useState(1);
   const toast = useToast();
   const [pending, setPending] = useState(false);
+  useEffect(() => {
+    rememberRecent({
+      id: product.id,
+      name: product.name,
+      slug: product.slug || '',
+      price: Number(product.price),
+      image: images[0]?.path
+    });
+  }, [product.id]);
+  const compare = product.compare_at_price ? Number(product.compare_at_price) : 0;
+  const onSale = compare > Number(product.price);
 
   async function add(buyNow: boolean) {
     if (pending) return;
@@ -39,8 +59,15 @@ export function ProductPurchase({ product }: { product: Product }) {
   }
 
   return (
-    <section className="purchasing_wrapper global_section">
+    <section className="purchasing_wrapper global_section shop-pdp">
       <div className="container">
+        <nav className="shop-crumb" aria-label="Breadcrumb">
+          <Link href="/">Home</Link>
+          <span aria-hidden="true">/</span>
+          {product.category_slug ? <Link href={`/categories/${product.category_slug}`}>{product.category_name}</Link> : <Link href="/products">Shop</Link>}
+          <span aria-hidden="true">/</span>
+          <span>{product.name}</span>
+        </nav>
         <div className="row">
           <div className="col-lg-7">
             <div className="purchasing_wrapper__left">
@@ -61,11 +88,15 @@ export function ProductPurchase({ product }: { product: Product }) {
             </div>
           </div>
           <div className="col-lg-5">
-            <div className="purchasing_wrapper__content product_content">
+            <div className="purchasing_wrapper__content product_content shop-pdp__buy">
+              {product.badge ? <p className="shop-pdp__badge">{product.badge}</p> : null}
               <h1>{product.name}</h1>
-              <p className="price">{money(product.price)}</p>
+              <p className="price">
+                {onSale ? <s>{money(compare)}</s> : null}
+                {money(product.price)}
+              </p>
               {product.sku ? <p>SKU: {product.sku}</p> : null}
-              {product.description ? <p>{product.description}</p> : null}
+              {product.grade_label ? <p>{product.grade_label}</p> : null}
               <p>{product.stock_qty > 0 ? `${product.stock_qty} in stock` : 'Out of stock'}</p>
               <div className="purchase_type">
                 <div className="purchase_type__select">
@@ -82,7 +113,14 @@ export function ProductPurchase({ product }: { product: Product }) {
               <div className="order-now" data-react-action="true">
                 <button type="button" className="global_btn" disabled={pending || product.stock_qty < 1} onClick={() => add(false)}><i className="bx bxs-shopping-bag" /> {pending ? 'Adding...' : 'Add to cart'}</button>
                 <button type="button" className="global_btn" disabled={pending || product.stock_qty < 1} onClick={() => add(true)}><i className="bx bxs-cart-alt" /> Buy now</button>
+                <WishlistButton productId={product.id} />
               </div>
+              {product.description ? (
+                <div className="shop-pdp__details">
+                  <h2>Details</h2>
+                  <p>{product.description}</p>
+                </div>
+              ) : null}
             </div>
           </div>
         </div>

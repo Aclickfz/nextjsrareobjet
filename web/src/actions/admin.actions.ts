@@ -70,10 +70,22 @@ export async function saveProductAction(formData: FormData) {
   }
   const uploaded = await storeUpload(formData.get('image'), 'products');
   if (uploaded) {
+    await getPool().execute('UPDATE product_images SET is_primary = 0 WHERE product_id = :product_id', { product_id: productId });
     await getPool().execute(
       'INSERT INTO product_images (product_id, path, sort_order, is_primary) VALUES (:product_id, :path, 0, 1)',
       { product_id: productId, path: uploaded }
     );
+  }
+  const gallery = formData.getAll('gallery');
+  let sort = 1;
+  for (const file of gallery) {
+    const extra = await storeUpload(file, 'products');
+    if (!extra) continue;
+    await getPool().execute(
+      'INSERT INTO product_images (product_id, path, sort_order, is_primary) VALUES (:product_id, :path, :sort_order, 0)',
+      { product_id: productId, path: extra, sort_order: sort }
+    );
+    sort += 1;
   }
   revalidatePath('/admin/products');
   redirect('/admin/products');
@@ -119,7 +131,7 @@ async function storeUpload(file: FormDataEntryValue | null, folder: string) {
   const dir = path.join(process.cwd(), 'public', 'uploads', folder);
   fs.mkdirSync(dir, { recursive: true });
   const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-  const filename = `${Date.now()}-${safe}`;
+  const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safe}`;
   fs.writeFileSync(path.join(dir, filename), Buffer.from(await file.arrayBuffer()));
   return `uploads/${folder}/${filename}`;
 }
@@ -145,6 +157,23 @@ export async function saveCategoryAction(formData: FormData) {
     );
   }
   revalidatePath('/admin/categories');
+}
+
+export async function saveTrackingAction(formData: FormData) {
+  await requireAdmin();
+  const { ensureOrderTrackingColumns } = await import('@/repositories/order.repository');
+  await ensureOrderTrackingColumns();
+  const id = Number(formData.get('id'));
+  await getPool().execute(
+    'UPDATE orders SET tracking_number = :tracking_number, carrier = :carrier WHERE id = :id',
+    {
+      id,
+      tracking_number: String(formData.get('tracking_number') || '').trim() || null,
+      carrier: String(formData.get('carrier') || '').trim() || null
+    }
+  );
+  revalidatePath('/admin/orders');
+  revalidatePath(`/admin/orders/${id}`);
 }
 
 export async function orderStatusAction(formData: FormData) {

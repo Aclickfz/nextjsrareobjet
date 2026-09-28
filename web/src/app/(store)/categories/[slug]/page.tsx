@@ -22,17 +22,41 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 }
 
-export default async function CategoryPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ sort?: string }> }) {
+export default async function CategoryPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ sort?: string; min?: string; max?: string; stock?: string }> }) {
   const { slug } = await params;
   const query = await searchParams;
   let category = null;
   let products: Awaited<ReturnType<typeof listProducts>>['products'] = [];
+  let total = 0;
   try {
     category = await getCategory(slug);
-    if (category) products = (await listProducts({ category: slug, sort: query.sort })).products;
+    if (category) {
+      const data = await listProducts({
+        category: slug,
+        sort: query.sort,
+        min: query.min ? Number(query.min) : undefined,
+        max: query.max ? Number(query.max) : undefined,
+        inStock: query.stock === '1',
+        limit: 48
+      });
+      products = data.products;
+      total = data.pagination.total;
+    }
   } catch {
     category = null;
   }
   if (!category) notFound();
-  return <ProductGrid products={products} heading={category.name} sort={query.sort} category={slug} action={`/categories/${slug}`} />;
+  return (
+    <ProductGrid
+      products={products}
+      heading={category.name}
+      sort={query.sort}
+      category={slug}
+      action={`/categories/${slug}`}
+      total={total}
+      min={query.min}
+      max={query.max}
+      inStock={query.stock === '1'}
+    />
+  );
 }

@@ -1,0 +1,170 @@
+@import url("https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Nunito+Sans:ital,opsz,wght@0,6..12,300;0,6..12,400;0,6..12,600;1,6..12,400&display=swap");
+
+:root {
+    --black-color: #222;
+    --white-color: #fff;
+    --main-color: #222;
+    --surface-color: #f7f6f2;
+    --muted-color: #5c5c5c;
+    --border-color: #e6e6e6;
+    --accent-color: #222;
+    --radius-sm: 0;
+    --radius-md: 0;
+    --shadow-soft: none;
+}
+
+html,
+body,
+body *:not(i) {
+    font-family: "Nunito Sans", "tt-font", sans-serif;
+}
+
+h1, h2, h3, h4, .product_heading h1, .shop-plp__title h1, .banner_video__text h1, .banner_video__text h2 {
+    font-family: "Libre Baskerville", "Merriweather", serif;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: #222;
+}
+
+body {
+    background: #fff;
+    color: #222;
+}
+
+a {
+    color: inherit;
+}
+
+.global_btn,
+button.global_btn,
+.catalog-add-cart {
+    background: #222;
+    border: 1px solid #222;
+    border-radius: 0;
+    color: #fff;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: none;
+}
+
+.global_btn:hover,
+button.global_btn:hover,
+.catalog-add-cart:hover:not(:disabled) {
+    background: #000;
+    color: #fff;
+}
+
+.myNav {
+    background: #fff;
+    border-bottom: 0;
+    box-shadow: none;
+}
+
+.bottom-menu {
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    background: #fff;
+}
+
+.bottom-menu ul li a {
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    color: #222;
+}
+
+.bottom-menu ul li a::after {
+    background: #222;
+    height: 1px;
+}
+
+.offer {
+    background: #f7f6f2;
+    color: #222;
+}
+
+.offer_info p,
+.offer_info p a {
+    color: #222;
+    font-size: 13px;
+}
+
+.banner_video__text h3 {
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-family: "Nunito Sans", sans-serif;
+}
+
+.card__inner,
+.shop-card {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+.card--img img,
+.media_hover img,
+.shop-related img {
+    border-radius: 0;
+}
+
+.card__inner_content a,
+.card__inner_content span {
+    color: #222;
+}
+
+.shop-filters,
+.purchasing_wrapper,
+.product_box,
+footer {
+    background: #fff;
+}
+
+.shop-pdp__buy,
+.purchasing_wrapper__content {
+    background: #fff;
+}
+
+footer,
+.footer_wrapper {
+    border-top: 1px solid #eee;
+    background: #f7f6f2;
+}
+
+.footer_wrapper h6 {
+    font-family: "Nunito Sans", sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+input,
+select,
+textarea,
+.form-select,
+.form-control {
+    border-radius: 0 !important;
+    border-color: #ccc;
+    font-family: "Nunito Sans", sans-serif;
+}
+
+.admin-shell {
+    font-family: "Nunito Sans", sans-serif;
+}
+
+.cart_wrapper {
+    background: #fff;
+    padding-bottom: 48px;
+}
+
+.cart-line,
+.cart-items-panel,
+.cart-summary {
+    border-radius: 0;
+    box-shadow: none;
+}

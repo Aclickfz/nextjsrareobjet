@@ -17,4 +17,8 @@
 @media(max-width:640px){.auth-page{padding:20px 14px 36px}.auth-frame{grid-template-columns:1fr;border-radius:14px;max-width:470px}.auth-story{min-height:0;padding:24px;background-position:center 45%}.auth-brand{font-size:24px}.auth-brand span{font-size:8px}.auth-story-copy{padding:24px 0 0}.auth-story h2{font-size:27px;margin:8px 0 0}.auth-story h2 br{display:none}.auth-story-copy p,.auth-story-footer,.auth-kicker{display:none}.auth-panel{padding:24px}.auth-panel-body{padding:26px 0}.auth-page h1{font-size:29px}.auth-emblem{display:none}.toast-stack{right:16px;left:auto;top:max(16px,env(safe-area-inset-top))}}
 @media(prefers-reduced-motion:reduce){.site-toast,.auth-spinner{animation:none}.auth-page *{transition:none!important}}
 
+.auth-frame--single{grid-template-columns:1fr;max-width:640px}
+.auth-page .shop-plp__title h1,.auth-page h1{font-family:Georgia,serif}
+.auth-page .card__inner{background:#fff;border:1px solid #e5e6dd;border-radius:16px;padding:12px}
+.auth-page .catalog-add-cart,.auth-page .global_btn{border-radius:8px;background:#2e4937;border-color:#2e4937}
 .admin-form > .action-form-fields{display:grid;gap:14px}.filters > .action-form-fields{display:contents}.cart-quantity__num form{margin:0}.auth-panel-body>.sign_form>p{font-size:13px;line-height:1.7;color:#6b746e}

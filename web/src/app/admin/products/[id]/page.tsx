@@ -11,6 +11,10 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
   const product = rows[0];
   if (!product) notFound();
   const categories = await query<{ id: number; name: string }[]>('SELECT id, name FROM categories ORDER BY name');
+  const images = await query<{ id: number; path: string; is_primary: number }[]>(
+    'SELECT id, path, is_primary FROM product_images WHERE product_id = :id ORDER BY is_primary DESC, sort_order ASC',
+    { id: Number(id) }
+  );
   return (
     <>
       <div className="page-head"><div><h2>Edit product</h2><p>{String(product.name)}</p></div></div>
@@ -42,7 +46,15 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
             <option value="0">Hidden</option>
           </select>
         </label>
-        <label>Replace image<input name="image" type="file" accept="image/*" /></label>
+        {images.length ? (
+          <div className="form-grid">
+            {images.map((image) => (
+              <img key={image.id} className="thumb" src={`/${String(image.path).replace(/^\//, '')}`} alt="" />
+            ))}
+          </div>
+        ) : null}
+        <label>Replace main image<input name="image" type="file" accept="image/*" /></label>
+        <label>Add gallery images<input name="gallery" type="file" accept="image/*" multiple /></label>
         <button type="submit">Save product</button>
       </ActionForm>
       </div>

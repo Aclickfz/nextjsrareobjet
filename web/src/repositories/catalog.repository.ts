@@ -45,6 +45,10 @@ export async function listProducts(input: {
   page?: number;
   limit?: number;
   includeInactive?: boolean;
+  min?: number;
+  max?: number;
+  inStock?: boolean;
+  excludeId?: number;
 }) {
   const q = (input.q || '').trim();
   const category = (input.category || '').trim();
@@ -63,6 +67,19 @@ export async function listProducts(input: {
     where.push('(c.slug = :category OR c.id = :categoryId)');
     params.category = category;
     params.categoryId = Number(category) || 0;
+  }
+  if (input.min != null && !Number.isNaN(input.min)) {
+    where.push('p.price >= :minPrice');
+    params.minPrice = input.min;
+  }
+  if (input.max != null && !Number.isNaN(input.max)) {
+    where.push('p.price <= :maxPrice');
+    params.maxPrice = input.max;
+  }
+  if (input.inStock) where.push('p.stock_qty > 0');
+  if (input.excludeId) {
+    where.push('p.id <> :excludeId');
+    params.excludeId = input.excludeId;
   }
   let orderBy = 'p.created_at DESC';
   if (sort === 'price-low') orderBy = 'p.price ASC';
@@ -102,6 +119,34 @@ export async function listCategories() {
     `SELECT c.*, (SELECT COUNT(*) FROM products p WHERE p.category_id = c.id AND p.is_active = 1) AS product_count
      FROM categories c WHERE c.is_active = 1 ORDER BY c.name ASC`
   );
+}
+
+export const STORE_NAV = [
+  { name: 'Furniture', slug: 'furniture' },
+  { name: 'New', slug: 'new' },
+  { name: 'Outdoor', slug: 'outdoor' },
+  { name: 'Bedding', slug: 'bedding' },
+  { name: 'Bath', slug: 'bath' },
+  { name: 'Lighting', slug: 'lighting' },
+  { name: 'Rugs', slug: 'rugs' },
+  { name: 'Windows', slug: 'windows' },
+  { name: 'Pillows & Decor', slug: 'pillows-decor' },
+  { name: 'Art & Mirrors', slug: 'art-mirrors' },
+  { name: 'Tabletop & Bar', slug: 'tabletop-bar' },
+  { name: 'Storage', slug: 'storage' },
+  { name: 'Holidays', slug: 'holidays' },
+  { name: 'Gifts', slug: 'gifts' }
+] as const;
+
+export async function ensureStoreCategories() {
+  for (const category of STORE_NAV) {
+    await query(
+      `INSERT INTO categories (name, slug, is_active)
+       SELECT :name, :slug, 1 FROM DUAL
+       WHERE NOT EXISTS (SELECT 1 FROM categories WHERE slug = :slug)`,
+      { name: category.name, slug: category.slug }
+    );
+  }
 }
 
 export async function getCategory(slug: string) {

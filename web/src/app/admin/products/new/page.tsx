@@ -30,7 +30,8 @@ export default async function NewProductPage() {
           <label>Grade<input name="grade_label" /></label>
         </div>
         <label>Description<textarea name="description" rows={4} /></label>
-        <label>Product image<input name="image" type="file" accept="image/*" /></label>
+        <label>Main image<input name="image" type="file" accept="image/*" /></label>
+        <label>Gallery images<input name="gallery" type="file" accept="image/*" multiple /></label>
         <button type="submit">Save product</button>
       </ActionForm>
       </div>
