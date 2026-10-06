@@ -24,7 +24,7 @@ export function rememberRecent(product: RecentProduct) {
   }
 }
 
-export function RecentsList() {
+export function RecentsList({ variant = 'page' }: { variant?: 'page' | 'rail' }) {
   const [items, setItems] = useState<RecentProduct[] | null>(null);
   useEffect(() => {
     try {
@@ -33,6 +33,27 @@ export function RecentsList() {
       setItems([]);
     }
   }, []);
+
+  if (variant === 'rail') {
+    if (!items?.length) return <p className="shop-rail__empty">Products you open will show up here.</p>;
+    return (
+      <div className="shop-rail__track">
+        {items.map((product) => (
+          <article className="shop-rail__card" key={product.slug}>
+            <div className="shop-rail__media">
+              <Link href={`/products/${product.slug}`}>
+                <img decoding="async" loading="lazy" src={imgSrc(product.image)} alt={product.name} />
+              </Link>
+            </div>
+            <Link href={`/products/${product.slug}`} className="shop-rail__meta">
+              <span>{product.name}</span>
+              <strong>{money(product.price)}</strong>
+            </Link>
+          </article>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <section className="auth-page">

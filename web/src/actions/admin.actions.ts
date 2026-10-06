@@ -39,31 +39,68 @@ export async function saveProductAction(formData: FormData) {
   let slug = slugify(String(formData.get('slug') || name));
   const clash = await query<{ id: number }[]>('SELECT id FROM products WHERE slug = :slug AND id <> :id', { slug, id: id || 0 });
   if (clash.length) slug = `${slug}-${Date.now().toString(36)}`;
+
+  const readJson = (key: string) => {
+    const raw = String(formData.get(key) || '').trim();
+    if (!raw) return null;
+    JSON.parse(raw);
+    return raw;
+  };
+
   const data = {
     category_id: formData.get('category_id') ? Number(formData.get('category_id')) : null,
     name,
     slug,
     description: String(formData.get('description') || '') || null,
     price: Number(formData.get('price') || 0),
+    price_max: formData.get('price_max') ? Number(formData.get('price_max')) : null,
     compare_at_price: formData.get('compare_at_price') ? Number(formData.get('compare_at_price')) : null,
     stock_qty: Number(formData.get('stock_qty') || 0),
     sku: String(formData.get('sku') || '') || null,
     badge: String(formData.get('badge') || '') || null,
     grade_label: String(formData.get('grade_label') || '') || null,
+    collection_key: String(formData.get('collection_key') || '') || null,
+    shown_caption: String(formData.get('shown_caption') || '') || null,
+    free_shipping: formData.get('free_shipping') === '1' ? 1 : 0,
+    option_groups: readJson('option_groups'),
+    details_sections: readJson('details_sections'),
+    dimensions: readJson('dimensions'),
+    faqs: readJson('faqs'),
+    related_searches: readJson('related_searches'),
+    related_category_slugs: readJson('related_category_slugs'),
+    ask_prompts: readJson('ask_prompts'),
+    paired_slugs: readJson('paired_slugs'),
+    collection_slugs: readJson('collection_slugs'),
+    similar_slugs: readJson('similar_slugs'),
+    still_deciding: readJson('still_deciding'),
     is_active: formData.get('is_active') === '0' ? 0 : 1
   };
   let productId = id;
   if (id) {
     await getPool().execute(
-      `UPDATE products SET category_id=:category_id, name=:name, slug=:slug, description=:description, price=:price,
-       compare_at_price=:compare_at_price, stock_qty=:stock_qty, sku=:sku, badge=:badge, grade_label=:grade_label, is_active=:is_active
+      `UPDATE products SET category_id=:category_id, name=:name, slug=:slug, description=:description, price=:price, price_max=:price_max,
+       compare_at_price=:compare_at_price, stock_qty=:stock_qty, sku=:sku, badge=:badge, grade_label=:grade_label,
+       collection_key=:collection_key, shown_caption=:shown_caption, free_shipping=:free_shipping,
+       option_groups=:option_groups, details_sections=:details_sections, dimensions=:dimensions, faqs=:faqs,
+       related_searches=:related_searches, related_category_slugs=:related_category_slugs, ask_prompts=:ask_prompts,
+       paired_slugs=:paired_slugs, collection_slugs=:collection_slugs, similar_slugs=:similar_slugs,
+       still_deciding=:still_deciding, is_active=:is_active
        WHERE id=:id`,
       { ...data, id }
     );
   } else {
     const [result] = await getPool().execute<ResultSetHeader>(
-      `INSERT INTO products (category_id, name, slug, description, price, compare_at_price, stock_qty, sku, badge, grade_label, is_active)
-       VALUES (:category_id, :name, :slug, :description, :price, :compare_at_price, :stock_qty, :sku, :badge, :grade_label, :is_active)`,
+      `INSERT INTO products (
+        category_id, name, slug, description, price, price_max, compare_at_price, stock_qty, sku, badge, grade_label,
+        collection_key, shown_caption, free_shipping, option_groups, details_sections, dimensions, faqs,
+        related_searches, related_category_slugs, ask_prompts, paired_slugs, collection_slugs, similar_slugs,
+        still_deciding, is_active
+      ) VALUES (
+        :category_id, :name, :slug, :description, :price, :price_max, :compare_at_price, :stock_qty, :sku, :badge, :grade_label,
+        :collection_key, :shown_caption, :free_shipping, :option_groups, :details_sections, :dimensions, :faqs,
+        :related_searches, :related_category_slugs, :ask_prompts, :paired_slugs, :collection_slugs, :similar_slugs,
+        :still_deciding, :is_active
+      )`,
       data
     );
     productId = result.insertId;
@@ -88,7 +125,34 @@ export async function saveProductAction(formData: FormData) {
     sort += 1;
   }
   revalidatePath('/admin/products');
+  revalidatePath(`/products/${slug}`);
   redirect('/admin/products');
+}
+
+export async function deleteProductAction(formData: FormData) {
+  await requireAdmin();
+  const id = Number(formData.get('id'));
+  if (!Number.isSafeInteger(id) || id <= 0) throw new Error('Invalid product ID');
+  const conn = await getPool().getConnection();
+  try {
+    await conn.beginTransaction();
+    await conn.execute('SELECT id FROM products WHERE id = :id FOR UPDATE', { id });
+    await conn.execute('DELETE FROM cart_items WHERE product_id = :id', { id });
+    await conn.execute('DELETE FROM wishlists WHERE product_id = :id', { id });
+    await conn.execute('DELETE FROM product_images WHERE product_id = :id', { id });
+    // Order snapshots and inventory history remain available after catalog deletion.
+    await conn.execute('DELETE FROM products WHERE id = :id', { id });
+    await conn.commit();
+  } catch (error) {
+    await conn.rollback();
+    throw error;
+  } finally {
+    conn.release();
+  }
+  revalidatePath('/admin/products');
+  revalidatePath('/admin/inventory');
+  revalidatePath('/admin/dashboard');
+  revalidatePath('/', 'layout');
 }
 
 export async function deactivateProductAction(formData: FormData) {

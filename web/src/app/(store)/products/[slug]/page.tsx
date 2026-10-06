@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ProductExtras } from '@/components/product/ProductExtras';
 import { ProductPurchase } from '@/components/product/ProductPurchase';
-import { getProduct, listProducts } from '@/services/product.service';
+import { getProduct, listProducts, listProductsBySlugs } from '@/services/product.service';
 import { imgSrc } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
@@ -35,20 +35,35 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     product = null;
   }
   if (!product || !product.is_active) notFound();
-  let related: Awaited<ReturnType<typeof listProducts>>['products'] = [];
-  if (product.category_slug) {
-    try {
-      related = (await listProducts({ category: product.category_slug, excludeId: product.id, limit: 4 })).products;
-    } catch {
-      related = [];
-    }
-  }
+
+  const pdp = product.pdp;
+  const [paired, collection, similarBySlug, categorySimilar] = await Promise.all([
+    listProductsBySlugs(pdp?.paired_slugs || [], product.id).catch(() => []),
+    listProductsBySlugs(pdp?.collection_slugs || [], product.id).catch(() => []),
+    listProductsBySlugs(pdp?.similar_slugs || [], product.id).catch(() => []),
+    product.category_slug
+      ? listProducts({ category: product.category_slug, excludeId: product.id, limit: 8 })
+          .then((result) => result.products)
+          .catch(() => [])
+      : Promise.resolve([])
+  ]);
+
+  const similar = similarBySlug.length ? similarBySlug : categorySimilar;
   const image = imgSrc(product.images?.[0]?.path);
   const url = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/products/${product.slug}`;
+  const maxPrice = pdp?.price_max != null ? Number(pdp.price_max) : Number(product.price);
+
   return (
-    <main id="main-content" tabIndex={-1}>
+    <main id="main-content" className="product-page" tabIndex={-1}>
       <ProductPurchase product={product} />
-      <ProductExtras products={related} />
+      <ProductExtras
+        paired={paired}
+        collection={collection}
+        similar={similar}
+        relatedCategories={pdp?.related_category_slugs || []}
+        relatedSearches={pdp?.related_searches || []}
+        faqs={pdp?.faqs || []}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -60,9 +75,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             sku: product.sku || undefined,
             image,
             offers: {
-              '@type': 'Offer',
+              '@type': 'AggregateOffer',
               priceCurrency: 'INR',
-              price: Number(product.price),
+              lowPrice: Number(product.price),
+              highPrice: maxPrice,
               availability: product.stock_qty > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
               url
             }

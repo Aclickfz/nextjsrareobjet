@@ -28,15 +28,31 @@ CREATE TABLE IF NOT EXISTS products (
   slug VARCHAR(200) NOT NULL,
   description TEXT NULL,
   price DECIMAL(12,2) NOT NULL DEFAULT 0,
+  price_max DECIMAL(12,2) NULL,
   compare_at_price DECIMAL(12,2) NULL,
   stock_qty INT NOT NULL DEFAULT 0,
   sku VARCHAR(80) NULL,
   badge VARCHAR(80) NULL,
   grade_label VARCHAR(80) NULL,
+  collection_key VARCHAR(120) NULL,
+  shown_caption VARCHAR(255) NULL,
+  free_shipping TINYINT(1) NOT NULL DEFAULT 0,
+  option_groups JSON NULL,
+  details_sections JSON NULL,
+  dimensions JSON NULL,
+  faqs JSON NULL,
+  related_searches JSON NULL,
+  related_category_slugs JSON NULL,
+  ask_prompts JSON NULL,
+  paired_slugs JSON NULL,
+  collection_slugs JSON NULL,
+  similar_slugs JSON NULL,
+  still_deciding JSON NULL,
   is_active TINYINT(1) NOT NULL DEFAULT 1,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY uniq_products_slug (slug),
-  KEY idx_products_category (category_id)
+  KEY idx_products_category (category_id),
+  KEY idx_products_collection (collection_key)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS product_images (

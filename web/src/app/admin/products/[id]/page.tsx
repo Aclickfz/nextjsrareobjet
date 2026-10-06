@@ -1,4 +1,5 @@
 import { ActionForm } from '@/components/ui/ActionForm';
+import { ProductAdminFields, ProductAdminShell } from '@/components/admin/ProductAdminFields';
 import { notFound } from 'next/navigation';
 import { saveProductAction } from '@/actions/admin.actions';
 import { query } from '@/lib/db';
@@ -16,48 +17,11 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
     { id: Number(id) }
   );
   return (
-    <>
-      <div className="page-head"><div><h2>Edit product</h2><p>{String(product.name)}</p></div></div>
-      <div className="panel">
+    <ProductAdminShell title="Edit product" subtitle={String(product.name)}>
       <ActionForm className="admin-form" action={saveProductAction} success="Product saved." successPath="/admin/products">
-        <input type="hidden" name="id" value={String(product.id)} />
-        <div className="form-grid">
-          <label>Name<input name="name" defaultValue={String(product.name)} required /></label>
-          <label>Slug<input name="slug" defaultValue={String(product.slug)} /></label>
-        </div>
-        <label>Category
-          <select name="category_id" defaultValue={String(product.category_id || '')}>
-            <option value="">Uncategorized</option>
-            {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
-          </select>
-        </label>
-        <div className="form-grid">
-          <label>Price<input name="price" type="number" step="0.01" defaultValue={Number(product.price)} required /></label>
-          <label>Compare at<input name="compare_at_price" type="number" step="0.01" defaultValue={product.compare_at_price ? Number(product.compare_at_price) : ''} /></label>
-          <label>Stock<input name="stock_qty" type="number" defaultValue={Number(product.stock_qty)} /></label>
-          <label>SKU<input name="sku" defaultValue={String(product.sku || '')} /></label>
-          <label>Badge<input name="badge" defaultValue={String(product.badge || '')} /></label>
-          <label>Grade<input name="grade_label" defaultValue={String(product.grade_label || '')} /></label>
-        </div>
-        <label>Description<textarea name="description" rows={4} defaultValue={String(product.description || '')} /></label>
-        <label>Storefront
-          <select name="is_active" defaultValue={String(product.is_active)}>
-            <option value="1">Live</option>
-            <option value="0">Hidden</option>
-          </select>
-        </label>
-        {images.length ? (
-          <div className="form-grid">
-            {images.map((image) => (
-              <img key={image.id} className="thumb" src={`/${String(image.path).replace(/^\//, '')}`} alt="" />
-            ))}
-          </div>
-        ) : null}
-        <label>Replace main image<input name="image" type="file" accept="image/*" /></label>
-        <label>Add gallery images<input name="gallery" type="file" accept="image/*" multiple /></label>
+        <ProductAdminFields product={product} categories={categories} images={images} />
         <button type="submit">Save product</button>
       </ActionForm>
-      </div>
-    </>
+    </ProductAdminShell>
   );
 }

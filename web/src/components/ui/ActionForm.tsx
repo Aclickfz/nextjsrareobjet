@@ -5,13 +5,14 @@ import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { getURLFromRedirectError } from 'next/dist/client/components/redirect';
 import { useToast } from './ToastProvider';
 
-type Props = Omit<ComponentProps<'form'>, 'action'> & { action: (data: FormData) => Promise<void>; success?: string; successPath?: string };
-export function ActionForm({ action, success = 'Changes saved.', successPath, children, ...props }: Props) {
+type Props = Omit<ComponentProps<'form'>, 'action' | 'encType' | 'method'> & { action: (data: FormData) => Promise<void>; success?: string; successPath?: string; confirmMessage?: string };
+export function ActionForm({ action, success = 'Changes saved.', successPath, confirmMessage, children, ...props }: Props) {
   const toast = useToast();
   const [pending, setPending] = useState(false);
   const busy = useRef(false);
   return <form {...props} aria-busy={pending} action={async data => {
     if (busy.current) return;
+    if (confirmMessage && !window.confirm(confirmMessage)) return;
     busy.current = true;
     setPending(true);
     try { await action(data); toast(success); }

@@ -1,4 +1,5 @@
 import { query } from '@/lib/db';
+import { normalizePdp, type ProductPdpFields } from '@/lib/product-pdp';
 
 export type ProductRow = {
   id: number;
@@ -16,7 +17,21 @@ export type ProductRow = {
   category_name?: string | null;
   category_slug?: string | null;
   images?: { path: string; is_primary: number }[];
+} & ProductPdpFields & {
+  pdp?: ReturnType<typeof normalizePdp>;
 };
+
+function mapProduct(row: ProductRow): ProductRow {
+  const price = Number(row.price);
+  const compare = row.compare_at_price != null ? Number(row.compare_at_price) : null;
+  return {
+    ...row,
+    price,
+    compare_at_price: compare,
+    price_max: row.price_max != null ? Number(row.price_max) : null,
+    pdp: normalizePdp(row)
+  };
+}
 
 export async function attachImages<T extends { id: number }>(rows: T[]) {
   if (!rows.length) return rows.map((row) => ({ ...row, images: [] as { path: string; is_primary: number }[] }));
@@ -96,9 +111,33 @@ export async function listProducts(input: {
      ${whereSql} ORDER BY ${orderBy} LIMIT ${limit} OFFSET ${offset}`,
     params
   );
-  const products = await attachImages(rows.map((row) => ({ ...row, price: Number(row.price) })));
+  const products = await attachImages(rows.map(mapProduct));
   const total = Number(countRows[0]?.total || 0);
   return { products, pagination: { page, limit, total, pages: Math.ceil(total / limit) } };
+}
+
+export async function listProductsBySlugs(slugs: string[], excludeId?: number) {
+  const clean = [...new Set(slugs.map((slug) => String(slug || '').trim()).filter(Boolean))];
+  if (!clean.length) return [];
+  const placeholders = clean.map((_, index) => `:slug${index}`).join(', ');
+  const params: Record<string, unknown> = {};
+  clean.forEach((slug, index) => {
+    params[`slug${index}`] = slug;
+  });
+  let excludeSql = '';
+  if (excludeId) {
+    excludeSql = ' AND p.id <> :excludeId';
+    params.excludeId = excludeId;
+  }
+  const rows = await query<ProductRow[]>(
+    `SELECT p.*, c.name AS category_name, c.slug AS category_slug
+     FROM products p LEFT JOIN categories c ON c.id = p.category_id
+     WHERE p.is_active = 1 AND p.slug IN (${placeholders})${excludeSql}`,
+    params
+  );
+  const products = await attachImages(rows.map(mapProduct));
+  const order = new Map(clean.map((slug, index) => [slug, index]));
+  return products.sort((a, b) => (order.get(a.slug) ?? 0) - (order.get(b.slug) ?? 0));
 }
 
 export async function getProduct(slugOrId: string) {
@@ -110,7 +149,7 @@ export async function getProduct(slugOrId: string) {
     { key: isId ? Number(slugOrId) : slugOrId }
   );
   if (!rows.length) return null;
-  const [product] = await attachImages([{ ...rows[0], price: Number(rows[0].price) }]);
+  const [product] = await attachImages([mapProduct(rows[0])]);
   return product;
 }
 

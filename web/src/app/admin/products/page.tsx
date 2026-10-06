@@ -2,7 +2,7 @@ import { ActionForm } from '@/components/ui/ActionForm';
 import Link from 'next/link';
 import { query } from '@/lib/db';
 import { imgSrc, money } from '@/lib/utils';
-import { deactivateProductAction } from '@/actions/admin.actions';
+import { deactivateProductAction, deleteProductAction } from '@/actions/admin.actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -58,6 +58,10 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
                 <td>
                   <div className="row-actions">
                     <Link href={`/admin/products/${product.id}`}>Edit</Link>
+                    <ActionForm action={deleteProductAction} success="Product deleted." confirmMessage={`Delete "${product.name}" permanently? This cannot be undone.`}>
+                      <input type="hidden" name="id" value={product.id} />
+                      <button className="danger" type="submit">Delete</button>
+                    </ActionForm>
                     {product.is_active ? (
                       <ActionForm action={deactivateProductAction} success="Product hidden."><input type="hidden" name="id" value={product.id} /><button className="danger" type="submit">Hide</button></ActionForm>
                     ) : null}

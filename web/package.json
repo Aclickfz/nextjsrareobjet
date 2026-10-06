@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start -H 0.0.0.0",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:migrate-pdp": "node scripts/migrate-pdp.mjs",
+    "db:seed-products": "node scripts/seed-products.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

@@ -888,3 +888,361 @@
         font-size: 28px;
     }
 }
+
+.purchasing_big__img {
+    position: relative;
+}
+
+.purchasing_big__img .catalog-heart {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    background: transparent;
+    font-size: 24px;
+}
+
+.shop-pdp__caption {
+    margin-top: 10px;
+    color: #6b746e;
+    font-size: 13px;
+}
+
+.shop-pdp__ask {
+    margin-top: 28px;
+    padding-top: 18px;
+    border-top: 1px solid #e8e8e8;
+}
+
+.shop-pdp__ask-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.shop-pdp__ask-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.shop-pdp__ask-chips button {
+    border: 1px solid #ddd;
+    background: #f7f7f7;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 13px;
+}
+
+.shop-pdp__ship {
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+.shop-pdp__options {
+    margin: 20px 0;
+}
+
+.shop-pdp__options-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.shop-pdp__options-head button {
+    border: 0;
+    background: transparent;
+    text-decoration: underline;
+    font-size: 13px;
+}
+
+.shop-pdp__option-toggle {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0;
+    border: 0;
+    border-top: 1px solid #e5e5e5;
+    background: transparent;
+    text-align: left;
+}
+
+.shop-pdp__swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-bottom: 14px;
+}
+
+.shop-pdp__swatches label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 88px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.shop-pdp__swatches img,
+.shop-pdp__swatch-color {
+    width: 88px;
+    height: 88px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+}
+
+.shop-pdp__swatches .active-btn img,
+.shop-pdp__swatches .active-btn .shop-pdp__swatch-color {
+    outline: 2px solid #111;
+    outline-offset: 2px;
+}
+
+.shop-pdp__qty-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.shop-pdp__secondary {
+    background: #fff !important;
+    color: #111 !important;
+    border: 1px solid #111 !important;
+}
+
+.shop-pdp__accordion {
+    margin-top: 28px;
+    border-top: 1px solid #e5e5e5;
+}
+
+.shop-pdp__acc-head {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border: 0;
+    border-bottom: 1px solid #e5e5e5;
+    background: transparent;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.shop-pdp__acc-body {
+    padding: 8px 0 18px;
+}
+
+.shop-pdp__acc-body h3 {
+    font-size: 15px;
+    margin: 14px 0 8px;
+}
+
+.shop-pdp__acc-body ul {
+    padding-left: 18px;
+    margin: 0;
+}
+
+.shop-pdp__dims > div {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 12px;
+    padding: 10px 12px;
+    font-size: 14px;
+}
+
+.shop-pdp__dims > div:nth-child(odd) {
+    background: #f5f5f5;
+}
+
+.shop-pdp__measure {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    text-decoration: underline !important;
+}
+
+.shop-pdp__deciding {
+    margin-top: 24px;
+}
+
+.shop-pdp__deciding h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.shop-pdp__deciding li {
+    border-bottom: 1px solid #ececec;
+}
+
+.shop-pdp__deciding a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 0;
+}
+
+.shop-rail {
+    padding-block: 2rem;
+}
+
+.shop-rail__head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.shop-rail__head h2 {
+    font-size: 22px;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.shop-rail__head::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e5e5e5;
+}
+
+.shop-rail__track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(220px, 1fr);
+    gap: 16px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+.shop-rail__card {
+    min-width: 220px;
+}
+
+.shop-rail__media {
+    position: relative;
+}
+
+.shop-rail__media img {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+}
+
+.shop-rail__media .catalog-heart {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1;
+    border: 0;
+    background: transparent;
+    font-size: 22px;
+}
+
+.shop-rail__badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 11px;
+}
+
+.shop-rail__meta {
+    display: grid;
+    gap: 4px;
+    margin-top: 10px;
+    color: inherit;
+}
+
+.shop-rail__price {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+}
+
+.shop-rail__price .is-sale {
+    color: #b42318;
+}
+
+.shop-rail__meta em {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.shop-rail__empty {
+    color: #666;
+}
+
+.shop-chips {
+    padding-block: 1.5rem;
+    border-top: 1px solid #ececec;
+}
+
+.shop-chips h2,
+.shop-faq h2 {
+    font-size: 22px;
+    margin-bottom: 14px;
+}
+
+.shop-chips__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.shop-chips__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    background: #f3f3f3;
+    border-radius: 4px;
+    color: #111;
+    font-size: 14px;
+}
+
+.shop-faq {
+    padding-block: 1.5rem 3rem;
+}
+
+.shop-faq details {
+    border-top: 1px solid #ececec;
+    padding: 14px 0;
+}
+
+.shop-faq summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.shop-faq summary::-webkit-details-marker {
+    display: none;
+}
+
+.shop-faq p {
+    margin: 10px 0 0 22px;
+    color: #555;
+}
+
+@media (max-width: 767px) {
+    .shop-pdp__dims > div {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+}
+
