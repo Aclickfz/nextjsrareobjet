@@ -1,0 +1,350 @@
+[
+  {
+    "category_slug": "furniture",
+    "name": "Montclair Upholstered Dining Chair",
+    "slug": "montclair-upholstered-dining-chair",
+    "description": "A tailored dining chair with a softly curved back, dense foam seat, and kiln-dried wood frame built for everyday gatherings.",
+    "price": 499,
+    "price_max": 679,
+    "compare_at_price": null,
+    "stock_qty": 24,
+    "sku": "MONT-DC-01",
+    "badge": "Bestseller",
+    "grade_label": "Contract Grade",
+    "collection_key": "montclair",
+    "shown_caption": "Shown in Rustic Chenille Dark Moss with Tuscan Sun Legs.",
+    "free_shipping": 1,
+    "images": [
+      "/assets/images/sofa1.webp",
+      "/assets/images/sofa2.webp",
+      "/assets/images/sofa3.webp",
+      "/assets/images/img2.jpeg",
+      "/assets/images/img3.jpeg"
+    ],
+    "option_groups": [
+      {
+        "name": "Furniture Finish",
+        "options": [
+          { "name": "Blackened Oak", "image": "/assets/images/img4.jpeg" },
+          { "name": "Tuscan Sun", "image": "/assets/images/img5.jpeg" },
+          { "name": "Weathered Chestnut", "image": "/assets/images/img3.jpeg" }
+        ]
+      },
+      {
+        "name": "Fabric and Color",
+        "options": [
+          { "name": "Rustic Chenille Dark Moss", "hex": "#4a5a3c" },
+          { "name": "Natural Linen", "hex": "#d8d0c4" },
+          { "name": "Charcoal Velvet", "hex": "#3a3a3a" }
+        ]
+      }
+    ],
+    "details_sections": [
+      {
+        "title": "Construction",
+        "items": [
+          "Kiln-dried rubberwood frame",
+          "High-resilience foam seat cushion",
+          "Available finishes: Tuscan Sun, Weathered Chestnut, Blackened Oak",
+          "Contract Grade / ANSI/BIFMA tested"
+        ]
+      },
+      {
+        "title": "Care",
+        "items": [
+          "Spot clean with a damp cloth",
+          "Avoid direct sunlight and heat sources",
+          "Professional cleaning recommended for upholstery"
+        ]
+      },
+      {
+        "title": "Assembly",
+        "items": [
+          "Arrives mostly assembled",
+          "White Glove delivery available at checkout"
+        ]
+      }
+    ],
+    "dimensions": [
+      { "label": "Overall", "value": "22\" w x 25\" d x 42.5\" h" },
+      { "label": "Seat", "value": "20.5\" w x 19.5\" d x 18.5\" h" },
+      { "label": "Legs", "value": "2\" w x 2\" d x 16.5\" h" },
+      { "label": "Distance Between Legs", "value": "18.5\" side to side; 19\" front to back" },
+      { "label": "Weight Capacity", "value": "500 lbs" },
+      { "label": "Weight", "value": "16.5 lbs" }
+    ],
+    "faqs": [
+      {
+        "question": "What are the dimensions of the Montclair Upholstered Dining Chair?",
+        "answer": "Overall 22\" w x 25\" d x 42.5\" h. Seat height is 18.5\"."
+      },
+      {
+        "question": "Which finishes and fabrics are available for the Montclair Upholstered Dining Chair?",
+        "answer": "Choose from Blackened Oak, Tuscan Sun, or Weathered Chestnut legs, with multiple fabric and colorways."
+      },
+      {
+        "question": "How do I care for the Montclair Upholstered Dining Chair?",
+        "answer": "Spot clean with a damp cloth and keep out of direct sunlight. Professional cleaning is recommended for deeper soil."
+      }
+    ],
+    "related_searches": [
+      { "label": "Classic Dining Room Chairs", "href": "/search?q=classic%20dining%20chairs" },
+      { "label": "Black Dining Chair", "href": "/search?q=black%20dining%20chair" },
+      { "label": "Brown Dining Chair", "href": "/search?q=brown%20dining%20chair" },
+      { "label": "Durable Dining Room Furniture", "href": "/search?q=durable%20dining%20furniture" }
+    ],
+    "related_category_slugs": [
+      { "label": "Armchair Dining Chairs", "href": "/categories/furniture" },
+      { "label": "Upholstered Dining Benches", "href": "/categories/furniture" },
+      { "label": "Upholstered Dining Chairs", "href": "/categories/furniture" },
+      { "label": "Side Chair All Dining Furniture", "href": "/categories/furniture" },
+      { "label": "Vintage Dining Chairs Stools", "href": "/categories/furniture" }
+    ],
+    "ask_prompts": [
+      "Will it hold up to heavy daily use?",
+      "What is the frame made of?",
+      "Will the seat keep its shape?"
+    ],
+    "paired_slugs": ["gulfport-chair", "montclair-bar-stool"],
+    "collection_slugs": ["montclair-tufted-dining-chair", "montclair-leather-dining-chair", "montclair-bar-stool"],
+    "similar_slugs": ["gulfport-chair", "aptos-lounge-chair"],
+    "still_deciding": [
+      { "label": "Chat with a Design Specialist (5am-7pm PST)", "href": "/contact", "icon": "bx-message-rounded-dots" },
+      { "label": "Request A Free Design Appointment", "href": "/contact", "icon": "bx-home-alt" },
+      { "label": "Order Free Swatches", "href": "/contact", "icon": "bx-palette" },
+      { "label": "View Similar Dining Chairs", "href": "/categories/furniture", "icon": "bx-sparkles" }
+    ]
+  },
+  {
+    "category_slug": "furniture",
+    "name": "Montclair Tufted Upholstered Dining Chair",
+    "slug": "montclair-tufted-dining-chair",
+    "description": "Button-tufted dining chair that pairs with the Montclair collection.",
+    "price": 499,
+    "price_max": 679,
+    "stock_qty": 18,
+    "sku": "MONT-DC-02",
+    "badge": null,
+    "grade_label": "Contract Grade",
+    "collection_key": "montclair",
+    "shown_caption": "Shown in Natural Linen with Blackened Oak Legs.",
+    "free_shipping": 1,
+    "images": ["/assets/images/sofa4.webp", "/assets/images/sofa5.webp"],
+    "option_groups": [],
+    "details_sections": [],
+    "dimensions": [{ "label": "Overall", "value": "22\" w x 25\" d x 42.5\" h" }],
+    "faqs": [],
+    "related_searches": [],
+    "related_category_slugs": [],
+    "ask_prompts": [],
+    "paired_slugs": ["montclair-upholstered-dining-chair"],
+    "collection_slugs": ["montclair-upholstered-dining-chair", "montclair-leather-dining-chair", "montclair-bar-stool"],
+    "similar_slugs": ["gulfport-chair"],
+    "still_deciding": []
+  },
+  {
+    "category_slug": "furniture",
+    "name": "Montclair Leather Dining Chair",
+    "slug": "montclair-leather-dining-chair",
+    "description": "Top-grain leather dining chair with the Montclair silhouette.",
+    "price": 699,
+    "price_max": 889,
+    "stock_qty": 12,
+    "sku": "MONT-DC-03",
+    "badge": "New",
+    "grade_label": null,
+    "collection_key": "montclair",
+    "shown_caption": "Shown in Cognac Leather with Tuscan Sun Legs.",
+    "free_shipping": 1,
+    "images": ["/assets/images/sofa6.webp", "/assets/images/sofa7.webp"],
+    "option_groups": [],
+    "details_sections": [],
+    "dimensions": [],
+    "faqs": [],
+    "related_searches": [],
+    "related_category_slugs": [],
+    "ask_prompts": [],
+    "paired_slugs": [],
+    "collection_slugs": ["montclair-upholstered-dining-chair", "montclair-tufted-dining-chair"],
+    "similar_slugs": [],
+    "still_deciding": []
+  },
+  {
+    "category_slug": "furniture",
+    "name": "Montclair Upholstered Bar & Counter Stool",
+    "slug": "montclair-bar-stool",
+    "description": "Matching bar and counter stool for the Montclair dining family.",
+    "price": 549,
+    "price_max": 729,
+    "stock_qty": 20,
+    "sku": "MONT-BS-01",
+    "badge": null,
+    "grade_label": "Contract Grade",
+    "collection_key": "montclair",
+    "shown_caption": "Shown in Rustic Chenille Dark Moss.",
+    "free_shipping": 1,
+    "images": ["/assets/images/sofa8.webp", "/assets/images/furniture2.jpeg"],
+    "option_groups": [],
+    "details_sections": [],
+    "dimensions": [],
+    "faqs": [],
+    "related_searches": [],
+    "related_category_slugs": [],
+    "ask_prompts": [],
+    "paired_slugs": ["montclair-upholstered-dining-chair"],
+    "collection_slugs": ["montclair-upholstered-dining-chair", "montclair-tufted-dining-chair"],
+    "similar_slugs": [],
+    "still_deciding": []
+  },
+  {
+    "category_slug": "furniture",
+    "name": "Gulfport Chair",
+    "slug": "gulfport-chair",
+    "description": "Deep lounge chair often paired with Montclair dining for living spaces.",
+    "price": 1499,
+    "price_max": null,
+    "stock_qty": 8,
+    "sku": "GULF-CH-01",
+    "badge": "Bestseller",
+    "grade_label": null,
+    "collection_key": "gulfport",
+    "shown_caption": null,
+    "free_shipping": 1,
+    "images": ["/assets/images/furniture3.jpeg", "/assets/images/furniture4.jpeg"],
+    "option_groups": [],
+    "details_sections": [],
+    "dimensions": [],
+    "faqs": [],
+    "related_searches": [],
+    "related_category_slugs": [],
+    "ask_prompts": [],
+    "paired_slugs": ["montclair-upholstered-dining-chair"],
+    "collection_slugs": [],
+    "similar_slugs": ["aptos-lounge-chair"],
+    "still_deciding": []
+  },
+  {
+    "category_slug": "furniture",
+    "name": "Aptos Lounge Chair",
+    "slug": "aptos-lounge-chair",
+    "description": "Relaxed lounge silhouette from the Aptos furniture collection.",
+    "price": 1699,
+    "price_max": 3499,
+    "compare_at_price": null,
+    "stock_qty": 6,
+    "sku": "APT-LC-01",
+    "badge": "Bestseller",
+    "grade_label": null,
+    "collection_key": "aptos",
+    "shown_caption": null,
+    "free_shipping": 0,
+    "images": ["/assets/images/furniture5.jpeg", "/assets/images/collection1.avif"],
+    "option_groups": [],
+    "details_sections": [],
+    "dimensions": [],
+    "faqs": [],
+    "related_searches": [],
+    "related_category_slugs": [],
+    "ask_prompts": [],
+    "paired_slugs": [],
+    "collection_slugs": [],
+    "similar_slugs": ["gulfport-chair"],
+    "still_deciding": []
+  },
+  {
+    "category_slug": "lighting",
+    "name": "Arc Floor Lamp",
+    "slug": "arc-floor-lamp",
+    "description": "Sculptural arc floor lamp with an adjustable shade for living rooms.",
+    "price": 389,
+    "price_max": 459,
+    "stock_qty": 15,
+    "sku": "LGT-ARC-01",
+    "badge": "New",
+    "grade_label": null,
+    "collection_key": "lighting-essentials",
+    "shown_caption": "Shown in Brushed Brass.",
+    "free_shipping": 1,
+    "images": ["/assets/images/mygift1.webp", "/assets/images/mygift2.webp"],
+    "option_groups": [
+      {
+        "name": "Finish",
+        "options": [
+          { "name": "Brushed Brass", "hex": "#c4a35a" },
+          { "name": "Matte Black", "hex": "#222" }
+        ]
+      }
+    ],
+    "details_sections": [
+      {
+        "title": "Construction",
+        "items": ["Weighted marble base", "Adjustable metal arm", "Uses one E26 bulb (not included)"]
+      }
+    ],
+    "dimensions": [
+      { "label": "Overall", "value": "14\" w x 70\" d x 76\" h" },
+      { "label": "Shade", "value": "14\" diameter" }
+    ],
+    "faqs": [
+      {
+        "question": "Is the Arc Floor Lamp dimmable?",
+        "answer": "Yes, when used with a compatible dimmable bulb and wall dimmer."
+      }
+    ],
+    "related_searches": [
+      { "label": "Floor Lamps", "href": "/search?q=floor%20lamps" },
+      { "label": "Brass Lighting", "href": "/search?q=brass%20lighting" }
+    ],
+    "related_category_slugs": [
+      { "label": "Table Lamps", "href": "/categories/lighting" },
+      { "label": "Ceiling Lights", "href": "/categories/lighting" }
+    ],
+    "ask_prompts": ["Will it tip easily?", "What bulb does it take?"],
+    "paired_slugs": ["gulfport-chair"],
+    "collection_slugs": [],
+    "similar_slugs": [],
+    "still_deciding": []
+  },
+  {
+    "category_slug": "bedding",
+    "name": "Washed Linen Duvet Cover",
+    "slug": "washed-linen-duvet-cover",
+    "description": "Stone-washed linen duvet with a soft hand and relaxed drape.",
+    "price": 56,
+    "price_max": 56,
+    "compare_at_price": 56,
+    "stock_qty": 40,
+    "sku": "BED-LIN-01",
+    "badge": "Sale",
+    "grade_label": null,
+    "collection_key": "linen-bedding",
+    "shown_caption": "Shown in Natural.",
+    "free_shipping": 1,
+    "images": ["/assets/images/collection2.avif", "/assets/images/banner.jpg"],
+    "option_groups": [
+      {
+        "name": "Color",
+        "options": [
+          { "name": "Natural", "hex": "#e8dfd0" },
+          { "name": "Fog", "hex": "#b9c0c2" },
+          { "name": "Ink", "hex": "#2c3340" }
+        ]
+      }
+    ],
+    "details_sections": [
+      {
+        "title": "Care",
+        "items": ["Machine wash cold", "Tumble dry low", "Iron on low if desired"]
+      }
+    ],
+    "dimensions": [{ "label": "Queen", "value": "88\" x 92\"" }],
+    "faqs": [],
+    "related_searches": [{ "label": "Linen Bedding", "href": "/search?q=linen%20bedding" }],
+    "related_category_slugs": [{ "label": "Bedding", "href": "/categories/bedding" }],
+    "ask_prompts": [],
+    "paired_slugs": [],
+    "collection_slugs": [],
+    "similar_slugs": [],
+    "still_deciding": []
+  }
+]
