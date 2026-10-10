@@ -17,6 +17,9 @@ CREATE TABLE IF NOT EXISTS categories (
   name VARCHAR(200) NOT NULL,
   slug VARCHAR(200) NOT NULL,
   image VARCHAR(500) NULL,
+  parent_id INT NULL,
+  sort_order INT NOT NULL DEFAULT 0,
+  KEY idx_categories_parent (parent_id, sort_order),
   is_active TINYINT(1) NOT NULL DEFAULT 1,
   UNIQUE KEY uniq_categories_slug (slug)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -24,6 +27,8 @@ CREATE TABLE IF NOT EXISTS categories (
 CREATE TABLE IF NOT EXISTS products (
   id INT AUTO_INCREMENT PRIMARY KEY,
   category_id INT NULL,
+  sort_order INT NOT NULL DEFAULT 0,
+  KEY idx_products_category_sort (category_id, sort_order),
   name VARCHAR(255) NOT NULL,
   slug VARCHAR(200) NOT NULL,
   description TEXT NULL,
@@ -35,7 +40,7 @@ CREATE TABLE IF NOT EXISTS products (
   badge VARCHAR(80) NULL,
   grade_label VARCHAR(80) NULL,
   collection_key VARCHAR(120) NULL,
-  shown_caption VARCHAR(255) NULL,
+  shown_caption LONGTEXT NULL,
   free_shipping TINYINT(1) NOT NULL DEFAULT 0,
   option_groups JSON NULL,
   details_sections JSON NULL,

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ProductGrid } from '@/components/product/ProductGrid';
-import { getCategory } from '@/repositories/catalog.repository';
+import { navigationCategories, getCategory } from '@/repositories/catalog.repository';
 import { listProducts } from '@/services/product.service';
 
 export const dynamic = 'force-dynamic';
@@ -46,11 +46,14 @@ export default async function CategoryPage({ params, searchParams }: { params: P
     category = null;
   }
   if (!category) notFound();
+  const children = (await navigationCategories()).filter(c => c.parent_id === category.id);
   return (
+    <>
+    {children.length > 0 && <nav aria-label="Subcategories" style={{ display: 'flex', flexWrap: 'wrap', gap: 20, padding: 24 }}>{children.map(c => <a key={c.id} href={`/categories/${c.slug}`}>{c.name}</a>)}</nav>}
     <ProductGrid
       products={products}
       heading={category.name}
-      sort={query.sort}
+      sort={query.sort || 'featured'}
       category={slug}
       action={`/categories/${slug}`}
       total={total}
@@ -58,5 +61,6 @@ export default async function CategoryPage({ params, searchParams }: { params: P
       max={query.max}
       inStock={query.stock === '1'}
     />
+    </>
   );
 }

@@ -3,6 +3,7 @@ import { ProductAdminFields, ProductAdminShell } from '@/components/admin/Produc
 import { notFound } from 'next/navigation';
 import { saveProductAction } from '@/actions/admin.actions';
 import { query } from '@/lib/db';
+import { adminCategories } from '@/repositories/catalog.repository';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +12,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
   const rows = await query<Record<string, string | number | null>[]>('SELECT * FROM products WHERE id = :id', { id: Number(id) });
   const product = rows[0];
   if (!product) notFound();
-  const categories = await query<{ id: number; name: string }[]>('SELECT id, name FROM categories ORDER BY name');
+  const categories = await adminCategories();
   const images = await query<{ id: number; path: string; is_primary: number }[]>(
     'SELECT id, path, is_primary FROM product_images WHERE product_id = :id ORDER BY is_primary DESC, sort_order ASC',
     { id: Number(id) }

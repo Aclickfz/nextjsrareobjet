@@ -29,6 +29,8 @@ model Category {
   id       Int     @id @default(autoincrement())
   name     String
   slug     String  @unique
+  parentId Int? @map("parent_id")
+  sortOrder Int @default(0) @map("sort_order")
   image    String?
   isActive Int     @default(1) @map("is_active")
 
@@ -38,6 +40,7 @@ model Category {
 model Product {
   id                   Int       @id @default(autoincrement())
   categoryId           Int?      @map("category_id")
+  sortOrder            Int @default(0) @map("sort_order")
   name                 String
   slug                 String    @unique
   description          String?   @db.Text
@@ -49,7 +52,7 @@ model Product {
   badge                String?
   gradeLabel           String?   @map("grade_label")
   collectionKey        String?   @map("collection_key")
-  shownCaption         String?   @map("shown_caption")
+  shownCaption         String?   @map("shown_caption") @db.LongText
   freeShipping         Int       @default(0) @map("free_shipping")
   optionGroups         Json?     @map("option_groups")
   detailsSections      Json?     @map("details_sections")

@@ -67,8 +67,9 @@ export function ProductGrid({
                 {min ? <input type="hidden" name="min" value={min} /> : null}
                 {max ? <input type="hidden" name="max" value={max} /> : null}
                 {inStock ? <input type="hidden" name="stock" value="1" /> : null}
-                <select className="form-select" name="sort" defaultValue={sort || 'newest'} aria-label="Sort products" onChange={(event) => event.currentTarget.form?.requestSubmit()}>
-                  <option value="newest">Featured</option>
+                <select className="form-select" name="sort" defaultValue={sort || (category ? 'featured' : 'newest')} aria-label="Sort products" onChange={(event) => event.currentTarget.form?.requestSubmit()}>
+                  <option value="featured">Featured</option>
+                  <option value="newest">Newest</option>
                   <option value="price-low">Price: low to high</option>
                   <option value="price-high">Price: high to low</option>
                   <option value="name">Name: A to Z</option>
@@ -80,7 +81,7 @@ export function ProductGrid({
             <form className="shop-filters" action={action} method="get">
               {q ? <input type="hidden" name="q" value={q} /> : null}
               {category && !action.startsWith('/categories/') ? <input type="hidden" name="category" value={category} /> : null}
-              <input type="hidden" name="sort" value={sort || 'newest'} />
+              <input type="hidden" name="sort" value={sort || (category ? 'featured' : 'newest')} />
               <label>Min price<input name="min" type="number" min={0} step="1" defaultValue={min || ''} /></label>
               <label>Max price<input name="max" type="number" min={0} step="1" defaultValue={max || ''} /></label>
               <label className="shop-filters__check"><input type="checkbox" name="stock" value="1" defaultChecked={inStock} /> In stock</label>
