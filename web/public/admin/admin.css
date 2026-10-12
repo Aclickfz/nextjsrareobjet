@@ -121,7 +121,11 @@
 .pill.off { background: #f6eeee; color: var(--bad); }
 .pill.warn { background: #f8f1e6; color: var(--warn); }
 .row-actions { display: flex; gap: 12px; align-items: center; }
+.category-row-actions { display: flex; flex-wrap: nowrap; gap: 12px; align-items: center; white-space: nowrap; }
+.category-row-actions form { margin: 0; }
+.category-row-actions .action-form-fields { display: flex; align-items: center; }
 .row-actions a { color: var(--accent); font-weight: 650; text-decoration: none; }
+.category-row-actions a { color: var(--accent); font-weight: 650; text-decoration: none; }
 .muted { color: var(--muted); font-size: 13px; }
 .order-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
 @media (max-width: 900px) {

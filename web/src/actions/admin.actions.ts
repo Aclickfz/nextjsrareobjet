@@ -1,17 +1,26 @@
 'use server';
 
+import { isRedirectError } from 'next/dist/client/components/redirect-error';
+import { AdminValidationError, type AdminActionResult } from '@/lib/admin-action-result';
+import { validateAdminUpload, validateProductForm } from '@/lib/admin-validation';
+
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import fs from 'fs';
 import path from 'path';
 import { requireAdmin } from './auth.actions';
 import { query, getPool } from '@/lib/db';
-import { categoryPath, nonNegativeInteger } from '@/lib/catalog-tree';
+import { categoryPath, nonNegativeInteger as parseNonNegativeInteger } from '@/lib/catalog-tree';
 import { adminCategories, STORE_NAV } from '@/repositories/catalog.repository';
 import { slugify } from '@/lib/utils';
 import { buildProductContent, type ContentKey } from '@/lib/product-content-fields';
 import { updateOrderStatus } from '@/repositories/order.repository';
 import type { ResultSetHeader } from 'mysql2/promise';
+
+function nonNegativeInteger(value: unknown) {
+  try { return parseNonNegativeInteger(value); }
+  catch { throw new AdminValidationError('Enter a valid non-negative whole number.'); }
+}
 
 export async function dashboardData() {
   await requireAdmin();
@@ -34,11 +43,12 @@ export async function dashboardData() {
   return { stats: stats[0], recentOrders, lowStock };
 }
 
-export async function saveProductAction(formData: FormData) {
+async function saveProductActionImpl(formData: FormData) {
   await requireAdmin();
+  validateProductForm(formData);
   const id = Number(formData.get('id') || 0);
   const name = String(formData.get('name') || '').trim();
-  if (!name) throw new Error('Name required');
+  if (!name) throw new AdminValidationError('Name required');
   let slug = slugify(String(formData.get('slug') || name));
   const clash = await query<{ id: number }[]>('SELECT id FROM products WHERE slug = :slug AND id <> :id', { slug, id: id || 0 });
   if (clash.length) slug = `${slug}-${Date.now().toString(36)}`;
@@ -47,7 +57,7 @@ export async function saveProductAction(formData: FormData) {
 
   const categoryId = Number(formData.get('category_id') || 0);
   const categories = await adminCategories();
-  if (!Number.isSafeInteger(categoryId) || categoryId <= 0 || !categories.some(c => c.id === categoryId)) throw new Error('Select a valid category or subcategory');
+  if (!Number.isSafeInteger(categoryId) || categoryId <= 0 || !categories.some(c => c.id === categoryId)) throw new AdminValidationError('Select a valid category or subcategory');
   const data = {
     sort_order: nonNegativeInteger(formData.get('sort_order') || 0),
     category_id: categoryId,
@@ -116,7 +126,11 @@ export async function saveProductAction(formData: FormData) {
     );
   }
   const gallery = formData.getAll('gallery');
-  let sort = 1;
+  const sortRows = await query<{ next_sort: number }[]>(
+    'SELECT COALESCE(MAX(sort_order), 0) + 1 AS next_sort FROM product_images WHERE product_id = :product_id AND is_primary = 0',
+    { product_id: productId }
+  );
+  let sort = Number(sortRows[0]?.next_sort || 1);
   for (const file of gallery) {
     const extra = await storeUpload(file, 'products');
     if (!extra) continue;
@@ -129,13 +143,37 @@ export async function saveProductAction(formData: FormData) {
   revalidatePath('/admin/products');
   revalidatePath(`/products/${slug}`);
   revalidatePath('/', 'layout');
-  redirect('/admin/products');
+  redirect(`/admin/products/${productId}`);
 }
 
-export async function deleteProductAction(formData: FormData) {
+async function deleteProductGalleryImageActionImpl(formData: FormData) {
+  await requireAdmin();
+  const productId = Number(formData.get('product_id'));
+  const imageId = Number(formData.get('image_id'));
+  if (!Number.isSafeInteger(productId) || productId <= 0 || !Number.isSafeInteger(imageId) || imageId <= 0) {
+    throw new AdminValidationError('Invalid product image');
+  }
+  const images = await query<{ slug: string }[]>(
+    `SELECT p.slug FROM product_images pi
+     JOIN products p ON p.id = pi.product_id
+     WHERE pi.id = :image_id AND pi.product_id = :product_id AND pi.is_primary = 0`,
+    { image_id: imageId, product_id: productId }
+  );
+  if (!images.length) throw new AdminValidationError('Gallery image not found');
+  await getPool().execute(
+    'DELETE FROM product_images WHERE id = :image_id AND product_id = :product_id AND is_primary = 0',
+    { image_id: imageId, product_id: productId }
+  );
+  revalidatePath(`/admin/products/${productId}`);
+  revalidatePath('/admin/products');
+  revalidatePath(`/products/${images[0].slug}`);
+  revalidatePath('/', 'layout');
+}
+
+async function deleteProductActionImpl(formData: FormData) {
   await requireAdmin();
   const id = Number(formData.get('id'));
-  if (!Number.isSafeInteger(id) || id <= 0) throw new Error('Invalid product ID');
+  if (!Number.isSafeInteger(id) || id <= 0) throw new AdminValidationError('Invalid product ID');
   const conn = await getPool().getConnection();
   try {
     await conn.beginTransaction();
@@ -158,25 +196,25 @@ export async function deleteProductAction(formData: FormData) {
   revalidatePath('/', 'layout');
 }
 
-export async function deactivateProductAction(formData: FormData) {
+async function deactivateProductActionImpl(formData: FormData) {
   await requireAdmin();
   await getPool().execute('UPDATE products SET is_active = 0 WHERE id = :id', { id: Number(formData.get('id')) });
   revalidatePath('/admin/products');
 }
 
-export async function adjustStockAction(formData: FormData) {
+async function adjustStockActionImpl(formData: FormData) {
   const admin = await requireAdmin();
   const id = Number(formData.get('product_id'));
   const change = Number(formData.get('change_qty'));
   const note = String(formData.get('note') || '');
-  if (!id || !change) throw new Error('Product and quantity change are required');
+  if (!Number.isSafeInteger(id) || id <= 0 || !Number.isSafeInteger(change) || !change) throw new AdminValidationError('Choose a product and enter a non-zero whole number for the stock change.', { change_qty: ['Enter a non-zero whole number.'] });
   const conn = await getPool().getConnection();
   try {
     await conn.beginTransaction();
     const [rows] = await conn.execute('SELECT stock_qty FROM products WHERE id = :id FOR UPDATE', { id });
     const product = (rows as { stock_qty: number }[])[0];
-    if (!product) throw new Error('Product not found');
-    if (product.stock_qty + change < 0) throw new Error('Stock cannot go below zero');
+    if (!product) throw new AdminValidationError('Product not found');
+    if (product.stock_qty + change < 0) throw new AdminValidationError('Stock cannot go below zero');
     await conn.execute('UPDATE products SET stock_qty = stock_qty + :change WHERE id = :id', { change, id });
     await conn.execute(
       `INSERT INTO inventory_logs (product_id, change_qty, reason, created_by, note) VALUES (:id, :change, 'adjust', :uid, :note)`,
@@ -194,7 +232,7 @@ export async function adjustStockAction(formData: FormData) {
 
 async function storeUpload(file: FormDataEntryValue | null, folder: string) {
   if (!(file instanceof File) || file.size === 0) return null;
-  if (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) throw new Error('Images only, max 5MB');
+  if (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) throw new AdminValidationError('Images only, max 5MB');
   const dir = path.join(process.cwd(), 'public', 'uploads', folder);
   fs.mkdirSync(dir, { recursive: true });
   const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
@@ -203,28 +241,28 @@ async function storeUpload(file: FormDataEntryValue | null, folder: string) {
   return `uploads/${folder}/${filename}`;
 }
 
-export async function saveCategoryAction(formData: FormData) {
+async function saveCategoryActionImpl(formData: FormData) {
   await requireAdmin();
   const id = nonNegativeInteger(formData.get('id') || 0);
   const categories = await adminCategories();
   const existing = categories.find(c => c.id === id);
-  if (id && !existing) throw new Error('Category not found');
-  if (existing && STORE_NAV.some(root => root.slug === existing.slug)) throw new Error('Top categories are fixed');
+  if (id && !existing) throw new AdminValidationError('Category not found');
+  if (existing && STORE_NAV.some(root => root.slug === existing.slug)) throw new AdminValidationError('Top categories are fixed');
   const parent_id = nonNegativeInteger(formData.get('parent_id') || 0);
   const parent = categories.find(c => c.id === parent_id);
-  if (!parent) throw new Error('Choose a parent category');
+  if (!parent) throw new AdminValidationError('Choose a parent category');
   const ancestors = categoryPath(categories, parent_id);
-  if (ancestors.length > 3 || !STORE_NAV.some(root => root.slug === ancestors[0]?.slug) || ancestors.some(c => c.id === id)) throw new Error('Choose a top category, category or subcategory as parent');
+  if (ancestors.length > 3 || !STORE_NAV.some(root => root.slug === ancestors[0]?.slug) || ancestors.some(c => c.id === id)) throw new AdminValidationError('Choose a top category, category or subcategory as parent');
   if (id) {
     const descendants = categories.filter(c => categoryPath(categories, c.id).some(p => p.id === id));
     const height = Math.max(...descendants.map(c => categoryPath(categories, c.id).length - categoryPath(categories, id).length), 0);
-    if (ancestors.length + 1 + height > 4) throw new Error('Move child subcategories first');
+    if (ancestors.length + 1 + height > 4) throw new AdminValidationError('Move child subcategories first');
   }
   const name = String(formData.get('name') || '').trim();
   const slug = slugify(String(formData.get('slug') || name));
-  if (!name || name.length > 200 || !slug || slug.length > 200) throw new Error('Enter a valid name and slug (max 200 characters)');
-  if (STORE_NAV.some(root => root.slug === slug)) throw new Error('This slug belongs to a fixed top category');
-  if (categories.some(c => c.slug === slug && c.id !== id)) throw new Error('Slug already exists');
+  if (!name || name.length > 200 || !slug || slug.length > 200) throw new AdminValidationError('Enter a valid name and slug (max 200 characters)');
+  if (STORE_NAV.some(root => root.slug === slug)) throw new AdminValidationError('This slug belongs to a fixed top category');
+  if (categories.some(c => c.slug === slug && c.id !== id)) throw new AdminValidationError('Slug already exists');
   const image = await storeUpload(formData.get('image_file'), 'categories') || existing?.image || null;
   const data = { id, name, slug, image, parent_id, sort_order: nonNegativeInteger(formData.get('sort_order') || 0), is_active: formData.get('is_active') === '0' ? 0 : 1 };
   await getPool().execute(id
@@ -233,7 +271,7 @@ export async function saveCategoryAction(formData: FormData) {
   revalidatePath('/', 'layout');
 }
 
-export async function deleteCategoryAction(formData: FormData) {
+async function deleteCategoryActionImpl(formData: FormData) {
   await requireAdmin();
   const id = nonNegativeInteger(formData.get('id'));
   const conn = await getPool().getConnection();
@@ -241,17 +279,17 @@ export async function deleteCategoryAction(formData: FormData) {
     await conn.beginTransaction();
     const [rows] = await conn.execute('SELECT slug FROM categories WHERE id=:id FOR UPDATE', { id });
     const category = (rows as { slug: string }[])[0];
-    if (!category || STORE_NAV.some(root => root.slug === category.slug)) throw new Error('Top categories are fixed');
+    if (!category || STORE_NAV.some(root => root.slug === category.slug)) throw new AdminValidationError('Top categories are fixed');
     const [children] = await conn.execute('SELECT id FROM categories WHERE parent_id=:id LIMIT 1', { id });
     const [products] = await conn.execute('SELECT id FROM products WHERE category_id=:id LIMIT 1', { id });
-    if ((children as unknown[]).length || (products as unknown[]).length) throw new Error('Move products and child categories before deleting this category');
+    if ((children as unknown[]).length || (products as unknown[]).length) throw new AdminValidationError('Move products and child categories before deleting this category');
     await conn.execute('DELETE FROM categories WHERE id=:id', { id });
     await conn.commit();
   } catch (error) { await conn.rollback(); throw error; } finally { conn.release(); }
   revalidatePath('/', 'layout');
 }
 
-export async function saveTrackingAction(formData: FormData) {
+async function saveTrackingActionImpl(formData: FormData) {
   await requireAdmin();
   const { ensureOrderTrackingColumns } = await import('@/repositories/order.repository');
   await ensureOrderTrackingColumns();
@@ -268,7 +306,7 @@ export async function saveTrackingAction(formData: FormData) {
   revalidatePath(`/admin/orders/${id}`);
 }
 
-export async function orderStatusAction(formData: FormData) {
+async function orderStatusActionImpl(formData: FormData) {
   const admin = await requireAdmin();
   const id = Number(formData.get('id'));
   const status = String(formData.get('status') || '');
@@ -277,11 +315,65 @@ export async function orderStatusAction(formData: FormData) {
   revalidatePath(`/admin/orders/${id}`);
 }
 
-export async function saveCustomerAction(formData: FormData) {
+async function saveCustomerActionImpl(formData: FormData) {
   await requireAdmin();
   await getPool().execute(
     "UPDATE users SET notes = :notes, phone = :phone WHERE id = :id AND role = 'customer'",
     { notes: String(formData.get('notes') || ''), phone: String(formData.get('phone') || ''), id: Number(formData.get('id')) }
   );
   revalidatePath('/admin/customers');
+}
+
+// Return expected errors explicitly: production Server Actions redact thrown messages.
+async function runAdminAction(action: (data: FormData) => Promise<void>, data: FormData): Promise<AdminActionResult | void> {
+  try {
+    await requireAdmin();
+    validateAdminUpload(data);
+    await action(data);
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    if (error instanceof AdminValidationError) return { error: error.message, fieldErrors: error.fieldErrors };
+    console.error('Admin action failed', error);
+    return { error: 'Unable to save these changes. Please try again.' };
+  }
+}
+
+export async function saveProductAction(data: FormData): Promise<AdminActionResult | void> {
+  return runAdminAction(saveProductActionImpl, data);
+}
+
+export async function deleteProductGalleryImageAction(data: FormData): Promise<AdminActionResult | void> {
+  return runAdminAction(deleteProductGalleryImageActionImpl, data);
+}
+
+export async function deleteProductAction(data: FormData): Promise<AdminActionResult | void> {
+  return runAdminAction(deleteProductActionImpl, data);
+}
+
+export async function deactivateProductAction(data: FormData): Promise<AdminActionResult | void> {
+  return runAdminAction(deactivateProductActionImpl, data);
+}
+
+export async function adjustStockAction(data: FormData): Promise<AdminActionResult | void> {
+  return runAdminAction(adjustStockActionImpl, data);
+}
+
+export async function saveCategoryAction(data: FormData): Promise<AdminActionResult | void> {
+  return runAdminAction(saveCategoryActionImpl, data);
+}
+
+export async function deleteCategoryAction(data: FormData): Promise<AdminActionResult | void> {
+  return runAdminAction(deleteCategoryActionImpl, data);
+}
+
+export async function saveTrackingAction(data: FormData): Promise<AdminActionResult | void> {
+  return runAdminAction(saveTrackingActionImpl, data);
+}
+
+export async function orderStatusAction(data: FormData): Promise<AdminActionResult | void> {
+  return runAdminAction(orderStatusActionImpl, data);
+}
+
+export async function saveCustomerAction(data: FormData): Promise<AdminActionResult | void> {
+  return runAdminAction(saveCustomerActionImpl, data);
 }

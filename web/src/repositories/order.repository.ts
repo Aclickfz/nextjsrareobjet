@@ -1,4 +1,5 @@
 import type { PoolConnection, ResultSetHeader } from 'mysql2/promise';
+import { AdminValidationError } from '@/lib/admin-action-result';
 import { getPool, query } from '@/lib/db';
 import { canTransition, invoiceNumber, nextPaymentStatus, orderNumber } from '@/lib/utils';
 import { clearCart, loadCart } from './cart.repository';
@@ -167,9 +168,9 @@ async function adjustStock(conn: PoolConnection, productId: number, changeQty: n
 
 export async function updateOrderStatus(orderId: number, nextStatus: string, adminId: number, markPaid?: boolean) {
   const order = await loadOrder(orderId, null, true);
-  if (!order) throw new Error('Order not found');
+  if (!order) throw new AdminValidationError('Order not found');
   if (!canTransition(String(order.status), nextStatus)) {
-    throw new Error(`Cannot move from ${order.status} to ${nextStatus}`);
+    throw new AdminValidationError(`Cannot move from ${order.status} to ${nextStatus}`);
   }
   const conn = await getPool().getConnection();
   try {
@@ -182,7 +183,7 @@ export async function updateOrderStatus(orderId: number, nextStatus: string, adm
           { id: item.product_id }
         );
         const product = (locked as { stock_qty: number }[])[0];
-        if (!product || product.stock_qty < item.qty) throw new Error(`Insufficient stock for ${item.name_snapshot}`);
+        if (!product || product.stock_qty < item.qty) throw new AdminValidationError(`Insufficient stock for ${item.name_snapshot}`);
         await adjustStock(conn, item.product_id, -item.qty, 'order', orderId, adminId, `Order ${order.order_number}`);
       }
       await conn.execute('UPDATE orders SET stock_deducted = 1 WHERE id = :id', { id: orderId });

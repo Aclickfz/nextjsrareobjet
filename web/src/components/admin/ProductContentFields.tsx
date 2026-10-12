@@ -1,4 +1,7 @@
 'use client';
+import { AdminInput, AdminTextarea } from '@/components/admin/AdminControls';
+import { AdminButton } from '@/components/admin/AdminForm';
+
 import { useRef, useState } from 'react';
 import { contentFields, contentRows, type ContentKey, type ContentRow } from '@/lib/product-content-fields';
 
@@ -12,12 +15,12 @@ function ContentEditor({ field, value }: { field: ContentKey; value: unknown }) 
     {rows.map(row => <div key={row.id} style={{ padding: 12, marginBottom: 12, border: '1px solid #ddd', borderRadius: 6 }}>
       <div className="form-grid">{config.fields.map((label, index) => <label key={index}>{label}
         {(field === 'details_sections' && index === 1) || (field === 'faqs' && index === 1)
-          ? <textarea name={`${field}_${index}`} rows={3} value={row.values[index] || ''} onChange={e => update(row.id, index, e.target.value)} />
-          : <input name={`${field}_${index}`} value={row.values[index] || ''} onChange={e => update(row.id, index, e.target.value)} />}
+          ? <AdminTextarea name={`${field}_${index}`} rows={3} value={row.values[index] || ''} onChange={e => update(row.id, index, e.target.value)} />
+          : <AdminInput name={`${field}_${index}`} value={row.values[index] || ''} onChange={e => update(row.id, index, e.target.value)} />}
       </label>)}</div>
-      <button type="button" onClick={() => setRows(current => current.filter(item => item.id !== row.id))}>Remove row</button>
+      <AdminButton type="button" onClick={() => setRows(current => current.filter(item => item.id !== row.id))}>Remove row</AdminButton>
     </div>)}
-    <button type="button" onClick={() => { const id = nextId.current++; setRows(current => [...current, { id, values: config.fields.map(() => '') as ContentRow }]); }}>Add {field === 'option_groups' ? 'option' : 'row'}</button>
+    <AdminButton type="button" onClick={() => { const id = nextId.current++; setRows(current => [...current, { id, values: config.fields.map(() => '') as ContentRow }]); }}>Add {field === 'option_groups' ? 'option' : 'row'}</AdminButton>
   </section>;
 }
 

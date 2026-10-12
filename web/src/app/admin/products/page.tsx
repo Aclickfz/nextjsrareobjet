@@ -1,4 +1,6 @@
-import { ActionForm } from '@/components/ui/ActionForm';
+import { AdminInput, AdminSelect } from '@/components/admin/AdminControls';
+import { AdminButton, AdminFilterForm } from '@/components/admin/AdminForm';
+import { AdminActionForm as ActionForm } from '@/components/admin/AdminForm';
 import Link from 'next/link';
 import { adminCategories } from '@/repositories/catalog.repository';
 import { categoryPath } from '@/lib/catalog-tree';
@@ -35,16 +37,16 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
           <h2>Products</h2>
           <p>Create, edit, and hide catalog items by category.</p>
         </div>
-        <Link className="btn" href="/admin/products/new">Add product</Link>
+        <AdminButton asChild><Link className="tw:text-white" href="/admin/products/new">Add product</Link></AdminButton>
       </div>
-      <form className="filters">
-        <input type="search" name="q" defaultValue={q || ''} placeholder="Search name or SKU" />
-        <select name="category" defaultValue={category || ''}>
+      <AdminFilterForm className="filters" key={`${q || ''}-${category || ''}`}>
+        <AdminInput type="search" name="q" aria-label="Search products" defaultValue={q || ''} placeholder="Search name or SKU" />
+        <AdminSelect name="category" aria-label="Filter by category" defaultValue={category || ''}>
           <option value="">All categories</option>
           {categories.map((item) => <option key={item.id} value={item.id}>{categoryPath(categories, item.id).map(c => c.name).join(" / ")}</option>)}
-        </select>
-        <button type="submit">Filter</button>
-      </form>
+        </AdminSelect>
+        <AdminButton type="submit">Filter</AdminButton>
+      </AdminFilterForm>
       <div className="panel">
         <table className="admin-table">
           <thead><tr><th></th><th>Product</th><th>SKU</th><th>Price</th><th>Stock</th><th>Status</th><th></th></tr></thead>
@@ -61,11 +63,11 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
                   <div className="row-actions">
                     <Link href={`/admin/products/${product.id}`}>Edit</Link>
                     <ActionForm action={deleteProductAction} success="Product deleted." confirmMessage={`Delete "${product.name}" permanently? This cannot be undone.`}>
-                      <input type="hidden" name="id" value={product.id} />
-                      <button className="danger" type="submit">Delete</button>
+                      <AdminInput type="hidden" name="id" value={product.id} />
+                      <AdminButton variant="destructive" size="sm" type="submit">Delete</AdminButton>
                     </ActionForm>
                     {product.is_active ? (
-                      <ActionForm action={deactivateProductAction} success="Product hidden."><input type="hidden" name="id" value={product.id} /><button className="danger" type="submit">Hide</button></ActionForm>
+                      <ActionForm action={deactivateProductAction} success="Product hidden."><AdminInput type="hidden" name="id" value={product.id} /><AdminButton variant="destructive" size="sm" type="submit">Hide</AdminButton></ActionForm>
                     ) : null}
                   </div>
                 </td>

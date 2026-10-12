@@ -1,4 +1,5 @@
-import { ActionForm } from '@/components/ui/ActionForm';
+import { AdminButton } from '@/components/admin/AdminForm';
+import { AdminActionForm as ActionForm } from '@/components/admin/AdminForm';
 import { ProductAdminFields, ProductAdminShell } from '@/components/admin/ProductAdminFields';
 import { notFound } from 'next/navigation';
 import { saveProductAction } from '@/actions/admin.actions';
@@ -19,9 +20,9 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
   );
   return (
     <ProductAdminShell title="Edit product" subtitle={String(product.name)}>
-      <ActionForm className="admin-form" action={saveProductAction} success="Product saved." successPath="/admin/products">
+      <ActionForm className="admin-form" validation="product" action={saveProductAction} success="Product saved." successPath={`/admin/products/${id}`}>
         <ProductAdminFields product={product} categories={categories} images={images} />
-        <button type="submit">Save product</button>
+        <AdminButton type="submit">Save product</AdminButton>
       </ActionForm>
     </ProductAdminShell>
   );
