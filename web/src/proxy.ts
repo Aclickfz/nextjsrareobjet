@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export function middleware(request: Request) {
+export function proxy(request: Request) {
   const response = NextResponse.next();
   const pathname = new URL(request.url).pathname;
   if (['/verify-email', '/reset-password'].includes(pathname)) {

@@ -1,3 +1,5 @@
+import { AdminInput } from '@/components/admin/AdminControls';
+import { AdminButton, AdminFilterForm } from '@/components/admin/AdminForm';
 import { query } from '@/lib/db';
 import { money } from '@/lib/utils';
 
@@ -20,11 +22,11 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
   return (
     <>
       <div className="page-head"><div><h2>Sales</h2><p>Confirmed, shipped, and delivered orders.</p></div></div>
-      <form>
-        <input type="date" name="from" defaultValue={from || ''} />
-        <input type="date" name="to" defaultValue={to || ''} />
-        <button type="submit">Filter</button>
-      </form>
+      <AdminFilterForm className="filters" key={`${from || ''}-${to || ''}`}>
+        <AdminInput type="date" name="from" aria-label="From date" defaultValue={from || ''} />
+        <AdminInput type="date" name="to" aria-label="To date" defaultValue={to || ''} />
+        <AdminButton type="submit">Filter</AdminButton>
+      </AdminFilterForm>
       <table className="admin-table">
         <thead><tr><th>Day</th><th>Orders</th><th>Revenue</th></tr></thead>
         <tbody>{daily.map((row) => <tr key={row.day}><td>{row.day}</td><td>{row.orders}</td><td>{money(Number(row.revenue))}</td></tr>)}</tbody>

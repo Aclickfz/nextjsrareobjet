@@ -1,7 +1,7 @@
 export function HomeMain() {
   return (
     <>
-<main id="main-content" tabIndex={-1}>
+<main id="main-content" className="home-page" tabIndex={-1}>
     <section className="banner_wrapper">
         <div className="banner_slider">
             <div className="banner_video global_section">

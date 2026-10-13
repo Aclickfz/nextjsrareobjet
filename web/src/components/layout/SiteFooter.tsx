@@ -11,7 +11,7 @@ export function SiteFooter() {
                             <h6 data-footer-toggle="footer-customer-service">Customer Service</h6>
                             <div className="footer_links" id="footer-customer-service">
                                 <a href="/contact">Contact Us</a>
-                                <a href="#">Track Your Order</a>
+                                <a href="/track-order">Track Your Order</a>
                                 <a href="#"> Returns & Exchanges</a>
                                 <a href="#">Shipping Information</a>
                                 <a href="#">International Orders</a>

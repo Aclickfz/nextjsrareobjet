@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import ts from 'typescript';
+const source=fs.readFileSync(new URL('../src/lib/product-content-fields.ts',import.meta.url),'utf8');
+const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;
+const {buildProductContent:build,contentRows,contentFields}=await import(`data:text/javascript;base64,${Buffer.from(code).toString('base64')}`);
+const form=new FormData();
+const add=(key,rows)=>rows.forEach(row=>row.forEach((value,index)=>form.append(`${key}_${index}`,value)));
+add('option_groups',[['Finish','Oak','/oak.jpg','#abc'],['Finish','Walnut','',''],['Size','Large','','']]);
+assert.deepEqual(JSON.parse(build('option_groups',form)),[{name:'Finish',options:[{name:'Oak',image:'/oak.jpg',hex:'#abc'},{name:'Walnut'}]},{name:'Size',options:[{name:'Large'}]}]);
+add('details_sections',[['Care','\u2022 Wipe clean\n- Keep dry']]);
+assert.deepEqual(JSON.parse(build('details_sections',form)),[{title:'Care',items:['Wipe clean','Keep dry']}]);
+add('dimensions',[['Height','24 in']]);
+add('faqs',[['Assembly?','No']]);
+add('related_searches',[['Lamps','/search?q=lamp']]);
+add('related_category_slugs',[['Furniture','/categories/furniture']]);
+add('ask_prompts',[['What size?']]);
+add('paired_slugs',[['table-lamp']]);
+add('collection_slugs',[['oak-table']]);
+add('similar_slugs',[['floor-lamp']]);
+add('still_deciding',[['Contact us','/contact','bx-chat']]);
+for(const key of Object.keys(contentFields)) {
+ assert.equal(build(key,new FormData()),null);
+ const stored=build(key,form);
+ const rows=contentRows(key,stored);
+ assert.ok(rows.length>0);
+ const edit=new FormData();rows.forEach(row=>row.forEach((value,index)=>edit.append(`${key}_${index}`,value)));
+ assert.deepEqual(JSON.parse(build(key,edit)),JSON.parse(stored),`${key} edit round trip`);
+}
+const blanks=new FormData();blanks.append('dimensions_0','');blanks.append('dimensions_1','');assert.equal(build('dimensions',blanks),null);
+console.log('PASS: normal form fields, option grouping, bullets, blank optional content and edit round trips for all content fields.');

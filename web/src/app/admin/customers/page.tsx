@@ -1,4 +1,6 @@
-import { ActionForm } from '@/components/ui/ActionForm';
+import { AdminInput, AdminTextarea } from '@/components/admin/AdminControls';
+import { AdminButton, AdminFilterForm } from '@/components/admin/AdminForm';
+import { AdminActionForm as ActionForm } from '@/components/admin/AdminForm';
 import { saveCustomerAction } from '@/actions/admin.actions';
 import { query } from '@/lib/db';
 
@@ -18,10 +20,10 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
         <div className="page-head"><div><h2>{customer.name}</h2><p>{customer.email}</p></div></div>
         <div className="panel">
         <ActionForm className="admin-form" action={saveCustomerAction} success="Customer saved.">
-          <input type="hidden" name="id" value={customer.id} />
-          <label>Phone<input name="phone" defaultValue={customer.phone || ''} /></label>
-          <label>Notes<textarea name="notes" defaultValue={customer.notes || ''} /></label>
-          <button type="submit">Save customer</button>
+          <AdminInput type="hidden" name="id" value={customer.id} />
+          <label>Phone<AdminInput name="phone" defaultValue={customer.phone || ''} /></label>
+          <label>Notes<AdminTextarea name="notes" defaultValue={customer.notes || ''} /></label>
+          <AdminButton type="submit">Save customer</AdminButton>
         </ActionForm>
         </div>
       </>
@@ -40,7 +42,7 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
   return (
     <>
       <div className="page-head"><div><h2>Customers</h2><p>Search shoppers and keep phone and notes.</p></div></div>
-      <form><input name="q" defaultValue={q || ''} placeholder="Search name, email, phone" /></form>
+      <AdminFilterForm className="filters" key={q || ''}><AdminInput name="q" aria-label="Search customers" defaultValue={q || ''} placeholder="Search name, email, phone" /><AdminButton type="submit" loadingText="Searching…">Search</AdminButton></AdminFilterForm>
       <table className="admin-table">
         <thead><tr><th>Name</th><th>Email</th><th>Orders</th><th></th></tr></thead>
         <tbody>

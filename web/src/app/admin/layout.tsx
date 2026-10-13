@@ -1,6 +1,9 @@
-import { ActionForm } from '@/components/ui/ActionForm';
+import { AdminButton } from '@/components/admin/AdminForm';
+import { AdminActionForm as ActionForm } from '@/components/admin/AdminForm';
 import Link from 'next/link';
 import { logoutAction, requireAdmin } from '@/actions/auth.actions';
+import { AdminToaster } from '@/components/admin/AdminForm';
+import './admin-ui.css';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,9 +28,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="nav-label">Shop flow</div>
         <Link href="/admin/orders">Orders</Link>
         <Link href="/admin/customers">Customers</Link>
-        <ActionForm action={logoutAction} success="You have been signed out." successPath="/"><button type="submit">Log out</button></ActionForm>
+        <ActionForm action={logoutAction} success="You have been signed out." successPath="/"><AdminButton type="submit">Log out</AdminButton></ActionForm>
       </aside>
       <main className="admin-main">{children}</main>
+      <AdminToaster />
     </div>
   );
 }

@@ -1,1 +1,1 @@
-export { listProducts, getProduct, listCategories, getCategory } from '@/repositories/catalog.repository';
+export { listProducts, listProductsBySlugs, getProduct, listCategories, getCategory } from '@/repositories/catalog.repository';

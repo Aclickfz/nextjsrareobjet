@@ -1,9 +1,36 @@
 import type { PoolConnection, ResultSetHeader } from 'mysql2/promise';
+import { AdminValidationError } from '@/lib/admin-action-result';
 import { getPool, query } from '@/lib/db';
 import { canTransition, invoiceNumber, nextPaymentStatus, orderNumber } from '@/lib/utils';
 import { clearCart, loadCart } from './cart.repository';
 
 type CartPayload = Awaited<ReturnType<typeof loadCart>>;
+
+export async function ensureOrderTrackingColumns() {
+  const columns = await query<{ COLUMN_NAME: string }[]>(
+    `SELECT COLUMN_NAME FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'orders' AND COLUMN_NAME IN ('tracking_number', 'carrier')`
+  );
+  const names = new Set(columns.map((column) => column.COLUMN_NAME));
+  if (!names.has('tracking_number')) {
+    await query('ALTER TABLE orders ADD COLUMN tracking_number VARCHAR(80) NULL');
+  }
+  if (!names.has('carrier')) {
+    await query('ALTER TABLE orders ADD COLUMN carrier VARCHAR(80) NULL');
+  }
+}
+
+export async function findOrderForTracking(orderNumber: string, postalCode: string) {
+  await ensureOrderTrackingColumns();
+  const rows = await query<Record<string, unknown>[]>(
+    `SELECT o.order_number, o.status, o.created_at, o.city, o.postal_code, o.tracking_number, o.carrier, o.total
+     FROM orders o
+     WHERE o.order_number = :orderNumber AND o.postal_code = :postalCode
+     LIMIT 1`,
+    { orderNumber, postalCode }
+  );
+  return rows[0] || null;
+}
 
 export async function loadOrder(orderId: number, userId: number | null, isAdmin: boolean): Promise<{
   id: number;
@@ -141,9 +168,9 @@ async function adjustStock(conn: PoolConnection, productId: number, changeQty: n
 
 export async function updateOrderStatus(orderId: number, nextStatus: string, adminId: number, markPaid?: boolean) {
   const order = await loadOrder(orderId, null, true);
-  if (!order) throw new Error('Order not found');
+  if (!order) throw new AdminValidationError('Order not found');
   if (!canTransition(String(order.status), nextStatus)) {
-    throw new Error(`Cannot move from ${order.status} to ${nextStatus}`);
+    throw new AdminValidationError(`Cannot move from ${order.status} to ${nextStatus}`);
   }
   const conn = await getPool().getConnection();
   try {
@@ -156,7 +183,7 @@ export async function updateOrderStatus(orderId: number, nextStatus: string, adm
           { id: item.product_id }
         );
         const product = (locked as { stock_qty: number }[])[0];
-        if (!product || product.stock_qty < item.qty) throw new Error(`Insufficient stock for ${item.name_snapshot}`);
+        if (!product || product.stock_qty < item.qty) throw new AdminValidationError(`Insufficient stock for ${item.name_snapshot}`);
         await adjustStock(conn, item.product_id, -item.qty, 'order', orderId, adminId, `Order ${order.order_number}`);
       }
       await conn.execute('UPDATE orders SET stock_deducted = 1 WHERE id = :id', { id: orderId });

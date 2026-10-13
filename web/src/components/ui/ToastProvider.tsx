@@ -31,6 +31,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     };
     const onInvalid = (event: Event) => {
       const field = event.target as HTMLInputElement;
+      if (field.closest('.admin-shell')) return;
       if (field.form?.querySelector(':invalid') === field) show(field.validationMessage, 'error');
     };
     const onStaticSubmit = (event: Event) => {

@@ -44,7 +44,8 @@ const styles = [
   '/assets/css/contract.css',
   '/assets/css/whishlist.css',
   '/assets/css/auth-modern.css',
-  '/assets/css/account.css'
+  '/assets/css/account.css',
+  '/assets/css/pottery-base.css'
 ];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -53,7 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         {styles.map((href) => <link key={href} rel="stylesheet" href={href} />)}
         <link rel="icon" href="/assets/images/Logo/favicon/favicon.ico" />
-        <meta name="theme-color" content="#303e34" />
+        <meta name="theme-color" content="#222222" />
       </head>
       <body><ToastProvider>{children}</ToastProvider></body>
     </html>
@@ -63,6 +64,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 export async function StoreShell({ children }: { children: React.ReactNode }) {
   let cart = 0;
   let wishlist = 0;
+  try {
+    const { ensureStoreCategories } = await import('@/repositories/catalog.repository');
+    await ensureStoreCategories();
+  } catch {
+    /* categories stay as already stored if the database is unavailable */
+  }
   try {
     cart = (await getCart()).count;
     const user = await currentUser();
