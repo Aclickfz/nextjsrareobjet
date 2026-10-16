@@ -1,37 +1,53 @@
-import { AdminButton } from '@/components/admin/AdminForm';
-import { AdminActionForm as ActionForm } from '@/components/admin/AdminForm';
-import Link from 'next/link';
-import { logoutAction, requireAdmin } from '@/actions/auth.actions';
+import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
+import { Geist, Geist_Mono } from 'next/font/google';
+import { ThemeProvider } from 'next-themes';
+import { requireAdmin } from '@/actions/auth.actions';
 import { AdminToaster } from '@/components/admin/AdminForm';
+import { AdminHeader } from '@/components/admin-shell/AdminHeader';
+import { AdminSidebar } from '@/components/admin-shell/AdminSidebar';
+import { SidebarInset, SidebarProvider } from '@/components/admin-ui/sidebar';
+import { TooltipProvider } from '@/components/admin-ui/tooltip';
+import './globals.css';
 import './admin-ui.css';
+import './legacy.css';
 
 export const dynamic = 'force-dynamic';
 
+export const metadata: Metadata = {
+  title: { default: 'Admin | JustAclick', template: '%s | JustAclick Admin' },
+  robots: { index: false, follow: false }
+};
+
+const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
+const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
+
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  await requireAdmin();
+  const user = await requireAdmin();
+  const sidebarOpen = (await cookies()).get('sidebar_state')?.value !== 'false';
+
   return (
-    <div className="admin-shell">
-      <link rel="stylesheet" href="/admin/admin.css" />
-      <aside className="admin-sidebar">
-        <div className="admin-brand">
-          <strong>JustAclick</strong>
-          <span>Commerce CRM</span>
-        </div>
-        <div className="nav-label">Overview</div>
-        <Link href="/admin/dashboard">Dashboard</Link>
-        <Link href="/admin/reports">Sales</Link>
-        <div className="nav-label">Catalog</div>
-        <Link href="/admin/categories">Categories</Link>
-        <Link href="/admin/products">Products</Link>
-        <Link href="/admin/products/new">Add product</Link>
-        <Link href="/admin/inventory">Inventory</Link>
-        <div className="nav-label">Shop flow</div>
-        <Link href="/admin/orders">Orders</Link>
-        <Link href="/admin/customers">Customers</Link>
-        <ActionForm action={logoutAction} success="You have been signed out." successPath="/"><AdminButton type="submit">Log out</AdminButton></ActionForm>
-      </aside>
-      <main className="admin-main">{children}</main>
-      <AdminToaster />
-    </div>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/assets/images/Logo/favicon/favicon.ico" />
+      </head>
+      <body>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          <TooltipProvider>
+            <SidebarProvider defaultOpen={sidebarOpen}>
+              <AdminSidebar />
+              <SidebarInset className="min-w-0">
+                <AdminHeader user={{ name: user.name, email: user.email }} />
+                <main className="admin-shell admin-main mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 sm:px-6">{children}</main>
+                <footer className="text-muted-foreground mx-auto w-full max-w-[1440px] border-t px-4 py-4 text-sm sm:px-6">
+                  © {new Date().getFullYear()} JustAclick Commerce CRM
+                </footer>
+              </SidebarInset>
+            </SidebarProvider>
+            <AdminToaster />
+          </TooltipProvider>
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }
