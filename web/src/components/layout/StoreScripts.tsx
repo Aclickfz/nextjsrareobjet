@@ -2,34 +2,50 @@
 
 import { useEffect } from 'react';
 
+const scriptLoads = new Map<string, Promise<void>>();
+
 function load(src: string) {
-  return new Promise<void>((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) {
-      resolve();
-      return;
-    }
+  const existing = scriptLoads.get(src);
+  if (existing) return existing;
+
+  // A script element can exist while it is still downloading. Share completion,
+  // not just element presence, across effect reruns and component remounts.
+  const pending = new Promise<void>((resolve, reject) => {
     const script = document.createElement('script');
     script.src = src;
     script.onload = () => resolve();
-    script.onerror = () => reject(new Error(src));
+    script.onerror = () => {
+      script.remove();
+      scriptLoads.delete(src);
+      reject(new Error(`Failed to load storefront script: ${src}`));
+    };
     document.body.appendChild(script);
   });
+  scriptLoads.set(src, pending);
+  return pending;
 }
 
 export function StoreScripts() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      await load('/assets/vendor/jquery/jquery.min.js');
-      await load('/assets/vendor/slick/slick.min.js');
-      await load('/assets/vendor/swiper/swiper-bundle.min.js');
+      for (const src of [
+        '/assets/vendor/jquery/jquery.min.js',
+        '/assets/vendor/slick/slick.min.js',
+        '/assets/vendor/swiper/swiper-bundle.min.js',
+        '/assets/js/index.js',
+        '/assets/js/carousels.js',
+        '/assets/js/filter.js'
+      ]) {
+        if (cancelled) return;
+        await load(src);
+      }
       if (cancelled) return;
-      await load('/assets/js/index.js');
-      await load('/assets/js/carousels.js');
-      await load('/assets/js/filter.js');
       const win = window as Window & { bootSiteUI?: () => void; startSiteUI?: () => void };
       win.bootSiteUI?.();
-    })().catch(() => undefined);
+    })().catch((error: unknown) => {
+      console.error('Unable to initialize storefront scripts', error);
+    });
     return () => {
       cancelled = true;
     };
