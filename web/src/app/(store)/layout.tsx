@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { SiteHeader } from '@/components/layout/SiteHeader';
-import { HeaderCounts, StoreScripts } from '@/components/layout/StoreScripts';
+import { StoreScripts } from '@/components/layout/StoreScripts';
 import { getCart } from '@/actions/cart.actions';
 import { currentUser } from '@/lib/auth';
 import { query } from '@/lib/db';
@@ -74,19 +74,22 @@ async function StoreShell({ children }: { children: React.ReactNode }) {
   }
   try {
     cart = (await getCart()).count;
+  } catch {
+    cart = 0;
+  }
+  try {
     const user = await currentUser();
     if (user) {
       const rows = await query<{ count: number }[]>('SELECT COUNT(*) AS count FROM wishlists WHERE user_id = :uid', { uid: user.id });
       wishlist = Number(rows[0]?.count || 0);
     }
   } catch {
-    cart = 0;
+    wishlist = 0;
   }
   return (
     <>
       <a className="skip-link" href="#main-content">Skip to content</a>
       <SiteHeader cart={cart} wishlist={wishlist} />
-      <HeaderCounts cart={cart} wishlist={wishlist} />
       {children}
       <SiteFooter />
       <StoreScripts />
