@@ -4,9 +4,9 @@ For verification and password-reset emails through Hostinger SMTP, follow [AUTH.
 
 The app in this folder is a Next.js Node server. Do not upload it as a static site.
 
-1. In hPanel, create a Node.js application with Node 20.9 or newer (the minimum required by Next.js 16.3.3). Local verification uses Node 24.19.0; check `node --version` in the deployment runtime too.
+1. In hPanel, create a Node.js application with a supported, security-patched Node LTS release (Next.js requires at least Node 20.9). Check `node --version` in the deployment runtime too.
 2. Set the application root to this `web` directory.
-3. Install command: `npm ci` (deploy the reviewed `package-lock.json` alongside `package.json`).
+3. Install command: `npm ci` (deploy the reviewed `package-lock.json` alongside `package.json`). Install development dependencies for the build; after building, `npm prune --omit=dev` can remove build tools from the runtime installation.
 4. Build command: `npm run build`
 5. Start command: `npm start`
 6. Local test uses `.env` (`npm run dev`). Production uses `.env.production` (`npm run build` and `npm start`). Both use database `justaclick` on `127.0.0.1` with the same user and password. On the server, set `NEXT_PUBLIC_APP_URL` to the public HTTPS address and keep `COOKIE_SECURE=true`.
@@ -35,4 +35,10 @@ If deployment reports `Server is not running`, capture the actual start command,
 
 After `npm run build`, run `node scripts/test-server-lifecycle.mjs`. It checks HTTP startup, SIGTERM/SIGINT handlers, repeated signals, and an occupied-port startup failure. On Windows, signals are emitted inside the test child through IPC because sending POSIX signals would forcibly terminate it; verify real signal delivery on the deployment host separately.
 
-Next.js 16.3.3 is patched for [GHSA-2xp9-vwfh-vxw4](https://github.com/vercel/next.js/security/advisories/GHSA-2xp9-vwfh-vxw4). Keep `images.unoptimized: true` in `next.config.ts`. Verify the deployed lockfile resolves Next.js 16.3.3 or a reviewed patched version; an older lockfile here resolved 16.1.6. This advisory does not establish a connection to the shutdown error.
+This checkout uses Next.js and eslint-config-next 16.4.3, plus Nodemailer 10.1.4 or newer. Keep `images.unoptimized: true` in `next.config.ts`. Deploy both dependency manifests together and use `npm ci` so the server uses the reviewed dependency tree.
+
+## Dependency security updates
+
+The unused `shadcn` generator CLI was removed from development dependencies, eliminating its transitive Undici, body-parser, and Zod 3 packages. Existing generated UI components do not require the CLI at runtime. The application requires Zod 4.6.7 or newer, and the fast-uri override requires the patched 3.1.9 release or newer within version 3.
+
+After uploading these changes, reinstall with `npm ci`, rebuild, and restart the Node application. Run `npm ls next zod fast-uri undici body-parser` and rescan the deployed installation; uploading package.json alone does not replace old dependencies or an already running process.
