@@ -41,7 +41,7 @@ export function ProductPurchase({ product }: { product: Product }) {
   const [qty, setQty] = useState(1);
   const [openGroup, setOpenGroup] = useState(0);
   const [selected, setSelected] = useState<Record<string, string>>({});
-  const [openPanel, setOpenPanel] = useState<'details' | 'dimensions' | null>('details');
+  const [openPanel, setOpenPanel] = useState<'details' | 'dimensions' | null>(null);
   const toast = useToast();
   const [pending, setPending] = useState(false);
 

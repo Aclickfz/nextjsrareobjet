@@ -9,6 +9,7 @@ import { imgSrc } from '@/lib/utils';
 import { logoutAction } from '@/actions/auth.actions';
 import { searchSuggestions } from '@/actions/search.actions';
 import styles from './StoreNavigation.module.css';
+import { AnnouncementTicker } from './AnnouncementTicker';
 
 type Props = { categories: CategoryNode[]; navigation: { name: string; slug: string }[]; cart: number; wishlist: number; user: { name: string; role: string } | null };
 
@@ -91,6 +92,7 @@ export function StoreNavigation({ categories, navigation, cart, wishlist, user }
   return <header ref={header} className={styles.header} onClick={event => { if ((event.target as HTMLElement).closest("a")) setMenu(null); }} onKeyDown={event => {
     if (event.key === 'Escape' && menu) { header.current?.querySelector<HTMLButtonElement>(`[data-menu="${menu}"]`)?.focus(); setMenu(null); }
   }}>
+    <AnnouncementTicker />
     <div className={styles.main}>
       <button ref={opener} className={`${styles.iconButton} ${styles.hamburger}`} type="button" aria-label="Open navigation menu" aria-haspopup="dialog" aria-controls="store-navigation-drawer" onClick={() => drawer.current?.showModal()}><Menu /></button>
       <Link href="/" className={styles.logo} aria-label="JustAclick home"><img src="/assets/images/Logo/Logo1.svg" alt="JustAclick" width={166} height={50} /></Link>
