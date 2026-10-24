@@ -4,6 +4,24 @@
 .header button, .drawer button { font: inherit; color: inherit; cursor: pointer; border: 0; background: transparent; }
 .header :is(a,button,input,summary):focus-visible, .drawer :is(a,button,summary):focus-visible { outline: 2px solid #222; outline-offset: 3px; }
 .header svg { flex-shrink: 0; }
+.ticker { display: flex; align-items: center; background: var(--surface-color, #f7f6f2); color: var(--main-color, #222); border-bottom: 1px solid var(--border-color, #e6e6e6); min-height: 40px; }
+.tickerViewport { flex: 1; min-width: 0; overflow: hidden; }
+.tickerTrack { display: flex; width: max-content; animation: tickerScroll 36s linear infinite; }
+.tickerGroup { display: flex; flex-shrink: 0; align-items: center; justify-content: space-around; min-width: 100vw; gap: 72px; padding: 10px 36px; }
+.tickerItem { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; font-size: 14px; font-weight: 600; line-height: 20px; }
+.ticker:hover .tickerTrack, .ticker:focus-within .tickerTrack { animation-play-state: paused; }
+.ticker:focus-visible { outline: 2px solid var(--main-color, #222); outline-offset: -3px; }
+@keyframes tickerScroll { to { transform: translateX(-50%); } }
+@media (max-width: 575px) {
+  .tickerItem { font-size: 12px; }
+  .tickerGroup { gap: 40px; padding-inline: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tickerTrack { animation: none; width: 100%; }
+  .tickerGroup { min-width: 0; width: 100%; flex-wrap: wrap; gap: 8px 24px; padding: 10px 16px; }
+  .tickerItem { white-space: normal; }
+  .tickerGroup[aria-hidden='true'] { display: none; }
+}
 .announcement { min-height: 32px; padding: 6px 20px; display: flex; align-items: center; justify-content: center; gap: 9px; background: #f7f6f2; font-size: 11px; letter-spacing: .04em; }
 .announcement a { display: inline-flex; align-items: center; gap: 5px; margin-left: 16px; text-decoration: underline; text-underline-offset: 3px; }
 .main { max-width: 1600px; margin: auto; padding: 22px 36px; display: grid; grid-template-columns: 190px minmax(200px, 560px) auto; align-items: center; justify-content: space-between; gap: 36px; }
