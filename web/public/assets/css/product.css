@@ -833,10 +833,16 @@
     gap: 8px;
 }
 
-.shop-card__price s,
-.shop-pdp .price s {
+.shop-card__price s {
     color: #888;
     font-weight: 400;
+}
+
+.shop-pdp .price s {
+    color: #d01212;
+    font-weight: 400;
+    text-decoration: line-through;
+    margin-right: 8px;
 }
 
 .shop-pdp__buy {
