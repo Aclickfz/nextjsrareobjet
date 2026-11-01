@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { addToCartAction } from '@/actions/cart.actions';
@@ -30,8 +30,16 @@ type Product = {
 function priceLabel(product: Product) {
   const min = Number(product.price);
   const max = product.pdp?.price_max != null ? Number(product.pdp.price_max) : null;
-  if (max != null && max > min) return `${money(min)} – ${money(max)}`;
-  return money(min);
+  const compare = product.compare_at_price ? Number(product.compare_at_price) : 0;
+  const highs = [max, compare].filter((value): value is number => value != null && value > min);
+  const highest = highs.length ? Math.max(...highs) : null;
+  if (highest == null) return money(min);
+  return (
+    <>
+      <s>{money(highest)}</s>
+      {money(min)}
+    </>
+  );
 }
 
 export function ProductPurchase({ product }: { product: Product }) {
@@ -39,8 +47,6 @@ export function ProductPurchase({ product }: { product: Product }) {
   const images = product.images?.length ? product.images : [{ path: '/assets/images/img2.jpeg' }];
   const [active, setActive] = useState(0);
   const [qty, setQty] = useState(1);
-  const [openGroup, setOpenGroup] = useState(0);
-  const [selected, setSelected] = useState<Record<string, string>>({});
   const [openPanel, setOpenPanel] = useState<'details' | 'dimensions' | null>(null);
   const toast = useToast();
   const [pending, setPending] = useState(false);
@@ -55,23 +61,7 @@ export function ProductPurchase({ product }: { product: Product }) {
     });
   }, [product.id]);
 
-  useEffect(() => {
-    const next: Record<string, string> = {};
-    for (const group of pdp?.option_groups || []) {
-      if (group.options[0]) next[group.name] = group.options[0].name;
-    }
-    setSelected(next);
-  }, [product.id]);
-
-  const caption = useMemo(() => {
-    if (!pdp?.option_groups?.length) return pdp?.shown_caption || null;
-    const picks = Object.values(selected).filter(Boolean);
-    if (!picks.length) return pdp.shown_caption || null;
-    return `Shown in ${picks.join(' with ')}.`;
-  }, [selected, pdp?.shown_caption, pdp?.option_groups]);
-
-  const compare = product.compare_at_price ? Number(product.compare_at_price) : 0;
-  const onSale = compare > Number(product.price);
+  const caption = pdp?.shown_caption || null;
 
   async function add(buyNow: boolean) {
     if (pending) return;
@@ -143,57 +133,8 @@ export function ProductPurchase({ product }: { product: Product }) {
               {product.grade_label ? <p className="shop-pdp__badge">{product.grade_label}</p> : null}
               {product.badge ? <p className="shop-pdp__badge shop-pdp__badge--soft">{product.badge}</p> : null}
               <h1>{product.name}</h1>
-              <p className="price">
-                {onSale ? <s>{money(compare)}</s> : null}
-                {priceLabel(product)}
-              </p>
+              <p className="price">{priceLabel(product)}</p>
               {pdp?.free_shipping ? <p className="shop-pdp__ship">Free Shipping</p> : null}
-
-              {(pdp?.option_groups || []).length ? (
-                <div className="shop-pdp__options">
-                  <div className="shop-pdp__options-head">
-                    <h6>Select Options</h6>
-                    <button type="button" onClick={() => {
-                      const next: Record<string, string> = {};
-                      for (const group of pdp?.option_groups || []) {
-                        if (group.options[0]) next[group.name] = group.options[0].name;
-                      }
-                      setSelected(next);
-                    }}>
-                      Clear Options
-                    </button>
-                  </div>
-                  {pdp!.option_groups.map((group, index) => (
-                    <div className="shop-pdp__option-group" key={group.name}>
-                      <button type="button" className="shop-pdp__option-toggle" aria-expanded={openGroup === index} onClick={() => setOpenGroup(openGroup === index ? -1 : index)}>
-                        <span>{group.name}</span>
-                        <span>{group.options.length} Options</span>
-                        <i className={`bx ${openGroup === index ? 'bx-chevron-up' : 'bx-chevron-down'}`} aria-hidden="true" />
-                      </button>
-                      {openGroup === index ? (
-                        <div className="purchase_type__input shop-pdp__swatches">
-                          {group.options.map((option) => {
-                            const checked = selected[group.name] === option.name;
-                            return (
-                              <label key={option.name} className={checked ? 'active-btn' : ''}>
-                                <input
-                                  type="radio"
-                                  name={group.name}
-                                  checked={checked}
-                                  onChange={() => setSelected((prev) => ({ ...prev, [group.name]: option.name }))}
-                                />
-                                {option.image ? <img src={imgSrc(option.image)} alt="" /> : null}
-                                {option.hex && !option.image ? <span className="shop-pdp__swatch-color" style={{ background: option.hex }} /> : null}
-                                <em>{option.name}</em>
-                              </label>
-                            );
-                          })}
-                        </div>
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-              ) : null}
 
               <div className="purchase_type">
                 <div className="purchase_type__select shop-pdp__qty-row">
