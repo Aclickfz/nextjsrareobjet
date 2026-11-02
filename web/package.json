@@ -9,6 +9,7 @@
     "lint": "eslint",
     "db:migrate-categories": "node scripts/migrate-categories.mjs",
     "db:migrate-pdp": "node scripts/migrate-pdp.mjs",
+    "db:drop-option-groups": "node scripts/drop-option-groups.mjs",
     "db:seed-products": "node scripts/seed-products.mjs"
   },
   "dependencies": {
@@ -57,6 +58,10 @@
     "typescript": "^5"
   },
   "overrides": {
-    "fast-uri": "^3.1.9"
+    "fast-uri": "^3.1.9",
+    "follow-redirects": "^1.16.2",
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "^11.0.1"
+    }
   }
 }

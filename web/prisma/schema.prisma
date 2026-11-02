@@ -54,7 +54,6 @@ model Product {
   collectionKey        String?   @map("collection_key")
   shownCaption         String?   @map("shown_caption") @db.LongText
   freeShipping         Int       @default(0) @map("free_shipping")
-  optionGroups         Json?     @map("option_groups")
   detailsSections      Json?     @map("details_sections")
   dimensions           Json?
   faqs                 Json?

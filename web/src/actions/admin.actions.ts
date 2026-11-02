@@ -74,7 +74,6 @@ async function saveProductActionImpl(formData: FormData) {
     collection_key: String(formData.get('collection_key') || '') || null,
     shown_caption: String(formData.get('shown_caption') || '') || null,
     free_shipping: formData.get('free_shipping') === '1' ? 1 : 0,
-    option_groups: readJson('option_groups'),
     details_sections: readJson('details_sections'),
     dimensions: readJson('dimensions'),
     faqs: readJson('faqs'),
@@ -93,7 +92,7 @@ async function saveProductActionImpl(formData: FormData) {
       `UPDATE products SET sort_order=:sort_order, category_id=:category_id, name=:name, slug=:slug, description=:description, price=:price, price_max=:price_max,
        compare_at_price=:compare_at_price, stock_qty=:stock_qty, sku=:sku, badge=:badge, grade_label=:grade_label,
        collection_key=:collection_key, shown_caption=:shown_caption, free_shipping=:free_shipping,
-       option_groups=:option_groups, details_sections=:details_sections, dimensions=:dimensions, faqs=:faqs,
+       details_sections=:details_sections, dimensions=:dimensions, faqs=:faqs,
        related_searches=:related_searches, related_category_slugs=:related_category_slugs, ask_prompts=:ask_prompts,
        paired_slugs=:paired_slugs, collection_slugs=:collection_slugs, similar_slugs=:similar_slugs,
        still_deciding=:still_deciding, is_active=:is_active
@@ -104,12 +103,12 @@ async function saveProductActionImpl(formData: FormData) {
     const [result] = await getPool().execute<ResultSetHeader>(
       `INSERT INTO products (
         sort_order, category_id, name, slug, description, price, price_max, compare_at_price, stock_qty, sku, badge, grade_label,
-        collection_key, shown_caption, free_shipping, option_groups, details_sections, dimensions, faqs,
+        collection_key, shown_caption, free_shipping, details_sections, dimensions, faqs,
         related_searches, related_category_slugs, ask_prompts, paired_slugs, collection_slugs, similar_slugs,
         still_deciding, is_active
       ) VALUES (
         :sort_order, :category_id, :name, :slug, :description, :price, :price_max, :compare_at_price, :stock_qty, :sku, :badge, :grade_label,
-        :collection_key, :shown_caption, :free_shipping, :option_groups, :details_sections, :dimensions, :faqs,
+        :collection_key, :shown_caption, :free_shipping, :details_sections, :dimensions, :faqs,
         :related_searches, :related_category_slugs, :ask_prompts, :paired_slugs, :collection_slugs, :similar_slugs,
         :still_deciding, :is_active
       )`,
@@ -119,7 +118,12 @@ async function saveProductActionImpl(formData: FormData) {
   }
   const uploaded = await storeUpload(formData.get('image'), 'products');
   if (uploaded) {
-    await getPool().execute('UPDATE product_images SET is_primary = 0 WHERE product_id = :product_id', { product_id: productId });
+    const oldPrimary = await query<{ path: string }[]>(
+      'SELECT path FROM product_images WHERE product_id = :product_id AND is_primary = 1',
+      { product_id: productId }
+    );
+    await getPool().execute('DELETE FROM product_images WHERE product_id = :product_id AND is_primary = 1', { product_id: productId });
+    for (const image of oldPrimary) removeUpload(image.path);
     await getPool().execute(
       'INSERT INTO product_images (product_id, path, sort_order, is_primary) VALUES (:product_id, :path, 0, 1)',
       { product_id: productId, path: uploaded }
@@ -239,6 +243,15 @@ async function storeUpload(file: FormDataEntryValue | null, folder: string) {
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safe}`;
   fs.writeFileSync(path.join(dir, filename), Buffer.from(await file.arrayBuffer()));
   return `uploads/${folder}/${filename}`;
+}
+
+function removeUpload(filePath: string) {
+  const relative = filePath.replace(/^\/+/, '');
+  if (!relative.startsWith('uploads/')) return;
+  const uploadsRoot = path.join(process.cwd(), 'public', 'uploads');
+  const absolute = path.join(process.cwd(), 'public', relative);
+  if (!absolute.startsWith(uploadsRoot + path.sep)) return;
+  fs.rmSync(absolute, { force: true });
 }
 
 async function saveCategoryActionImpl(formData: FormData) {

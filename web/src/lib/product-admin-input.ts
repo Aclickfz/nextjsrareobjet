@@ -14,7 +14,6 @@ export function optionalProductContent(key: string, value: unknown): string | nu
     return index < 0 ? [line, ''] : [line.slice(0, index).trim(), line.slice(index + 1).trim()];
   };
   switch (key) {
-    case 'option_groups': return JSON.stringify([{ name: 'Options', options: lines.map(name => ({ name })) }]);
     case 'details_sections': return JSON.stringify([{ title: 'Details', items: lines }]);
     case 'dimensions': return JSON.stringify(lines.map(line => { const [label, value] = pair(line); return { label, value }; }));
     case 'faqs': return JSON.stringify(lines.map(line => { const [question, answer] = pair(line); return { question, answer }; }));

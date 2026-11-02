@@ -20,14 +20,14 @@ function ContentEditor({ field, value }: { field: ContentKey; value: unknown }) 
       </label>)}</div>
       <AdminButton type="button" onClick={() => setRows(current => current.filter(item => item.id !== row.id))}>Remove row</AdminButton>
     </div>)}
-    <AdminButton type="button" onClick={() => { const id = nextId.current++; setRows(current => [...current, { id, values: config.fields.map(() => '') as ContentRow }]); }}>Add {field === 'option_groups' ? 'option' : 'row'}</AdminButton>
+    <AdminButton type="button" onClick={() => { const id = nextId.current++; setRows(current => [...current, { id, values: config.fields.map(() => '') as ContentRow }]); }}>Add row</AdminButton>
   </section>;
 }
 
 export function ProductContentFields({ product }: { product?: Record<string, unknown> }) {
   return <>
     <h3 className="admin-section-title">Product page content (optional)</h3>
-    <p className="admin-help">Only name and category are required. Add rows for the content you want to display. Use the same group name to combine product options.</p>
+    <p className="admin-help">Only name and category are required. Add rows for the content you want to display.</p>
     {(Object.keys(contentFields) as ContentKey[]).map(field => <ContentEditor key={field} field={field} value={product?.[field]} />)}
   </>;
 }

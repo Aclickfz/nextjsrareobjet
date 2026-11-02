@@ -6,8 +6,6 @@ const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNe
 const {buildProductContent:build,contentRows,contentFields}=await import(`data:text/javascript;base64,${Buffer.from(code).toString('base64')}`);
 const form=new FormData();
 const add=(key,rows)=>rows.forEach(row=>row.forEach((value,index)=>form.append(`${key}_${index}`,value)));
-add('option_groups',[['Finish','Oak','/oak.jpg','#abc'],['Finish','Walnut','',''],['Size','Large','','']]);
-assert.deepEqual(JSON.parse(build('option_groups',form)),[{name:'Finish',options:[{name:'Oak',image:'/oak.jpg',hex:'#abc'},{name:'Walnut'}]},{name:'Size',options:[{name:'Large'}]}]);
 add('details_sections',[['Care','\u2022 Wipe clean\n- Keep dry']]);
 assert.deepEqual(JSON.parse(build('details_sections',form)),[{title:'Care',items:['Wipe clean','Keep dry']}]);
 add('dimensions',[['Height','24 in']]);
@@ -28,4 +26,4 @@ for(const key of Object.keys(contentFields)) {
  assert.deepEqual(JSON.parse(build(key,edit)),JSON.parse(stored),`${key} edit round trip`);
 }
 const blanks=new FormData();blanks.append('dimensions_0','');blanks.append('dimensions_1','');assert.equal(build('dimensions',blanks),null);
-console.log('PASS: normal form fields, option grouping, bullets, blank optional content and edit round trips for all content fields.');
+console.log('PASS: normal form fields, bullets, blank optional content and edit round trips for all content fields.');

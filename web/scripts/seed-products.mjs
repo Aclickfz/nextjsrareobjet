@@ -57,7 +57,6 @@ try {
       collection_key: item.collection_key || null,
       shown_caption: item.shown_caption || null,
       free_shipping: item.free_shipping ? 1 : 0,
-      option_groups: toJson(item.option_groups),
       details_sections: toJson(item.details_sections),
       dimensions: toJson(item.dimensions),
       faqs: toJson(item.faqs),
@@ -79,7 +78,7 @@ try {
           category_id=:category_id, name=:name, description=:description, price=:price, price_max=:price_max,
           compare_at_price=:compare_at_price, stock_qty=:stock_qty, sku=:sku, badge=:badge, grade_label=:grade_label,
           collection_key=:collection_key, shown_caption=:shown_caption, free_shipping=:free_shipping,
-          option_groups=:option_groups, details_sections=:details_sections, dimensions=:dimensions, faqs=:faqs,
+          details_sections=:details_sections, dimensions=:dimensions, faqs=:faqs,
           related_searches=:related_searches, related_category_slugs=:related_category_slugs, ask_prompts=:ask_prompts,
           paired_slugs=:paired_slugs, collection_slugs=:collection_slugs, similar_slugs=:similar_slugs,
           still_deciding=:still_deciding, is_active=:is_active
@@ -91,12 +90,12 @@ try {
       const [result] = await connection.query(
         `INSERT INTO products (
           category_id, name, slug, description, price, price_max, compare_at_price, stock_qty, sku, badge, grade_label,
-          collection_key, shown_caption, free_shipping, option_groups, details_sections, dimensions, faqs,
+          collection_key, shown_caption, free_shipping, details_sections, dimensions, faqs,
           related_searches, related_category_slugs, ask_prompts, paired_slugs, collection_slugs, similar_slugs,
           still_deciding, is_active
         ) VALUES (
           :category_id, :name, :slug, :description, :price, :price_max, :compare_at_price, :stock_qty, :sku, :badge, :grade_label,
-          :collection_key, :shown_caption, :free_shipping, :option_groups, :details_sections, :dimensions, :faqs,
+          :collection_key, :shown_caption, :free_shipping, :details_sections, :dimensions, :faqs,
           :related_searches, :related_category_slugs, :ask_prompts, :paired_slugs, :collection_slugs, :similar_slugs,
           :still_deciding, :is_active
         )`,
