@@ -60,7 +60,7 @@ export function ProductAdminFields({
         </div>
       ) : null}
       <label>{isEdit ? 'Replace main image' : 'Main image'}<AdminInput name="image" type="file" accept="image/*" /></label>
-      <label>{isEdit ? 'Add gallery image' : 'Gallery image'}<AdminInput name="gallery" type="file" accept="image/*" /></label>
+      <label>{isEdit ? 'Add gallery images' : 'Gallery images'}<AdminInput name="gallery" type="file" accept="image/*" multiple /></label>
     </>
   );
 }

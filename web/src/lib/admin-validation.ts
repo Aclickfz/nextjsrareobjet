@@ -22,7 +22,7 @@ export function validateAdminUpload(form: FormData) {
     } else total += new TextEncoder().encode(value).length;
   }
   // Leave room for multipart boundaries and Server Action metadata.
-  if (total > 9 * 1024 * 1024) throw new AdminValidationError('The combined upload is too large. Keep this form below 9 MB; save additional gallery images separately.');
+  if (total > 45 * 1024 * 1024) throw new AdminValidationError('The combined upload is too large. Keep this form below 45 MB; save additional gallery images separately.');
   if (Object.keys(fields).length) throw new AdminValidationError('Check the selected images.', fields);
 }
 

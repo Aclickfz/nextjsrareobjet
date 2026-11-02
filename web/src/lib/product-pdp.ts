@@ -1,14 +1,3 @@
-export type OptionSwatch = {
-  name: string;
-  image?: string;
-  hex?: string;
-};
-
-export type OptionGroup = {
-  name: string;
-  options: OptionSwatch[];
-};
-
 export type DetailSection = {
   title: string;
   items: string[];
@@ -40,7 +29,6 @@ export type ProductPdpFields = {
   collection_key?: string | null;
   shown_caption?: string | null;
   free_shipping?: number | boolean | null;
-  option_groups?: OptionGroup[] | string | null;
   details_sections?: DetailSection[] | string | null;
   dimensions?: DimensionRow[] | string | null;
   faqs?: FaqItem[] | string | null;
@@ -69,7 +57,6 @@ export function normalizePdp(product: ProductPdpFields) {
     collection_key: product.collection_key || null,
     shown_caption: product.shown_caption || null,
     free_shipping: Boolean(Number(product.free_shipping || 0)),
-    option_groups: parseJsonField<OptionGroup[]>(product.option_groups, []),
     details_sections: parseJsonField<DetailSection[]>(product.details_sections, []),
     dimensions: parseJsonField<DimensionRow[]>(product.dimensions, []),
     faqs: parseJsonField<FaqItem[]>(product.faqs, []),

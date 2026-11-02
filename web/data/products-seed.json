@@ -21,24 +21,6 @@
       "/assets/images/img2.jpeg",
       "/assets/images/img3.jpeg"
     ],
-    "option_groups": [
-      {
-        "name": "Furniture Finish",
-        "options": [
-          { "name": "Blackened Oak", "image": "/assets/images/img4.jpeg" },
-          { "name": "Tuscan Sun", "image": "/assets/images/img5.jpeg" },
-          { "name": "Weathered Chestnut", "image": "/assets/images/img3.jpeg" }
-        ]
-      },
-      {
-        "name": "Fabric and Color",
-        "options": [
-          { "name": "Rustic Chenille Dark Moss", "hex": "#4a5a3c" },
-          { "name": "Natural Linen", "hex": "#d8d0c4" },
-          { "name": "Charcoal Velvet", "hex": "#3a3a3a" }
-        ]
-      }
-    ],
     "details_sections": [
       {
         "title": "Construction",
@@ -130,7 +112,6 @@
     "shown_caption": "Shown in Natural Linen with Blackened Oak Legs.",
     "free_shipping": 1,
     "images": ["/assets/images/sofa4.webp", "/assets/images/sofa5.webp"],
-    "option_groups": [],
     "details_sections": [],
     "dimensions": [{ "label": "Overall", "value": "22\" w x 25\" d x 42.5\" h" }],
     "faqs": [],
@@ -157,7 +138,6 @@
     "shown_caption": "Shown in Cognac Leather with Tuscan Sun Legs.",
     "free_shipping": 1,
     "images": ["/assets/images/sofa6.webp", "/assets/images/sofa7.webp"],
-    "option_groups": [],
     "details_sections": [],
     "dimensions": [],
     "faqs": [],
@@ -184,7 +164,6 @@
     "shown_caption": "Shown in Rustic Chenille Dark Moss.",
     "free_shipping": 1,
     "images": ["/assets/images/sofa8.webp", "/assets/images/furniture2.jpeg"],
-    "option_groups": [],
     "details_sections": [],
     "dimensions": [],
     "faqs": [],
@@ -211,7 +190,6 @@
     "shown_caption": null,
     "free_shipping": 1,
     "images": ["/assets/images/furniture3.jpeg", "/assets/images/furniture4.jpeg"],
-    "option_groups": [],
     "details_sections": [],
     "dimensions": [],
     "faqs": [],
@@ -239,7 +217,6 @@
     "shown_caption": null,
     "free_shipping": 0,
     "images": ["/assets/images/furniture5.jpeg", "/assets/images/collection1.avif"],
-    "option_groups": [],
     "details_sections": [],
     "dimensions": [],
     "faqs": [],
@@ -266,15 +243,6 @@
     "shown_caption": "Shown in Brushed Brass.",
     "free_shipping": 1,
     "images": ["/assets/images/mygift1.webp", "/assets/images/mygift2.webp"],
-    "option_groups": [
-      {
-        "name": "Finish",
-        "options": [
-          { "name": "Brushed Brass", "hex": "#c4a35a" },
-          { "name": "Matte Black", "hex": "#222" }
-        ]
-      }
-    ],
     "details_sections": [
       {
         "title": "Construction",
@@ -321,16 +289,6 @@
     "shown_caption": "Shown in Natural.",
     "free_shipping": 1,
     "images": ["/assets/images/collection2.avif", "/assets/images/banner.jpg"],
-    "option_groups": [
-      {
-        "name": "Color",
-        "options": [
-          { "name": "Natural", "hex": "#e8dfd0" },
-          { "name": "Fog", "hex": "#b9c0c2" },
-          { "name": "Ink", "hex": "#2c3340" }
-        ]
-      }
-    ],
     "details_sections": [
       {
         "title": "Care",
