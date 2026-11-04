@@ -29,7 +29,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/assets/images/Logo/favicon/favicon.ico" />
+        <link rel="icon" href="/assets/images/Logo/favicon/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/Logo/favicon/favicon-32x32.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/Logo/favicon/apple-icon-180x180.png" />
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>

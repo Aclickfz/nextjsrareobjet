@@ -95,7 +95,7 @@ export function StoreNavigation({ categories, navigation, cart, wishlist, user }
     <AnnouncementTicker />
     <div className={styles.main}>
       <button ref={opener} className={`${styles.iconButton} ${styles.hamburger}`} type="button" aria-label="Open navigation menu" aria-haspopup="dialog" aria-controls="store-navigation-drawer" onClick={() => drawer.current?.showModal()}><Menu /></button>
-      <Link href="/" className={styles.logo} aria-label="JustAclick home"><img src="/assets/images/Logo/Logo1.svg" alt="JustAclick" width={166} height={50} /></Link>
+      <Link href="/" className={styles.logo} aria-label="JustAclick home"><img src="/assets/images/Logo/JustAClick-Logo.png" alt="JustAClick" width={166} height={48} /></Link>
       <ProductSearch />
       <div className={styles.actions}>
         <div className={styles.account} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setMenu(current => current === 'account' ? null : current); }}>
