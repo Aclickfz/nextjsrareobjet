@@ -1,0 +1,222 @@
+/* Site-wide look matching the home video hero. Loaded last. */
+:root {
+    --hero-ink: #111;
+    --hero-overlay: linear-gradient(90deg, rgb(10 10 10 / 72%) 0%, rgb(10 10 10 / 35%) 45%, rgb(10 10 10 / 0%) 75%),
+        linear-gradient(0deg, rgb(10 10 10 / 65%) 0%, rgb(10 10 10 / 0%) 40%);
+    --ease-out: cubic-bezier(.2, .7, .2, 1);
+    --content-width: 100%;
+    --page-gutter: clamp(1rem, 3vw, 3rem);
+}
+
+/* Full-width layout on every screen size. */
+html, body { max-width: 100%; overflow-x: hidden; }
+.container, .container-fluid, .footer_wrapper .container, .account-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-inline: var(--page-gutter);
+}
+.offer_info, .bottom-menu > ul { max-width: 100%; }
+main > section[aria-roledescription='carousel'] { border-radius: 0 !important; margin-inline: 0 !important; }
+.banner_wrapper .banner_video { padding-block: 0 !important; }
+.banner_wrapper .container-fluid { padding-inline: 0 !important; }
+.banner_wrapper .banner_video__content, .banner_wrapper .banner_video__content img { border-radius: 0 !important; width: 100%; }
+
+/* Pill buttons: solid dark by default, white when sitting on imagery. */
+.global_btn, .shop-now a, .collection-btn a, .design-btn a, .furniture_content__btn a,
+.my-checkout a, .order-now a, .order-now button, .sign_submit, .btn-dark, .btn-primary {
+    min-height: 50px;
+    padding: .75rem 1.75rem;
+    border-radius: 999px !important;
+    border: 1px solid var(--hero-ink);
+    background: var(--hero-ink);
+    color: #fff !important;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    transition: background .25s, color .25s, border-color .25s, transform .25s var(--ease-out), box-shadow .25s;
+}
+.global_btn:hover, .shop-now a:hover, .collection-btn a:hover, .design-btn a:hover, .furniture_content__btn a:hover,
+.my-checkout a:hover, .order-now a:hover, .order-now button:hover, .sign_submit:hover, .btn-dark:hover, .btn-primary:hover {
+    background: #fff;
+    color: var(--hero-ink) !important;
+    border-color: var(--hero-ink);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgb(0 0 0 / 12%);
+}
+
+.design-btn a:nth-child(2), .furniture_content__btn a:nth-child(2) {
+    background: transparent;
+    color: var(--hero-ink) !important;
+}
+.design-btn a:nth-child(2):hover, .furniture_content__btn a:nth-child(2):hover {
+    background: var(--hero-ink);
+    color: #fff !important;
+}
+
+.banner_video__text .global_btn, .collection-btn a, .box-content {
+    background: #fff;
+    color: var(--hero-ink) !important;
+    border-color: #fff;
+}
+.banner_video__text .global_btn:hover, .collection-btn a:hover {
+    background: transparent;
+    color: #fff !important;
+    border-color: #fff;
+}
+
+/* Old image banner: same overlay and typography as the video hero. */
+.banner_video__content { position: relative; overflow: hidden; border-radius: 16px; }
+.banner_video__content::after { content: ''; position: absolute; inset: 0; background: var(--hero-overlay); pointer-events: none; }
+.banner_video__content img { transition: transform 1.2s var(--ease-out); }
+.banner_video:hover .banner_video__content img { transform: scale(1.04); }
+.banner_video__text { z-index: 2; }
+.banner_video__text h3 {
+    display: inline-block;
+    padding: 7px 14px;
+    color: #fff;
+    border: 1px solid rgb(255 255 255 / 40%);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 8%);
+    backdrop-filter: blur(6px);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+}
+.banner_video__text h1, .banner_video__text h2 {
+    font-family: var(--font-body);
+    font-weight: 500;
+    letter-spacing: -.02em;
+    line-height: 1.02;
+}
+
+/* Inner page banners (About, Blogs, Contact, Cart, ...): dark image hero. */
+.category_banner, .cart_banner {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: flex-end;
+    min-height: clamp(260px, 38vw, 420px);
+    padding-block: clamp(2.5rem, 6vw, 4.5rem);
+    background: #111 url('/assets/images/banner2.jpg') center / cover no-repeat;
+    border-bottom: 0;
+    overflow: hidden;
+}
+.category_banner::before, .cart_banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--hero-overlay);
+}
+.category_banner > .container, .cart_banner > .container { max-width: var(--content-width); }
+.category_banner__content, .cart_banner__content { text-align: left; align-items: flex-start; }
+.category_banner__content h1, .cart_banner__content h1 {
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: clamp(2.2rem, 5.5vw, 4.5rem);
+    font-weight: 500;
+    line-height: 1.02;
+    letter-spacing: -.02em;
+    text-transform: capitalize;
+    animation: hero-rise .8s var(--ease-out) .15s both;
+}
+.category_banner__breadcrumb, .cart_banner__breadcrumb {
+    justify-content: flex-start;
+    align-items: center;
+    width: fit-content;
+    margin-top: 1rem;
+    padding: 7px 16px;
+    border: 1px solid rgb(255 255 255 / 40%);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 8%);
+    backdrop-filter: blur(6px);
+    animation: hero-rise .8s var(--ease-out) .3s both;
+}
+.category_banner__breadcrumb :is(p, span, a), .cart_banner__breadcrumb :is(p, span, a) {
+    margin: 0;
+    color: rgb(255 255 255 / 85%) !important;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+.category_banner__breadcrumb a:hover, .cart_banner__breadcrumb a:hover { color: #fff !important; }
+
+.catalog-title {
+    font-family: var(--font-body);
+    font-weight: 500;
+    letter-spacing: -.02em;
+}
+
+/* Editorial headings. */
+.main_heading h3, .main_heading h2, .holiday_heading h3, .collection_heading h3,
+.collection_wrapper__left h2, .bestseller_wrapper__right h3, .design_wrapper__content h3, .furniture_content h3 {
+    font-family: var(--font-body);
+    font-weight: 500;
+    letter-spacing: -.02em;
+}
+.main_heading h4, .bestseller_wrapper__right h6, .design_wrapper__content h6, .discover_heading h6, .collection_wrapper__left h4 {
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Imagery: rounded corners, slow zoom on hover. */
+.categories_box, .holiday_grid__box, .furniture_img, .collection_img, .bestseller_wrapper__left,
+.wednesday_wrapper__banner, .mycollection_box__img, .categories_wrapper__box, .elements_wrapper .swiper-slide > a,
+.discover_wrapper .swiper-slide > a, .product-card, .product_box {
+    overflow: hidden;
+    border-radius: 14px;
+}
+:is(.categories_box, .holiday_grid__box, .furniture_img, .collection_img, .bestseller_wrapper__left,
+.wednesday_wrapper__banner, .mycollection_box, .categories_wrapper__box, .swiper-slide, .product-card, .product_box) img {
+    transition: transform 1s var(--ease-out);
+}
+:is(.categories_box, .holiday_grid__box, .furniture_img, .collection_img, .bestseller_wrapper__left,
+.wednesday_wrapper__banner, .mycollection_box, .categories_wrapper__box, .swiper-slide, .product-card, .product_box):hover img {
+    transform: scale(1.05);
+}
+
+/* Form fields and cards. */
+input:not([type='checkbox'], [type='radio'], [type='range']), select, textarea {
+    border-radius: 12px;
+    transition: border-color .2s, box-shadow .2s;
+}
+input:not([type='checkbox'], [type='radio'], [type='range']):focus, select:focus, textarea:focus {
+    border-color: var(--hero-ink) !important;
+    box-shadow: 0 0 0 3px rgb(17 17 17 / 10%);
+    outline: none;
+}
+.search-field input:focus { box-shadow: none; }
+
+/* Scroll reveal; only active once the script has run. */
+.reveal-ready .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .8s ease, transform .8s var(--ease-out);
+}
+.reveal-ready .reveal.is-visible { opacity: 1; transform: none; }
+
+@keyframes hero-rise {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 767px) {
+    .global_btn, .shop-now a, .collection-btn a, .design-btn a, .furniture_content__btn a {
+        min-height: 46px;
+        padding: .65rem 1.25rem;
+    }
+    .category_banner, .cart_banner { min-height: 240px; }
+    .banner_video__content { border-radius: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reveal-ready .reveal { opacity: 1; transform: none; transition: none; }
+    .category_banner__content h1, .category_banner__breadcrumb, .cart_banner__content h1, .cart_banner__breadcrumb { animation: none; }
+    :is(.categories_box, .holiday_grid__box, .furniture_img, .collection_img, .bestseller_wrapper__left,
+    .wednesday_wrapper__banner, .mycollection_box, .categories_wrapper__box, .swiper-slide, .product-card, .product_box):hover img { transform: none; }
+}

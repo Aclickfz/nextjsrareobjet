@@ -24,7 +24,7 @@
 }
 .announcement { min-height: 32px; padding: 6px 20px; display: flex; align-items: center; justify-content: center; gap: 9px; background: #f7f6f2; font-size: 11px; letter-spacing: .04em; }
 .announcement a { display: inline-flex; align-items: center; gap: 5px; margin-left: 16px; text-decoration: underline; text-underline-offset: 3px; }
-.main { max-width: 1600px; margin: auto; padding: 22px 36px; display: grid; grid-template-columns: 190px minmax(200px, 560px) auto; align-items: center; justify-content: space-between; gap: 36px; }
+.main { max-width: none; margin: auto; padding: 22px 36px; display: grid; grid-template-columns: 190px minmax(200px, 560px) auto; align-items: center; justify-content: space-between; gap: 36px; }
 .logo { display: inline-flex; align-items: center; }
 .logo img { display: block; width: 166px; height: 50px; object-fit: contain; }
 .search { position: relative; min-width: 0; }
@@ -53,7 +53,7 @@
 .accountPanel a:hover { text-decoration: underline; }
 .hamburger { display: none; }
 .navigation { border-top: 1px solid #eee; position: relative; }
-.navigation > ul { display: flex; align-items: center; justify-content: space-between; gap: 4px; list-style: none; padding: 0 32px; margin: 0 auto; max-width: 1600px; }
+.navigation > ul { display: flex; align-items: center; justify-content: space-between; gap: 4px; list-style: none; padding: 0 32px; margin: 0 auto; max-width: none; }
 .navItem { display: flex; align-items: center; min-height: 47px; }
 .navItem > a { font-size: 12px; padding: 15px 4px; white-space: nowrap; }
 .navItem > a:hover, .navItem a[aria-current] { text-decoration: underline; text-underline-offset: 6px; }
