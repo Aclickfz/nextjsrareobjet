@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { SiteHeader } from '@/components/layout/SiteHeader';
 import { StoreScripts } from '@/components/layout/StoreScripts';
+import { ScrollReveal } from '@/components/layout/ScrollReveal';
 import { getCart } from '@/actions/cart.actions';
 import { currentUser } from '@/lib/auth';
 import { query } from '@/lib/db';
@@ -47,7 +48,8 @@ const styles = [
   '/assets/css/whishlist.css',
   '/assets/css/auth-modern.css',
   '/assets/css/account.css',
-  '/assets/css/pottery-base.css'
+  '/assets/css/pottery-base.css',
+  '/assets/css/modern-ui.css'
 ];
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
@@ -93,6 +95,7 @@ async function StoreShell({ children }: { children: React.ReactNode }) {
       {children}
       <SiteFooter />
       <StoreScripts />
+      <ScrollReveal />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
