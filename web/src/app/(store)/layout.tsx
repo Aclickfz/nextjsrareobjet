@@ -57,9 +57,9 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
     <html lang="en">
       <head>
         {styles.map((href) => <link key={href} rel="stylesheet" href={href} />)}
-        <link rel="icon" href="/assets/images/Logo/favicon/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/png" sizes="96x96" href="/assets/images/Logo/favicon/favicon-96x96.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/Logo/favicon/favicon-32x32.png" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/Logo/favicon/apple-icon-180x180.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/Logo/favicon/favicon-180x180.png" />
         <meta name="theme-color" content="#222222" />
       </head>
       <body><ToastProvider><StoreShell>{children}</StoreShell></ToastProvider></body>
