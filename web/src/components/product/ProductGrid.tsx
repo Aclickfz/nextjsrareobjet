@@ -93,10 +93,12 @@ export function ProductGrid({
               const image = product.images?.[0]?.path;
               const compare = product.compare_at_price ? Number(product.compare_at_price) : 0;
               const onSale = compare > Number(product.price);
+              const badge = product.badge || (onSale ? 'Sale' : '');
               return (
                 <div className="col-xl-3 col-md-4 col-sm-6" key={product.id}>
                   <div className="card__inner shop-card">
                     <div className="card--img">
+                      {badge ? <span className="shop-card__badge">{badge}</span> : null}
                       <Link href={`/products/${product.slug}`}>
                         <div className="media_hover">
                           <img decoding="async" loading="lazy" src={imgSrc(image)} className="img-fluid" alt={product.name} />
@@ -107,7 +109,6 @@ export function ProductGrid({
                       </div>
                     </div>
                     <div className="card__inner_content">
-                      <h6>{product.badge || (onSale ? 'Sale' : '\u00a0')}</h6>
                       <Link href={`/products/${product.slug}`}>{product.name}</Link>
                       <span className="shop-card__price">
                         {onSale ? <s>{money(compare)}</s> : null}

@@ -7,6 +7,7 @@ import { addToCartAction } from '@/actions/cart.actions';
 import { imgSrc, money } from '@/lib/utils';
 import { useToast } from '@/components/ui/ToastProvider';
 import { WishlistButton } from './WishlistButton';
+import { ProductImageViewer } from './ProductImageViewer';
 import { rememberRecent } from './RecentsList';
 import type { normalizePdp } from '@/lib/product-pdp';
 
@@ -105,7 +106,7 @@ export function ProductPurchase({ product }: { product: Product }) {
                 </div>
                 <div className="purchasing_big__img">
                   <WishlistButton productId={product.id} />
-                  <img id="imgBox" src={imgSrc(images[active]?.path)} className="img-fluid example-1 image" alt={product.name} />
+                  <ProductImageViewer images={images} active={active} onChange={setActive} name={product.name} />
                   {caption ? <p className="shop-pdp__caption">{caption}</p> : null}
                 </div>
               </div>

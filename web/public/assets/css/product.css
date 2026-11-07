@@ -1252,3 +1252,240 @@
     }
 }
 
+.shop-card__badge {
+    position: absolute;
+    top: calc(1rem + 22px);
+    left: 1rem;
+    z-index: 2;
+    transform: translateY(-50%);
+    padding: 4px 9px;
+    border-radius: 3px;
+    background: #fff;
+    color: #222;
+    font-size: 11px;
+    line-height: 1.3;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    pointer-events: none;
+}
+
+@media (max-width: 767.98px) {
+    .shop-card__badge {
+        top: calc(1rem + 18px);
+        left: 1rem;
+        font-size: 10px;
+        padding: 3px 7px;
+    }
+}
+
+.pdp-zoom {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.pdp-zoom__lens {
+    position: absolute;
+    width: 26%;
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.pdp-zoom__pane {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 16px);
+    width: 65%;
+    height: 65%;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-size: 300%;
+    border: 1px solid #e4e4e4;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    pointer-events: none;
+    z-index: 30;
+}
+
+@media (hover: none), (max-width: 991px) {
+    .pdp-zoom__lens,
+    .pdp-zoom__pane {
+        display: none;
+    }
+}
+
+.pdp-lightbox__overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.pdp-lightbox {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    width: min(1020px, 96vw);
+    height: min(800px, 92vh);
+    padding: 24px 32px 32px;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    outline: none;
+}
+
+.pdp-lightbox__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.pdp-lightbox__title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 400;
+}
+
+.pdp-lightbox__close {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #222;
+    cursor: pointer;
+}
+
+.pdp-lightbox__close svg {
+    width: 30px;
+    height: 30px;
+}
+
+.pdp-lightbox__body {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 112px minmax(0, 1fr) 48px;
+    gap: 28px;
+    min-height: 0;
+}
+
+.pdp-lightbox__thumbs {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.pdp-lightbox__thumbs::-webkit-scrollbar {
+    display: none;
+}
+
+.pdp-lightbox__thumbs button {
+    flex-shrink: 0;
+    padding: 0;
+    border: 1px solid transparent;
+    background: none;
+    cursor: pointer;
+}
+
+.pdp-lightbox__thumbs button.is-active {
+    border-color: #222;
+}
+
+.pdp-lightbox__thumbs img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+}
+
+.pdp-lightbox__stage {
+    display: flex;
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+}
+
+.pdp-lightbox__stage img {
+    margin: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.pdp-lightbox__tools {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-top: 80px;
+}
+
+.pdp-lightbox__tools button {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #222;
+    cursor: pointer;
+}
+
+.pdp-lightbox__tools button svg {
+    width: 34px;
+    height: 34px;
+    stroke-width: 1.25;
+}
+
+.pdp-lightbox__tools button:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+@media (max-width: 767px) {
+    .pdp-lightbox {
+        width: 100vw;
+        height: 100dvh;
+        padding: 16px;
+    }
+
+    .pdp-lightbox__body {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr) auto;
+        gap: 12px;
+    }
+
+    .pdp-lightbox__thumbs {
+        order: 2;
+        flex-direction: row;
+        gap: 10px;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .pdp-lightbox__thumbs button {
+        width: 72px;
+    }
+
+    .pdp-lightbox__tools {
+        display: none;
+    }
+}
+
