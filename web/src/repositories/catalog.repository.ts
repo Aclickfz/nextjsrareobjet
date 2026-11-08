@@ -163,20 +163,14 @@ export async function listCategories() {
 }
 
 export const STORE_NAV = [
+  { name: 'New Arrivals', slug: 'new' },
   { name: 'Furniture', slug: 'furniture' },
-  { name: 'New', slug: 'new' },
-  { name: 'Outdoor', slug: 'outdoor' },
-  { name: 'Bedding', slug: 'bedding' },
-  { name: 'Bath', slug: 'bath' },
-  { name: 'Lighting', slug: 'lighting' },
-  { name: 'Rugs', slug: 'rugs' },
-  { name: 'Windows', slug: 'windows' },
-  { name: 'Pillows & Decor', slug: 'pillows-decor' },
-  { name: 'Art & Mirrors', slug: 'art-mirrors' },
-  { name: 'Tabletop & Bar', slug: 'tabletop-bar' },
-  { name: 'Storage', slug: 'storage' },
-  { name: 'Holidays', slug: 'holidays' },
-  { name: 'Gifts', slug: 'gifts' }
+  { name: 'Home Décor', slug: 'pillows-decor' },
+  { name: 'Lighting & Lamps', slug: 'lighting' },
+  { name: 'Kitchen & Tabletop', slug: 'tabletop-bar' },
+  { name: 'Home Utility & Essentials', slug: 'home-utility-essentials' },
+  { name: 'Gifts', slug: 'gifts' },
+  { name: 'Sale', slug: 'sale' }
 ] as const;
 
 export async function ensureStoreCategories() {
@@ -185,6 +179,10 @@ export async function ensureStoreCategories() {
       `INSERT INTO categories (name, slug, is_active)
        SELECT :name, :slug, 1 FROM DUAL
        WHERE NOT EXISTS (SELECT 1 FROM categories WHERE slug = :slug)`,
+      { name: category.name, slug: category.slug }
+    );
+    await query(
+      'UPDATE categories SET name = :name WHERE slug = :slug AND parent_id IS NULL AND name <> :name',
       { name: category.name, slug: category.slug }
     );
   }

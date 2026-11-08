@@ -42,6 +42,7 @@ const styles = [
   '/assets/css/payment.css',
   '/assets/css/login.css',
   '/assets/css/about.css',
+  '/assets/css/content-pages.css',
   '/assets/css/blogs.css',
   '/assets/css/blog_details.css',
   '/assets/css/contract.css',
