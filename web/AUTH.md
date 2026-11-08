@@ -18,12 +18,12 @@ SMTP_PORT=465
 SMTP_USER=accounts@yourdomain.com
 SMTP_PASSWORD="your-mailbox-password"
 AUTH_EMAIL_FROM="JustAclick <accounts@yourdomain.com>"
-SUPPORT_EMAIL_TO=alclickfz@gmail.com
+SUPPORT_EMAIL_TO=aclickfz@gmail.com
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 COOKIE_SECURE=false
 ```
 
-Use the same mailbox for SMTP_USER and AUTH_EMAIL_FROM. After a chat/feedback form is saved, the app emails the customer a confirmation and emails `SUPPORT_EMAIL_TO` (default `alclickfz@gmail.com`) so admin can resolve the issue. Port 465 uses TLS immediately. If your provider/network requires port 587, change SMTP_PORT to 587; the app then requires STARTTLS. No SMTP_SECURE variable is needed. Certificate validation remains enabled.
+Use the same mailbox for SMTP_USER and AUTH_EMAIL_FROM. After a chat/feedback form is saved, the app emails the customer a confirmation and emails `SUPPORT_EMAIL_TO` (default `aclickfz@gmail.com`) so admin can resolve the issue. Port 465 uses TLS immediately. If your provider/network requires port 587, change SMTP_PORT to 587; the app then requires STARTTLS. No SMTP_SECURE variable is needed. Certificate validation remains enabled.
 
 Next.js loads environment files from web/, not the repository root .evn file. Existing process environment variables and .env.local/.env.development.local may override .env; remove conflicting values. If a password contains a literal dollar sign, escape it as \$ in a Next.js env file (quotes alone do not prevent expansion). Do not use the escape in a hosting dashboard field. Never prefix SMTP credentials with NEXT_PUBLIC_ or commit them.
 
