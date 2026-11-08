@@ -75,7 +75,7 @@ export const sitePages: SitePage[] = [
         'After-hours messages are answered on the next business day.'
       ] }
     ],
-    cta: { label: 'Contact our team', href: '/contact' }
+    cta: { label: 'Open chat', href: '/chat-support' }
   },
   {
     slug: 'brand-feedback',
@@ -93,7 +93,7 @@ export const sitePages: SitePage[] = [
         'We cannot reply to every note personally, but every submission is read.'
       ] }
     ],
-    cta: { label: 'Send feedback', href: '/contact' }
+    cta: { label: 'Send feedback', href: '/brand-feedback' }
   },
   {
     slug: 'safety-recalls',

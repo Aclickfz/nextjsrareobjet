@@ -7,6 +7,7 @@ import { getCart } from '@/actions/cart.actions';
 import { currentUser } from '@/lib/auth';
 import { query } from '@/lib/db';
 import { ToastProvider } from '@/components/ui/ToastProvider';
+import { ChatSupportLauncher } from '@/components/support/ChatSupportLauncher';
 
 export const dynamic = 'force-dynamic';
 
@@ -97,6 +98,7 @@ async function StoreShell({ children }: { children: React.ReactNode }) {
       <SiteHeader cart={cart} wishlist={wishlist} />
       {children}
       <SiteFooter />
+      <ChatSupportLauncher />
       <StoreScripts />
       <ScrollReveal />
       <script
