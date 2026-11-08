@@ -1,3 +1,4 @@
+﻿import { assetImage } from '@/lib/utils';
 import { HeroVideoBanner } from './HeroVideoBanner';
 import { CategoryShowcases } from './CategoryShowcases';
 
@@ -13,7 +14,7 @@ export function HomeMain() {
             <div className="row">
                 <div className="col-lg-7">
                     <div className="bestseller_wrapper__left">
-                        <img decoding="async" loading="lazy" src="/assets/images/furniture5.jpeg" className="img-fluid" alt="furniture" />
+                        <img decoding="async" loading="lazy" src={assetImage('furniture5.jpeg')} className="img-fluid" alt="furniture" />
                     </div>
                 </div>
                 <div className="col-lg-5">
@@ -51,10 +52,10 @@ export function HomeMain() {
                     <div className="col-lg-6">
                         <div className="collection_wrapper__right">
                             <div className="collection_img">
-                                <img decoding="async" loading="lazy" src="/assets/images/collection1.avif" className="img-fluid" alt="collection1" />
+                                <img decoding="async" loading="lazy" src={assetImage('collection1.avif')} className="img-fluid" alt="collection1" />
                             </div>
                             <div className="collection_img">
-                                <img decoding="async" loading="lazy" src="/assets/images/collection2.avif" className="img-fluid" alt="collection1" />
+                                <img decoding="async" loading="lazy" src={assetImage('collection2.avif')} className="img-fluid" alt="collection1" />
                             </div>
                         </div>
                     </div>
@@ -69,10 +70,10 @@ export function HomeMain() {
                     <div className="col-lg-6">
                         <div className="collection_wrapper__right">
                             <div className="collection_img">
-                                <img decoding="async" loading="lazy" src="/assets/images/collection1.avif" className="img-fluid" alt="Table tops collection" />
+                                <img decoding="async" loading="lazy" src={assetImage('collection1.avif')} className="img-fluid" alt="Table tops collection" />
                             </div>
                             <div className="collection_img">
-                                <img decoding="async" loading="lazy" src="/assets/images/collection2.avif" className="img-fluid" alt="Kitchenware collection" />
+                                <img decoding="async" loading="lazy" src={assetImage('collection2.avif')} className="img-fluid" alt="Kitchenware collection" />
                             </div>
                         </div>
                     </div>
@@ -110,32 +111,32 @@ export function HomeMain() {
                     <div className="swiper-wrapper">
                         <div className="swiper-slide">
                             <a href="#">
-                                <img decoding="async" loading="lazy" src="/assets/images/img2.jpeg" className="img-fluid" alt="Explore the collection" />
+                                <img decoding="async" loading="lazy" src={assetImage('img2.jpeg')} className="img-fluid" alt="Explore the collection" />
                             </a>
                         </div>
                         <div className="swiper-slide">
                             <a href="#">
-                                <img decoding="async" loading="lazy" src="/assets/images/img3.jpeg" className="img-fluid" alt="Explore the collection" />
+                                <img decoding="async" loading="lazy" src={assetImage('img3.jpeg')} className="img-fluid" alt="Explore the collection" />
                             </a>
                         </div>
                         <div className="swiper-slide">
                             <a href="#">
-                                <img decoding="async" loading="lazy" src="/assets/images/img4.jpeg" className="img-fluid" alt="Explore the collection" />
+                                <img decoding="async" loading="lazy" src={assetImage('img4.jpeg')} className="img-fluid" alt="Explore the collection" />
                             </a>
                         </div>
                         <div className="swiper-slide">
                             <a href="#">
-                                <img decoding="async" loading="lazy" src="/assets/images/img5.jpeg" className="img-fluid" alt="Explore the collection" />
+                                <img decoding="async" loading="lazy" src={assetImage('img5.jpeg')} className="img-fluid" alt="Explore the collection" />
                             </a>
                         </div>
                         <div className="swiper-slide">
                             <a href="#">
-                                <img decoding="async" loading="lazy" src="/assets/images/img1.avif" className="img-fluid" alt="Explore the collection" />
+                                <img decoding="async" loading="lazy" src={assetImage('img1.avif')} className="img-fluid" alt="Explore the collection" />
                             </a>
                         </div>
                         <div className="swiper-slide">
                             <a href="#">
-                                <img decoding="async" loading="lazy" src="/assets/images/img1.avif" className="img-fluid" alt="Explore the collection" />
+                                <img decoding="async" loading="lazy" src={assetImage('img1.avif')} className="img-fluid" alt="Explore the collection" />
                             </a>
                         </div>
 
@@ -160,32 +161,32 @@ export function HomeMain() {
                     <div className="swiper-wrapper">
                         <div className="swiper-slide">
                             <a href="#">
-                                <img decoding="async" loading="lazy" src="/assets/images/016.avif" className="img-fluid" alt="Explore the collection" />
+                                <img decoding="async" loading="lazy" src={assetImage('016.avif')} className="img-fluid" alt="Explore the collection" />
                             </a>
                         </div>
                         <div className="swiper-slide">
                             <a href="#">
-                                <img decoding="async" loading="lazy" src="/assets/images/010.avif" className="img-fluid" alt="Explore the collection" />
+                                <img decoding="async" loading="lazy" src={assetImage('010.avif')} className="img-fluid" alt="Explore the collection" />
                             </a>
                         </div>
                         <div className="swiper-slide">
                             <a href="#">
-                                <img decoding="async" loading="lazy" src="/assets/images/012.avif" className="img-fluid" alt="Explore the collection" />
+                                <img decoding="async" loading="lazy" src={assetImage('012.avif')} className="img-fluid" alt="Explore the collection" />
                             </a>
                         </div>
                         <div className="swiper-slide">
                             <a href="#">
-                                <img decoding="async" loading="lazy" src="/assets/images/013.avif" className="img-fluid" alt="Explore the collection" />
+                                <img decoding="async" loading="lazy" src={assetImage('013.avif')} className="img-fluid" alt="Explore the collection" />
                             </a>
                         </div>
                         <div className="swiper-slide">
                             <a href="#">
-                                <img decoding="async" loading="lazy" src="/assets/images/009.avif" className="img-fluid" alt="Explore the collection" />
+                                <img decoding="async" loading="lazy" src={assetImage('009.avif')} className="img-fluid" alt="Explore the collection" />
                             </a>
                         </div>
                         <div className="swiper-slide">
                             <a href="#">
-                                <img decoding="async" loading="lazy" src="/assets/images/img1.avif" className="img-fluid" alt="Explore the collection" />
+                                <img decoding="async" loading="lazy" src={assetImage('img1.avif')} className="img-fluid" alt="Explore the collection" />
                             </a>
                         </div>
 
@@ -205,7 +206,7 @@ export function HomeMain() {
                 <div className="mycollection_box">
                     <a href="#">
                         <div className="mycollection_box__img">
-                            <img decoding="async" loading="lazy" src="/assets/images/sofa1.webp" className="img-fluid" alt="Explore the collection" />
+                            <img decoding="async" loading="lazy" src={assetImage('sofa1.webp')} className="img-fluid" alt="Explore the collection" />
                         </div>
                         <div className="mycollection_box__content">
                             <p>up to 40% off sofas & chairs <i className='bx bx-chevron-right'></i></p>
@@ -215,7 +216,7 @@ export function HomeMain() {
                 <div className="mycollection_box">
                     <a href="#">
                         <div className="mycollection_box__img">
-                            <img decoding="async" loading="lazy" src="/assets/images/sofa2.webp" className="img-fluid" alt="Explore the collection" />
+                            <img decoding="async" loading="lazy" src={assetImage('sofa2.webp')} className="img-fluid" alt="Explore the collection" />
                         </div>
                         <div className="mycollection_box__content">
                             <p>up to 40% off sofas & chairs <i className='bx bx-chevron-right'></i></p>
@@ -225,7 +226,7 @@ export function HomeMain() {
                 <div className="mycollection_box">
                     <a href="#">
                         <div className="mycollection_box__img">
-                            <img decoding="async" loading="lazy" src="/assets/images/sofa3.webp" className="img-fluid" alt="Explore the collection" />
+                            <img decoding="async" loading="lazy" src={assetImage('sofa3.webp')} className="img-fluid" alt="Explore the collection" />
                         </div>
                         <div className="mycollection_box__content">
                             <p>up to 40% off sofas & chairs <i className='bx bx-chevron-right'></i></p>
@@ -235,7 +236,7 @@ export function HomeMain() {
                 <div className="mycollection_box">
                     <a href="#">
                         <div className="mycollection_box__img">
-                            <img decoding="async" loading="lazy" src="/assets/images/sofa4.webp" className="img-fluid" alt="Explore the collection" />
+                            <img decoding="async" loading="lazy" src={assetImage('sofa4.webp')} className="img-fluid" alt="Explore the collection" />
                         </div>
                         <div className="mycollection_box__content">
                             <p>up to 40% off sofas & chairs <i className='bx bx-chevron-right'></i></p>
@@ -245,7 +246,7 @@ export function HomeMain() {
                 <div className="mycollection_box">
                     <a href="#">
                         <div className="mycollection_box__img">
-                            <img decoding="async" loading="lazy" src="/assets/images/sofa5.webp" className="img-fluid" alt="Explore the collection" />
+                            <img decoding="async" loading="lazy" src={assetImage('sofa5.webp')} className="img-fluid" alt="Explore the collection" />
                         </div>
                         <div className="mycollection_box__content">
                             <p>up to 40% off sofas & chairs <i className='bx bx-chevron-right'></i></p>
@@ -255,7 +256,7 @@ export function HomeMain() {
                 <div className="mycollection_box">
                     <a href="#">
                         <div className="mycollection_box__img">
-                            <img decoding="async" loading="lazy" src="/assets/images/sofa6.webp" className="img-fluid" alt="Explore the collection" />
+                            <img decoding="async" loading="lazy" src={assetImage('sofa6.webp')} className="img-fluid" alt="Explore the collection" />
                         </div>
                         <div className="mycollection_box__content">
                             <p>up to 40% off sofas & chairs <i className='bx bx-chevron-right'></i></p>
@@ -265,7 +266,7 @@ export function HomeMain() {
                 <div className="mycollection_box">
                     <a href="#">
                         <div className="mycollection_box__img">
-                            <img decoding="async" loading="lazy" src="/assets/images/sofa7.webp" className="img-fluid" alt="Explore the collection" />
+                            <img decoding="async" loading="lazy" src={assetImage('sofa7.webp')} className="img-fluid" alt="Explore the collection" />
                         </div>
                         <div className="mycollection_box__content">
                             <p>up to 40% off sofas & chairs <i className='bx bx-chevron-right'></i></p>
@@ -275,7 +276,7 @@ export function HomeMain() {
                 <div className="mycollection_box">
                     <a href="#">
                         <div className="mycollection_box__img">
-                            <img decoding="async" loading="lazy" src="/assets/images/sofa8.webp" className="img-fluid" alt="Explore the collection" />
+                            <img decoding="async" loading="lazy" src={assetImage('sofa8.webp')} className="img-fluid" alt="Explore the collection" />
                         </div>
                         <div className="mycollection_box__content">
                             <p>up to 40% off sofas & chairs <i className='bx bx-chevron-right'></i></p>
@@ -289,3 +290,4 @@ export function HomeMain() {
     </>
   );
 }
+

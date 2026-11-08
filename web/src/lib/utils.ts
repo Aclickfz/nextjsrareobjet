@@ -38,11 +38,22 @@ export function invoiceNumber(orderId: number) {
   return `INV-${String(orderId).padStart(6, '0')}`;
 }
 
+export function mediaBaseUrl() {
+  return (process.env.NEXT_PUBLIC_MEDIA_BASE_URL || '').replace(/\/$/, '');
+}
+
+/** Resolves product/homepage image paths to local or S3/CDN URLs. */
 export function imgSrc(path?: string | null) {
-  if (!path) return '/assets/images/img2.jpeg';
-  if (/^https?:\/\//i.test(path)) return path;
-  const clean = path.replace(/^\.\//, '').replace(/^\//, '');
+  if (!path) return imgSrc('assets/images/img2.jpeg');
+  if (/^https?:\/\//i.test(path) || path.startsWith('data:') || path.startsWith('blob:')) return path;
+  const clean = path.replace(/^\.\//, '').replace(/^\/+/, '');
+  const base = mediaBaseUrl();
+  if (base) return `${base}/${clean}`;
   return `/${clean}`;
+}
+
+export function assetImage(file: string) {
+  return imgSrc(`assets/images/${file.replace(/^\/+/, '').replace(/^assets\/images\//, '')}`);
 }
 
 export function nextPaymentStatus(current: string, nextStatus: string, markPaid?: boolean) {

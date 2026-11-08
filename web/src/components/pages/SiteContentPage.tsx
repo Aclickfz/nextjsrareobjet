@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import type { SitePage, SitePageBlock } from '@/lib/site-pages';
+import { imgSrc } from '@/lib/utils';
 
 function Block({ block }: { block: SitePageBlock }) {
   if (block.type === 'paragraph') {
@@ -48,7 +49,7 @@ export function SiteContentPage({ page, cta }: { page: SitePage; cta?: ReactNode
         <div className="container">
           <div className="site-content__grid">
             <div className="site-content__media">
-              <img src={page.image} alt={page.imageAlt} />
+              <img src={imgSrc(page.image)} alt={page.imageAlt} />
             </div>
             <div className="site-content__body">
               {page.eyebrow ? <p className="site-content__eyebrow">{page.eyebrow}</p> : null}

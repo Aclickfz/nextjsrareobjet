@@ -8,6 +8,7 @@ import { currentUser } from '@/lib/auth';
 import { query } from '@/lib/db';
 import { ToastProvider } from '@/components/ui/ToastProvider';
 import { ChatSupportLauncher } from '@/components/support/ChatSupportLauncher';
+import { mediaBaseUrl } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,6 +64,7 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
         <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/Logo/favicon/favicon-32x32.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/Logo/favicon/favicon-180x180.png" />
         <meta name="theme-color" content="#222222" />
+        {mediaBaseUrl() ? <meta name="media-base" content={mediaBaseUrl()} /> : null}
       </head>
       <body><ToastProvider><StoreShell>{children}</StoreShell></ToastProvider></body>
     </html>
