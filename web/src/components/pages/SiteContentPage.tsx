@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { SitePage, SitePageBlock } from '@/lib/site-pages';
 
 function Block({ block }: { block: SitePageBlock }) {
@@ -27,7 +28,7 @@ function Block({ block }: { block: SitePageBlock }) {
   );
 }
 
-export function SiteContentPage({ page }: { page: SitePage }) {
+export function SiteContentPage({ page, cta }: { page: SitePage; cta?: ReactNode }) {
   return (
     <main id="main-content" tabIndex={-1}>
       <section className="category_banner">
@@ -56,11 +57,11 @@ export function SiteContentPage({ page }: { page: SitePage }) {
               {page.blocks.map((block, index) => (
                 <Block key={`${page.slug}-${index}`} block={block} />
               ))}
-              {page.cta ? (
+              {cta ?? (page.cta ? (
                 <a className="site-content__cta" href={page.cta.href}>
                   {page.cta.label}
                 </a>
-              ) : null}
+              ) : null)}
             </div>
           </div>
         </div>
