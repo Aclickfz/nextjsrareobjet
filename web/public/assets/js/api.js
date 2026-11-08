@@ -81,11 +81,13 @@ window.JustAclick = window.JustAclick || {};
   };
 
   JA.imgSrc = function imgSrc(path) {
-    if (!path) return 'assets/images/img2.jpeg';
-    if (/^https?:\/\//i.test(path) || path.startsWith('/') || path.startsWith('assets/') || path.startsWith('uploads/')) {
-      return path.startsWith('/') ? path.slice(1) : path;
-    }
-    return path;
+    var base = (document.querySelector('meta[name="media-base"]') || {}).content || '';
+    base = String(base).replace(/\/$/, '');
+    if (!path) path = 'assets/images/img2.jpeg';
+    if (/^https?:\/\//i.test(path) || /^data:|^blob:/i.test(path)) return path;
+    var clean = String(path).replace(/^\.\//, '').replace(/^\/+/, '');
+    if (base) return base + '/' + clean;
+    return '/' + clean;
   };
 
   JA.status = function status(el, message) {

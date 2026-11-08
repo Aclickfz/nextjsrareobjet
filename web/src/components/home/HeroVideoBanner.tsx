@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { assetImage } from '@/lib/utils';
 import styles from './HeroVideoBanner.module.css';
 
 type Slide = {
@@ -19,7 +20,7 @@ const SLIDES: Slide[] = [
     title: 'Interior Design, Reimagined',
     description: 'Original pieces and timeless collections crafted to make every room feel like home.',
     video: 'https://videos.pexels.com/video-files/7578552/7578552-uhd_2560_1440_30fps.mp4',
-    poster: '/assets/images/banner.jpg',
+    poster: assetImage('banner.jpg'),
     href: '/products',
   },
   {
@@ -27,7 +28,7 @@ const SLIDES: Slide[] = [
     title: 'The Fall Collection',
     description: 'Warm textures, sculpted forms and quiet luxury — curated for the colder months.',
     video: 'https://videos.pexels.com/video-files/7578544/7578544-uhd_2560_1440_30fps.mp4',
-    poster: '/assets/images/banner2.jpg',
+    poster: assetImage('banner2.jpg'),
     href: '/products',
   },
   {
@@ -35,7 +36,7 @@ const SLIDES: Slide[] = [
     title: 'Living Room Essentials',
     description: 'Sofas, lighting and décor that bring comfort and character together.',
     video: 'https://videos.pexels.com/video-files/3015510/3015510-hd_1920_1080_24fps.mp4',
-    poster: '/assets/images/banner.jpg',
+    poster: assetImage('banner.jpg'),
     href: '/products',
   },
 ];

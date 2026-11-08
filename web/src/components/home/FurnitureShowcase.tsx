@@ -1,4 +1,5 @@
 import { ArrowRight } from 'lucide-react';
+import { assetImage, imgSrc } from '@/lib/utils';
 import { navigationCategories } from '@/repositories/catalog.repository';
 import { CategorySlider, type SliderCategory } from './CategorySlider';
 import styles from './FurnitureShowcase.module.css';
@@ -9,8 +10,6 @@ type ShowcaseConfig = {
   banner: { image: string; eyebrow: string; title: string; text: string; cta: string };
   fallback: [string, string][];
 };
-
-const IMG = '/assets/images/';
 
 const SHOWCASES: ShowcaseConfig[] = [
   {
@@ -103,14 +102,14 @@ type CategoryRow = Awaited<ReturnType<typeof navigationCategories>>[number];
 
 function sliderItems(config: ShowcaseConfig, rows: CategoryRow[]): SliderCategory[] {
   const href = `/categories/${config.slug}`;
-  const fallback = config.fallback.map(([name, image]) => ({ name, href, image: IMG + image }));
+  const fallback = config.fallback.map(([name, image]) => ({ name, href, image: assetImage(image) }));
   const parent = rows.find((row) => row.slug === config.slug);
   const children = parent ? rows.filter((row) => row.parent_id === parent.id) : [];
   if (children.length < 3) return fallback;
   return children.map((row, i) => ({
     name: row.name,
     href: `/categories/${row.slug}`,
-    image: row.image || fallback[i % fallback.length].image
+    image: row.image ? imgSrc(row.image) : fallback[i % fallback.length].image
   }));
 }
 
@@ -145,7 +144,7 @@ function CategoryShowcase({ config, items }: { config: ShowcaseConfig; items: Sl
       </header>
 
       <a href={href} className={styles.banner}>
-        <img src={IMG + config.banner.image} alt="" className={styles.bannerImage} loading="lazy" decoding="async" />
+        <img src={assetImage(config.banner.image)} alt="" className={styles.bannerImage} loading="lazy" decoding="async" />
         <span className={styles.bannerOverlay} />
         <span className={styles.bannerContent}>
           <span className={styles.eyebrow}>{config.banner.eyebrow}</span>

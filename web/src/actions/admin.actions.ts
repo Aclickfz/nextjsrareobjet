@@ -15,6 +15,7 @@ import { adminCategories, STORE_NAV } from '@/repositories/catalog.repository';
 import { slugify } from '@/lib/utils';
 import { buildProductContent, type ContentKey } from '@/lib/product-content-fields';
 import { updateOrderStatus } from '@/repositories/order.repository';
+import { deleteFromS3, s3Configured, uploadToS3 } from '@/lib/s3';
 import type { ResultSetHeader } from 'mysql2/promise';
 
 function nonNegativeInteger(value: unknown) {
@@ -123,7 +124,7 @@ async function saveProductActionImpl(formData: FormData) {
       { product_id: productId }
     );
     await getPool().execute('DELETE FROM product_images WHERE product_id = :product_id AND is_primary = 1', { product_id: productId });
-    for (const image of oldPrimary) removeUpload(image.path);
+    for (const image of oldPrimary) await removeUpload(image.path);
     await getPool().execute(
       'INSERT INTO product_images (product_id, path, sort_order, is_primary) VALUES (:product_id, :path, 0, 1)',
       { product_id: productId, path: uploaded }
@@ -157,8 +158,8 @@ async function deleteProductGalleryImageActionImpl(formData: FormData) {
   if (!Number.isSafeInteger(productId) || productId <= 0 || !Number.isSafeInteger(imageId) || imageId <= 0) {
     throw new AdminValidationError('Invalid product image');
   }
-  const images = await query<{ slug: string }[]>(
-    `SELECT p.slug FROM product_images pi
+  const images = await query<{ slug: string; path: string }[]>(
+    `SELECT p.slug, pi.path FROM product_images pi
      JOIN products p ON p.id = pi.product_id
      WHERE pi.id = :image_id AND pi.product_id = :product_id AND pi.is_primary = 0`,
     { image_id: imageId, product_id: productId }
@@ -168,6 +169,7 @@ async function deleteProductGalleryImageActionImpl(formData: FormData) {
     'DELETE FROM product_images WHERE id = :image_id AND product_id = :product_id AND is_primary = 0',
     { image_id: imageId, product_id: productId }
   );
+  await removeUpload(images[0].path);
   revalidatePath(`/admin/products/${productId}`);
   revalidatePath('/admin/products');
   revalidatePath(`/products/${images[0].slug}`);
@@ -237,17 +239,29 @@ async function adjustStockActionImpl(formData: FormData) {
 async function storeUpload(file: FormDataEntryValue | null, folder: string) {
   if (!(file instanceof File) || file.size === 0) return null;
   if (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) throw new AdminValidationError('Images only, max 5MB');
-  const dir = path.join(process.cwd(), 'public', 'uploads', folder);
-  fs.mkdirSync(dir, { recursive: true });
   const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safe}`;
-  fs.writeFileSync(path.join(dir, filename), Buffer.from(await file.arrayBuffer()));
-  return `uploads/${folder}/${filename}`;
+  const key = `uploads/${folder}/${filename}`;
+  const body = Buffer.from(await file.arrayBuffer());
+  if (s3Configured()) {
+    await uploadToS3(key, body, file.type || 'application/octet-stream');
+    return key;
+  }
+  const dir = path.join(process.cwd(), 'public', 'uploads', folder);
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, filename), body);
+  return key;
 }
 
-function removeUpload(filePath: string) {
-  const relative = filePath.replace(/^\/+/, '');
+async function removeUpload(filePath: string) {
+  const relative = filePath
+    .replace(/^https?:\/\/[^/]+\//i, '')
+    .replace(/^\/+/, '');
   if (!relative.startsWith('uploads/')) return;
+  if (s3Configured()) {
+    try { await deleteFromS3(relative); } catch { /* best-effort cleanup */ }
+    return;
+  }
   const uploadsRoot = path.join(process.cwd(), 'public', 'uploads');
   const absolute = path.join(process.cwd(), 'public', relative);
   if (!absolute.startsWith(uploadsRoot + path.sep)) return;

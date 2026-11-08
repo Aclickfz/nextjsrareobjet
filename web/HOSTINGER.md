@@ -22,7 +22,7 @@ The app in this folder is a Next.js Node server. Do not upload it as a static si
 - `DB_SSL` — `true` only if Hostinger MySQL requires SSL
 - `PORT` — provided by Hostinger. `npm start` listens on all interfaces.
 
-7. Keep `public/uploads/products` writable so admin image uploads persist.
+7. Keep `public/uploads/products` writable so admin image uploads persist locally. Prefer AWS S3 (see `S3.md`); when `AWS_*` + `NEXT_PUBLIC_MEDIA_BASE_URL` are set, uploads and homepage/product media load from S3.
 8. After the app is running, check `/`, `/products`, `/login`, add to cart, cash-on-delivery checkout, and admin order confirmation.
 
 `schema.sql` in `sql/schema.sql` matches the tables the current Express API already uses. Run it only on an empty database. Do not drop the live tables.

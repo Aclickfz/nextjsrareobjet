@@ -6,6 +6,7 @@ import { X } from 'lucide-react';
 import { toast } from 'sonner';
 import { deleteProductGalleryImageAction } from '@/actions/admin.actions';
 import { useAdminForm } from '@/components/admin/AdminForm';
+import { imgSrc } from '@/lib/utils';
 
 type ProductImage = { id: number; path: string; is_primary: number };
 
@@ -35,7 +36,7 @@ export function ProductGalleryImage({ image, productId }: { image: ProductImage;
   }
 
   return <div className="product-gallery-item" data-primary={primary}>
-    <img src={`/${image.path.replace(/^\//, '')}`} alt={primary ? 'Main product image' : 'Product gallery image'} />
+    <img src={imgSrc(image.path)} alt={primary ? 'Main product image' : 'Product gallery image'} />
     {!primary && <button
       type="button"
       className="product-gallery-remove"

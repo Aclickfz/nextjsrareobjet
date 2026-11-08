@@ -10,9 +10,11 @@
     "db:migrate-categories": "node scripts/migrate-categories.mjs",
     "db:migrate-pdp": "node scripts/migrate-pdp.mjs",
     "db:drop-option-groups": "node scripts/drop-option-groups.mjs",
-    "db:seed-products": "node scripts/seed-products.mjs"
+    "db:seed-products": "node scripts/seed-products.mjs",
+    "media:migrate-s3": "node scripts/migrate-images-to-s3.mjs"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1164.0",
     "@hookform/resolvers": "^5.2.2",
     "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-table": "^8.21.3",
