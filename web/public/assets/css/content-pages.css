@@ -1,0 +1,125 @@
+.site-content {
+  padding-block: var(--space-section, 3.5rem);
+}
+
+.site-content__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  align-items: start;
+}
+
+.site-content__media {
+  position: sticky;
+  top: 6rem;
+}
+
+.site-content__media img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  display: block;
+}
+
+.site-content__eyebrow {
+  margin: 0 0 0.65rem;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-color, #6b6b6b);
+}
+
+.site-content__body h2 {
+  margin: 0 0 1rem;
+  font-size: clamp(1.6rem, 2.6vw, 2.35rem);
+  font-weight: 400;
+  color: var(--black-color, #111);
+  text-transform: capitalize;
+}
+
+.site-content__intro,
+.site-content__body > p {
+  margin: 0 0 1.1rem;
+  color: var(--muted-color, #6b6b6b);
+  line-height: 1.85;
+  font-size: 16px;
+}
+
+.site-content__list {
+  margin: 0 0 1.35rem;
+  padding-left: 1.15rem;
+  color: var(--muted-color, #6b6b6b);
+}
+
+.site-content__list li {
+  margin-bottom: 0.55rem;
+  line-height: 1.7;
+}
+
+.site-content__cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0 0 1.5rem;
+}
+
+.site-content__card {
+  padding: 1.15rem 1.1rem;
+  background: var(--surface-color, #f7f5f2);
+  border: 1px solid var(--border-color, #e6e1da);
+}
+
+.site-content__card h3 {
+  margin: 0 0 0.55rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--black-color, #111);
+  text-transform: capitalize;
+}
+
+.site-content__card p {
+  margin: 0;
+  color: var(--muted-color, #6b6b6b);
+  line-height: 1.65;
+  font-size: 14px;
+}
+
+.site-content__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0.75rem 1.35rem;
+  margin-top: 0.35rem;
+  border: 1px solid var(--black-color, #111);
+  color: var(--black-color, #111) !important;
+  text-decoration: none !important;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 12px;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+.site-content__cta:hover {
+  background: var(--black-color, #111);
+  color: #fff !important;
+}
+
+@media (max-width: 991.98px) {
+  .site-content__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .site-content__media {
+    position: static;
+  }
+
+  .site-content__media img {
+    aspect-ratio: 16 / 10;
+  }
+
+  .site-content__cards {
+    grid-template-columns: 1fr;
+  }
+}
