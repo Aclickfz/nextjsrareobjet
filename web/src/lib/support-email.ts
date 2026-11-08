@@ -11,7 +11,7 @@ export type SupportEmailPayload = {
   queryId?: number;
 };
 
-const DEFAULT_ADMIN_INBOX = 'alclickfz@gmail.com';
+const DEFAULT_ADMIN_INBOX = 'aclickfz@gmail.com';
 
 function escapeHtml(value: string) {
   return value
