@@ -6,6 +6,7 @@ import { currentUser, getSessionId } from '@/lib/auth';
 import { getOrCreateCart, loadCart } from '@/repositories/cart.repository';
 import { placeOrder } from '@/repositories/order.repository';
 import { query } from '@/lib/db';
+import { sendOrderConfirmationEmail, storeOrderConfirmationOnS3 } from '@/lib/order-email';
 
 export async function toggleWishlistAction(productId: number) {
   const user = await currentUser();
@@ -56,5 +57,15 @@ export async function placeOrderAction(_state: { error?: string } | undefined, f
     return { error: error instanceof Error ? error.message : 'Could not place order' };
   }
   if (!order?.id) return { error: 'Order was saved but could not be opened' };
+  try {
+    await sendOrderConfirmationEmail(order);
+  } catch {
+    // Order is already placed; confirmation email is best-effort.
+  }
+  try {
+    await storeOrderConfirmationOnS3(order, user.id);
+  } catch {
+    // Order is already placed; S3 archive is best-effort.
+  }
   redirect(`/account/orders/${order.id}`);
 }

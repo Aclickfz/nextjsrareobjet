@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
-import { assetImage } from '@/lib/utils';
 import styles from './HeroVideoBanner.module.css';
 
 type Slide = {
@@ -14,13 +13,12 @@ type Slide = {
   href: string;
 };
 
-const SLIDES: Slide[] = [
+const SLIDE_BASE = [
   {
     eyebrow: 'New Season · 2026',
     title: 'Interior Design, Reimagined',
     description: 'Original pieces and timeless collections crafted to make every room feel like home.',
     video: 'https://videos.pexels.com/video-files/7578552/7578552-uhd_2560_1440_30fps.mp4',
-    poster: assetImage('banner.jpg'),
     href: '/products',
   },
   {
@@ -28,7 +26,6 @@ const SLIDES: Slide[] = [
     title: 'The Fall Collection',
     description: 'Warm textures, sculpted forms and quiet luxury — curated for the colder months.',
     video: 'https://videos.pexels.com/video-files/7578544/7578544-uhd_2560_1440_30fps.mp4',
-    poster: assetImage('banner2.jpg'),
     href: '/products',
   },
   {
@@ -36,14 +33,17 @@ const SLIDES: Slide[] = [
     title: 'Living Room Essentials',
     description: 'Sofas, lighting and décor that bring comfort and character together.',
     video: 'https://videos.pexels.com/video-files/3015510/3015510-hd_1920_1080_24fps.mp4',
-    poster: assetImage('banner.jpg'),
     href: '/products',
   },
-];
+] as const;
 
 const SLIDE_DURATION = 8000;
 
-export function HeroVideoBanner() {
+export function HeroVideoBanner({ posters }: { posters: [string, string, string] }) {
+  const slides: Slide[] = SLIDE_BASE.map((slide, i) => ({
+    ...slide,
+    poster: posters[i] || posters[0]
+  }));
   const [active, setActive] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [progress, setProgress] = useState(0);
@@ -54,8 +54,8 @@ export function HeroVideoBanner() {
   const goTo = useCallback((index: number) => {
     elapsedRef.current = 0;
     setProgress(0);
-    setActive((index + SLIDES.length) % SLIDES.length);
-  }, []);
+    setActive((index + slides.length) % slides.length);
+  }, [slides.length]);
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) setPlaying(false);
@@ -110,13 +110,13 @@ export function HeroVideoBanner() {
         touchX.current = null;
       }}
     >
-      {SLIDES.map((slide, i) => (
+      {slides.map((slide, i) => (
         <div
           key={slide.title}
           className={`${styles.slide} ${i === active ? styles.slideActive : ''}`}
           role="group"
           aria-roledescription="slide"
-          aria-label={`${i + 1} of ${SLIDES.length}`}
+          aria-label={`${i + 1} of ${slides.length}`}
           aria-hidden={i !== active}
         >
           <video
@@ -149,7 +149,7 @@ export function HeroVideoBanner() {
 
       <div className={styles.controls}>
         <div className={styles.tabs} role="tablist" aria-label="Choose slide">
-          {SLIDES.map((slide, i) => (
+          {slides.map((slide, i) => (
             <button
               key={slide.title}
               type="button"

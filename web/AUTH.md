@@ -23,7 +23,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 COOKIE_SECURE=false
 ```
 
-Use the same mailbox for SMTP_USER and AUTH_EMAIL_FROM. After a chat/feedback form is saved, the app emails the customer a confirmation and emails `SUPPORT_EMAIL_TO` (default `aclickfz@gmail.com`) so admin can resolve the issue. Port 465 uses TLS immediately. If your provider/network requires port 587, change SMTP_PORT to 587; the app then requires STARTTLS. No SMTP_SECURE variable is needed. Certificate validation remains enabled.
+Use the same mailbox for SMTP_USER and AUTH_EMAIL_FROM. After a chat/feedback form is saved, the app emails the customer a confirmation and emails `SUPPORT_EMAIL_TO` (default `aclickfz@gmail.com`) so admin can resolve the issue. The same SMTP mailbox also sends **order confirmation** emails after checkout (products, shipping, payment/COD, invoice link). Port 465 uses TLS immediately. If your provider/network requires port 587, change SMTP_PORT to 587; the app then requires STARTTLS. No SMTP_SECURE variable is needed. Certificate validation remains enabled.
 
 Next.js loads environment files from web/, not the repository root .evn file. Existing process environment variables and .env.local/.env.development.local may override .env; remove conflicting values. If a password contains a literal dollar sign, escape it as \$ in a Next.js env file (quotes alone do not prevent expansion). Do not use the escape in a hosting dashboard field. Never prefix SMTP credentials with NEXT_PUBLIC_ or commit them.
 

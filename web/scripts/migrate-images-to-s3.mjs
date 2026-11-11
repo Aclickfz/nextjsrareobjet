@@ -88,10 +88,18 @@ try {
 }
 
 console.log(`Migrating images to s3://${bucket} (${region})`);
-const homepage = await migrateFolder('assets/images');
-const products = await migrateFolder('uploads/products');
-const categories = await migrateFolder('uploads/categories');
-console.log(`Done. Uploaded homepage=${homepage}, products=${products}, categories=${categories}`);
-console.log('Set NEXT_PUBLIC_MEDIA_BASE_URL to your bucket/CloudFront URL, then rebuild.');
+const assets = await migrateFolder('assets/images');
+const products = await migrateFolder('products');
+const categories = await migrateFolder('category');
+const banners = await migrateFolder('banner');
+// Legacy local folders (pre-align)
+const legacyProducts = await migrateFolder('uploads/products');
+const legacyCategories = await migrateFolder('uploads/categories');
+const legacyHomepage = await migrateFolder('uploads/homepage');
+console.log(
+  `Done. Uploaded assets=${assets}, products=${products}, category=${categories}, banner=${banners}`
+  + ` (legacy uploads/ products=${legacyProducts}, categories=${legacyCategories}, homepage=${legacyHomepage})`
+);
+console.log('Set NEXT_PUBLIC_MEDIA_BASE_URL to your bucket/CloudFront URL (bucket root, no /banner suffix), then rebuild.');
 if (publicBase) console.log(`Public base: ${publicBase}`);
 else console.log(`Example: NEXT_PUBLIC_MEDIA_BASE_URL=https://${bucket}.s3.${region}.amazonaws.com`);

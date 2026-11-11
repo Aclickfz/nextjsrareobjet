@@ -1,4 +1,4 @@
-import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 function required(name: string) {
   const value = process.env[name]?.trim();
@@ -21,6 +21,11 @@ export function mediaBaseUrl() {
     || process.env.AWS_S3_PUBLIC_URL?.trim()
     || ''
   ).replace(/\/$/, '');
+}
+
+/** Keys the app may serve via /api/media or delete from S3. */
+export function isManagedMediaKey(key: string) {
+  return /^(products|category|banner|assets|uploads|orders)\//.test(key);
 }
 
 function region() {
@@ -48,14 +53,19 @@ export function s3ObjectUrl(key: string) {
   return `https://${bucket()}.s3.${region()}.amazonaws.com/${clean}`;
 }
 
-export async function uploadToS3(key: string, body: Buffer, contentType: string) {
+export async function uploadToS3(
+  key: string,
+  body: Buffer,
+  contentType: string,
+  cacheControl = 'public, max-age=31536000, immutable'
+) {
   const clean = key.replace(/^\/+/, '');
   await client().send(new PutObjectCommand({
     Bucket: bucket(),
     Key: clean,
     Body: body,
     ContentType: contentType,
-    CacheControl: 'public, max-age=31536000, immutable'
+    CacheControl: cacheControl
   }));
   return s3ObjectUrl(clean);
 }
@@ -64,9 +74,30 @@ export async function deleteFromS3(keyOrUrl: string) {
   const key = keyOrUrl
     .replace(/^https?:\/\/[^/]+\//i, '')
     .replace(/^\/+/, '');
-  if (!key.startsWith('uploads/') && !key.startsWith('assets/')) return;
+  if (!isManagedMediaKey(key)) return;
   await client().send(new DeleteObjectCommand({
     Bucket: bucket(),
     Key: key
   }));
+}
+
+export async function getS3Object(key: string) {
+  const clean = key.replace(/^\/+/, '');
+  if (!isManagedMediaKey(clean)) throw new Error('Invalid media key');
+  const result = await client().send(new GetObjectCommand({
+    Bucket: bucket(),
+    Key: clean
+  }));
+  if (!result.Body) throw new Error('Empty S3 object');
+  return {
+    body: result.Body,
+    contentType: result.ContentType || 'application/octet-stream',
+    cacheControl: result.CacheControl || 'public, max-age=31536000, immutable',
+    contentLength: result.ContentLength
+  };
+}
+
+/** Stable key for a customer's order confirmation HTML archive. */
+export function orderConfirmationS3Key(userId: number, orderId: number) {
+  return `orders/user-${userId}/order-${orderId}/confirmation.html`;
 }

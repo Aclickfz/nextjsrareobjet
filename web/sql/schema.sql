@@ -175,3 +175,12 @@ CREATE TABLE IF NOT EXISTS support_queries (
   KEY idx_support_queries_status (status),
   KEY idx_support_queries_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS site_media (
+  slot_key VARCHAR(64) PRIMARY KEY,
+  label VARCHAR(120) NOT NULL,
+  section VARCHAR(64) NOT NULL,
+  path VARCHAR(512) NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_site_media_section (section)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
