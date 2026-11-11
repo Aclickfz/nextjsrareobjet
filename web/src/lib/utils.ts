@@ -42,11 +42,26 @@ export function mediaBaseUrl() {
   return (process.env.NEXT_PUBLIC_MEDIA_BASE_URL || '').replace(/\/$/, '');
 }
 
-/** Resolves product/homepage image paths to local or S3/CDN URLs. */
+function isS3StyleKey(clean: string) {
+  return /^(products|category|banner|assets|uploads|orders)\//.test(clean);
+}
+
+/**
+ * Resolves product/homepage image paths.
+ * Default: `/api/media/...` so private S3 buckets still display (app streams with AWS credentials).
+ * Set NEXT_PUBLIC_MEDIA_DIRECT=1 to use NEXT_PUBLIC_MEDIA_BASE_URL (public bucket / CloudFront) instead.
+ */
 export function imgSrc(path?: string | null) {
   if (!path) return imgSrc('assets/images/img2.jpeg');
   if (/^https?:\/\//i.test(path) || path.startsWith('data:') || path.startsWith('blob:')) return path;
+  if (path.startsWith('/api/media/')) return path;
   const clean = path.replace(/^\.\//, '').replace(/^\/+/, '');
+  if (isS3StyleKey(clean)) {
+    const direct = process.env.NEXT_PUBLIC_MEDIA_DIRECT === '1';
+    const base = mediaBaseUrl();
+    if (direct && base) return `${base}/${clean}`;
+    return `/api/media/${clean}`;
+  }
   const base = mediaBaseUrl();
   if (base) return `${base}/${clean}`;
   return `/${clean}`;

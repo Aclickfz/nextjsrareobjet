@@ -34,20 +34,26 @@ export async function findOrderForTracking(orderNumber: string, postalCode: stri
 
 export async function loadOrder(orderId: number, userId: number | null, isAdmin: boolean): Promise<{
   id: number;
+  user_id: number;
   subtotal: number;
   shipping: number;
   total: number;
   status: string;
   payment_status: string;
+  payment_method?: string;
   stock_deducted: number;
   order_number: string;
   customer_name?: string;
+  customer_email?: string;
+  customer_phone?: string;
   given_name?: string;
   family_name?: string;
   street_address?: string;
   city?: string;
   postal_code?: string;
+  notes?: string;
   invoice_number?: string;
+  issued_at?: string;
   items: { product_id: number; qty: number; name_snapshot: string; price_snapshot: number; line_total: number; image?: string }[];
 } | null> {
   if (!isAdmin && !userId) return null;
@@ -75,13 +81,26 @@ export async function loadOrder(orderId: number, userId: number | null, isAdmin:
   return {
     ...order,
     id: Number(order.id),
+    user_id: Number(order.user_id),
     subtotal: Number(order.subtotal),
     shipping: Number(order.shipping),
     total: Number(order.total),
     status: String(order.status),
     payment_status: String(order.payment_status),
+    payment_method: order.payment_method ? String(order.payment_method) : undefined,
     stock_deducted: Number(order.stock_deducted),
     order_number: String(order.order_number),
+    customer_name: order.customer_name ? String(order.customer_name) : undefined,
+    customer_email: order.customer_email ? String(order.customer_email) : undefined,
+    customer_phone: order.customer_phone ? String(order.customer_phone) : undefined,
+    given_name: order.given_name ? String(order.given_name) : undefined,
+    family_name: order.family_name ? String(order.family_name) : undefined,
+    street_address: order.street_address ? String(order.street_address) : undefined,
+    city: order.city ? String(order.city) : undefined,
+    postal_code: order.postal_code ? String(order.postal_code) : undefined,
+    notes: order.notes ? String(order.notes) : undefined,
+    invoice_number: order.invoice_number ? String(order.invoice_number) : undefined,
+    issued_at: order.issued_at ? String(order.issued_at) : undefined,
     items: items.map((item) => ({
       ...item,
       product_id: Number(item.product_id),

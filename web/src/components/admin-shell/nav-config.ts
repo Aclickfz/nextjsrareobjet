@@ -1,4 +1,4 @@
-import { BarChart3, Boxes, FolderTree, LayoutDashboard, Package, PackagePlus, ShoppingCart, Users, type LucideIcon } from 'lucide-react';
+import { BarChart3, Boxes, FolderTree, ImageIcon, LayoutDashboard, Package, PackagePlus, ShoppingCart, Users, type LucideIcon } from 'lucide-react';
 
 export type AdminNavItem = { label: string; href: string; icon: LucideIcon; exact?: boolean };
 export type AdminNavGroup = { label: string; items: AdminNavItem[] };
@@ -15,6 +15,7 @@ export const adminNav: AdminNavGroup[] = [
     label: 'Catalog',
     items: [
       { label: 'Categories', href: '/admin/categories', icon: FolderTree },
+      { label: 'Homepage media', href: '/admin/homepage', icon: ImageIcon },
       { label: 'Products', href: '/admin/products', icon: Package },
       { label: 'Add product', href: '/admin/products/new', icon: PackagePlus, exact: true },
       { label: 'Inventory', href: '/admin/inventory', icon: Boxes }

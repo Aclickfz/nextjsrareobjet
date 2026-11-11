@@ -16,6 +16,8 @@ import { slugify } from '@/lib/utils';
 import { buildProductContent, type ContentKey } from '@/lib/product-content-fields';
 import { updateOrderStatus } from '@/repositories/order.repository';
 import { deleteFromS3, s3Configured, uploadToS3 } from '@/lib/s3';
+import { siteMediaSlotByKey } from '@/lib/site-media-slots';
+import { getSiteMediaPath, updateSiteMediaPath } from '@/repositories/site-media.repository';
 import type { ResultSetHeader } from 'mysql2/promise';
 
 function nonNegativeInteger(value: unknown) {
@@ -236,18 +238,40 @@ async function adjustStockActionImpl(formData: FormData) {
   revalidatePath('/admin/inventory');
 }
 
+/** Admin logical folder → S3 / public key prefix (matches rareobjet-media layout). */
+const UPLOAD_PREFIX: Record<string, string> = {
+  products: 'products',
+  categories: 'category',
+  homepage: 'banner'
+};
+
+function isManagedUploadKey(relative: string) {
+  return relative.startsWith('products/')
+    || relative.startsWith('category/')
+    || relative.startsWith('banner/')
+    || relative.startsWith('uploads/'); // legacy keys
+}
+
 async function storeUpload(file: FormDataEntryValue | null, folder: string) {
   if (!(file instanceof File) || file.size === 0) return null;
   if (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) throw new AdminValidationError('Images only, max 5MB');
+  const prefix = UPLOAD_PREFIX[folder];
+  if (!prefix) throw new AdminValidationError('Unknown upload folder');
   const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safe}`;
-  const key = `uploads/${folder}/${filename}`;
+  const key = `${prefix}/${filename}`;
   const body = Buffer.from(await file.arrayBuffer());
   if (s3Configured()) {
-    await uploadToS3(key, body, file.type || 'application/octet-stream');
-    return key;
+    try {
+      await uploadToS3(key, body, file.type || 'application/octet-stream');
+    } catch (error) {
+      console.error('S3 upload failed', error);
+      throw new AdminValidationError('Could not upload image to S3. Check AWS credentials, region, and bucket.');
+    }
+    return key; // relative key saved in DB (products/…, category/…, banner/…)
   }
-  const dir = path.join(process.cwd(), 'public', 'uploads', folder);
+  // Local fallback only when AWS env is not configured
+  const dir = path.join(process.cwd(), 'public', prefix);
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, filename), body);
   return key;
@@ -257,14 +281,14 @@ async function removeUpload(filePath: string) {
   const relative = filePath
     .replace(/^https?:\/\/[^/]+\//i, '')
     .replace(/^\/+/, '');
-  if (!relative.startsWith('uploads/')) return;
+  if (!isManagedUploadKey(relative)) return;
   if (s3Configured()) {
     try { await deleteFromS3(relative); } catch { /* best-effort cleanup */ }
     return;
   }
-  const uploadsRoot = path.join(process.cwd(), 'public', 'uploads');
+  const publicRoot = path.join(process.cwd(), 'public');
   const absolute = path.join(process.cwd(), 'public', relative);
-  if (!absolute.startsWith(uploadsRoot + path.sep)) return;
+  if (!absolute.startsWith(publicRoot + path.sep)) return;
   fs.rmSync(absolute, { force: true });
 }
 
@@ -403,4 +427,53 @@ export async function orderStatusAction(data: FormData): Promise<AdminActionResu
 
 export async function saveCustomerAction(data: FormData): Promise<AdminActionResult | void> {
   return runAdminAction(saveCustomerActionImpl, data);
+}
+
+async function saveHomepageMediaActionImpl(formData: FormData) {
+  await requireAdmin();
+  const slotKey = String(formData.get('slot_key') || '').trim();
+  const meta = siteMediaSlotByKey(slotKey);
+  if (!meta) throw new AdminValidationError('Unknown homepage media slot');
+  const uploaded = await storeUpload(formData.get('image_file'), 'homepage');
+  if (!uploaded) throw new AdminValidationError('Choose an image to upload (max 5MB)');
+  const previous = await getSiteMediaPath(slotKey);
+  await updateSiteMediaPath(slotKey, uploaded);
+  if (
+    previous
+    && previous !== uploaded
+    && (previous.startsWith('banner/') || previous.startsWith('uploads/homepage/'))
+  ) {
+    await removeUpload(previous);
+  }
+  revalidatePath('/');
+  revalidatePath('/admin/homepage');
+}
+
+export async function saveHomepageMediaAction(data: FormData): Promise<AdminActionResult | void> {
+  return runAdminAction(saveHomepageMediaActionImpl, data);
+}
+
+/** Image-only update for a category (used on homepage media admin under each section). */
+async function saveCategoryImageActionImpl(formData: FormData) {
+  await requireAdmin();
+  const id = nonNegativeInteger(formData.get('id'));
+  const categories = await adminCategories();
+  const existing = categories.find((c) => c.id === id);
+  if (!existing) throw new AdminValidationError('Category not found');
+  const uploaded = await storeUpload(formData.get('image_file'), 'categories');
+  if (!uploaded) throw new AdminValidationError('Choose an image to upload (max 5MB)');
+  if (existing.image && existing.image !== uploaded && (
+    existing.image.startsWith('category/')
+    || existing.image.startsWith('uploads/categories/')
+  )) {
+    await removeUpload(existing.image);
+  }
+  await getPool().execute('UPDATE categories SET image = :image WHERE id = :id', { id, image: uploaded });
+  revalidatePath('/');
+  revalidatePath('/admin/homepage');
+  revalidatePath('/admin/categories');
+}
+
+export async function saveCategoryImageAction(data: FormData): Promise<AdminActionResult | void> {
+  return runAdminAction(saveCategoryImageActionImpl, data);
 }
