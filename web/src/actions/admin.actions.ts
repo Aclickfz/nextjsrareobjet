@@ -487,3 +487,55 @@ async function saveCategoryImageActionImpl(formData: FormData) {
 export async function saveCategoryImageAction(data: FormData): Promise<AdminActionResult | void> {
   return runAdminAction(saveCategoryImageActionImpl, data);
 }
+
+async function saveShopTileActionImpl(formData: FormData) {
+  await requireAdmin();
+  validateAdminUpload(formData);
+  const { getShopTile, saveShopTile } = await import('@/repositories/shop-tiles.repository');
+  const id = nonNegativeInteger(formData.get('id') || 0);
+  const showcase_slug = String(formData.get('showcase_slug') || '').trim();
+  const name = String(formData.get('name') || '').trim();
+  const href = String(formData.get('href') || '').trim();
+  if (!showcase_slug) throw new AdminValidationError('Choose a showcase section.');
+  if (!name) throw new AdminValidationError('Enter a tile name.');
+  if (!href) throw new AdminValidationError('Enter a link URL.');
+  const existing = id ? await getShopTile(id) : null;
+  if (id && !existing) throw new AdminValidationError('Shop tile not found.');
+  const uploaded = await storeUpload(formData.get('image_file'), 'homepage');
+  const image = uploaded || existing?.image || null;
+  if (!image) throw new AdminValidationError('Choose an image for this tile.');
+  if (uploaded && existing?.image && existing.image !== uploaded && isManagedUploadKey(existing.image)) {
+    await removeUpload(existing.image);
+  }
+  await saveShopTile({
+    id: id || undefined,
+    showcase_slug,
+    name,
+    href,
+    image,
+    sort_order: nonNegativeInteger(formData.get('sort_order') || 0),
+    is_active: formData.get('is_active') === '0' ? 0 : 1
+  });
+  revalidatePath('/');
+  revalidatePath('/admin/shop-categories');
+}
+
+async function deleteShopTileActionImpl(formData: FormData) {
+  await requireAdmin();
+  const { deleteShopTile, getShopTile } = await import('@/repositories/shop-tiles.repository');
+  const id = nonNegativeInteger(formData.get('id'));
+  const existing = await getShopTile(id);
+  if (!existing) throw new AdminValidationError('Shop tile not found.');
+  await deleteShopTile(id);
+  if (existing.image && isManagedUploadKey(existing.image)) await removeUpload(existing.image);
+  revalidatePath('/');
+  revalidatePath('/admin/shop-categories');
+}
+
+export async function saveShopTileAction(data: FormData): Promise<AdminActionResult | void> {
+  return runAdminAction(saveShopTileActionImpl, data);
+}
+
+export async function deleteShopTileAction(data: FormData): Promise<AdminActionResult | void> {
+  return runAdminAction(deleteShopTileActionImpl, data);
+}

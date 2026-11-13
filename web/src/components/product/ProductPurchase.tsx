@@ -56,18 +56,20 @@ function ProductStoryDetails({
   if (!canToggle) return null;
 
   return (
-    <div className="shop-pdp__story-details">
+    <div className={`shop-pdp__story-card${expanded ? ' is-open' : ''}`}>
       {story ? (
-        <div className="shop-pdp__text-block">
-          <h3 className="shop-pdp__text-title">Product Story :</h3>
+        <article className="shop-pdp__story-block">
+          <span className="shop-pdp__story-label">Product Story</span>
           <p className={`shop-pdp__details-copy${expanded ? '' : ' shop-pdp__details-copy--clamp'}`}>{story}</p>
-        </div>
+        </article>
       ) : null}
 
-      {expanded && productType ? (
-        <div className="shop-pdp__text-block">
-          <h3 className="shop-pdp__text-title">Product Type :</h3>
-          <p className="shop-pdp__details-copy">{productType}</p>
+      {productType ? (
+        <div className={`shop-pdp__story-extra${expanded ? ' is-open' : ''}`} aria-hidden={!expanded}>
+          <article className="shop-pdp__story-block shop-pdp__story-block--type">
+            <span className="shop-pdp__story-label">Product Type</span>
+            <p className="shop-pdp__details-copy">{productType}</p>
+          </article>
         </div>
       ) : null}
 
@@ -77,7 +79,8 @@ function ProductStoryDetails({
         aria-expanded={expanded}
         onClick={() => setExpanded((value) => !value)}
       >
-        {expanded ? 'See less' : 'See more'}
+        <span>{expanded ? 'See less' : 'See more'}</span>
+        <i className={`bx ${expanded ? 'bx-chevron-up' : 'bx-chevron-down'}`} aria-hidden="true" />
       </button>
     </div>
   );
@@ -208,16 +211,20 @@ export function ProductPurchase({ product }: { product: Product }) {
                 {openPanel === 'details' ? (
                   <div className="shop-pdp__acc-body">
                     <ProductStoryDetails story={productStory} productType={productType} />
-                    {detailSections.map((section) => (
-                      <div key={section.title} className="shop-pdp__details-section">
-                        <h3>{section.title}</h3>
-                        <ul>
-                          {section.items.map((item) => (
-                            <li key={item}>{item}</li>
-                          ))}
-                        </ul>
+                    {detailSections.length ? (
+                      <div className="shop-pdp__specs">
+                        {detailSections.map((section) => (
+                          <div key={section.title} className="shop-pdp__details-section">
+                            <h3>{section.title}</h3>
+                            <ul>
+                              {section.items.map((item) => (
+                                <li key={item}>{item}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    ) : null}
                   </div>
                 ) : null}
 
