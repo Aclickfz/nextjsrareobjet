@@ -98,14 +98,29 @@ export async function saveShopTile(data: {
       `UPDATE homepage_shop_tiles
        SET showcase_slug=:showcase_slug, name=:name, href=:href, image=:image, sort_order=:sort_order, is_active=:is_active
        WHERE id=:id`,
-      data
+      {
+        id: data.id,
+        showcase_slug: data.showcase_slug,
+        name: data.name,
+        href: data.href,
+        image: data.image,
+        sort_order: data.sort_order,
+        is_active: data.is_active
+      }
     );
     return data.id;
   }
   const [result] = await getPool().execute<ResultSetHeader>(
     `INSERT INTO homepage_shop_tiles (showcase_slug, name, href, image, sort_order, is_active)
      VALUES (:showcase_slug, :name, :href, :image, :sort_order, :is_active)`,
-    data
+    {
+      showcase_slug: data.showcase_slug,
+      name: data.name,
+      href: data.href,
+      image: data.image,
+      sort_order: data.sort_order,
+      is_active: data.is_active
+    }
   );
   return result.insertId;
 }
