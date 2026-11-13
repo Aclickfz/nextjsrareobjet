@@ -31,13 +31,13 @@ export function signToken(user: { id: number; session_version: number }) {
   return jwt.sign(
     { id: user.id, version: user.session_version },
     secret(),
-    { expiresIn: '7d', algorithm: 'HS256' }
+    { expiresIn: '1d', algorithm: 'HS256' }
   );
 }
 
 export async function setAuthCookie(token: string) {
   const jar = await cookies();
-  jar.set('token', token, { ...cookieBase, maxAge: 7 * 24 * 60 * 60 });
+  jar.set('token', token, { ...cookieBase, maxAge: 24 * 60 * 60 });
 }
 
 export async function clearAuthCookie() {
