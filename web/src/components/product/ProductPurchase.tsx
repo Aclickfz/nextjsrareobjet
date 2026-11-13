@@ -43,26 +43,42 @@ function priceLabel(product: Product) {
   );
 }
 
-const STORY_PREVIEW_LENGTH = 220;
-
-function ProductStoryBlock({ story }: { story: string }) {
+function ProductStoryDetails({
+  story,
+  productType
+}: {
+  story: string;
+  productType: string;
+}) {
   const [expanded, setExpanded] = useState(false);
-  const needsToggle = story.length > STORY_PREVIEW_LENGTH;
-  const text = !needsToggle || expanded ? story : `${story.slice(0, STORY_PREVIEW_LENGTH).trimEnd()}…`;
+  const canToggle = Boolean(story || productType);
+
+  if (!canToggle) return null;
 
   return (
-    <div className="shop-pdp__story">
-      <p className="shop-pdp__details-copy">{text}</p>
-      {needsToggle ? (
-        <button
-          type="button"
-          className="shop-pdp__see-more"
-          aria-expanded={expanded}
-          onClick={() => setExpanded((value) => !value)}
-        >
-          {expanded ? 'See less' : 'See more'}
-        </button>
+    <div className="shop-pdp__story-details">
+      {story ? (
+        <div className="shop-pdp__text-block">
+          <h3 className="shop-pdp__text-title">Product Story :</h3>
+          <p className={`shop-pdp__details-copy${expanded ? '' : ' shop-pdp__details-copy--clamp'}`}>{story}</p>
+        </div>
       ) : null}
+
+      {expanded && productType ? (
+        <div className="shop-pdp__text-block">
+          <h3 className="shop-pdp__text-title">Product Type :</h3>
+          <p className="shop-pdp__details-copy">{productType}</p>
+        </div>
+      ) : null}
+
+      <button
+        type="button"
+        className="shop-pdp__see-more"
+        aria-expanded={expanded}
+        onClick={() => setExpanded((value) => !value)}
+      >
+        {expanded ? 'See less' : 'See more'}
+      </button>
     </div>
   );
 }
@@ -76,6 +92,7 @@ export function ProductPurchase({ product }: { product: Product }) {
   const toast = useToast();
   const [pending, setPending] = useState(false);
   const productStory = (pdp?.product_story || '').trim();
+  const productType = (product.description || '').trim();
   const detailSections = (pdp?.details_sections || []).filter((section) => section.items?.length);
 
   useEffect(() => {
@@ -87,8 +104,6 @@ export function ProductPurchase({ product }: { product: Product }) {
       image: images[0]?.path
     });
   }, [product.id]);
-
-  const caption = pdp?.shown_caption || null;
 
   async function add(buyNow: boolean) {
     if (pending) return;
@@ -133,7 +148,6 @@ export function ProductPurchase({ product }: { product: Product }) {
                 <div className="purchasing_big__img">
                   <WishlistButton productId={product.id} />
                   <ProductImageViewer images={images} active={active} onChange={setActive} name={product.name} />
-                  {caption ? <p className="shop-pdp__caption">{caption}</p> : null}
                 </div>
               </div>
 
@@ -193,8 +207,7 @@ export function ProductPurchase({ product }: { product: Product }) {
                 </button>
                 {openPanel === 'details' ? (
                   <div className="shop-pdp__acc-body">
-                    {product.description ? <p className="shop-pdp__details-copy">{product.description}</p> : null}
-                    {productStory ? <ProductStoryBlock story={productStory} /> : null}
+                    <ProductStoryDetails story={productStory} productType={productType} />
                     {detailSections.map((section) => (
                       <div key={section.title} className="shop-pdp__details-section">
                         <h3>{section.title}</h3>

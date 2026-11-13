@@ -912,9 +912,7 @@
 }
 
 .shop-pdp__caption {
-    margin-top: 10px;
-    color: #6b746e;
-    font-size: 13px;
+    display: none;
 }
 
 .shop-pdp__ask {
@@ -1055,16 +1053,31 @@
     margin: 0;
 }
 
+.shop-pdp__text-block {
+    margin: 0 0 16px;
+}
+
+.shop-pdp__text-title {
+    margin: 0 0 6px !important;
+    font-size: 15px !important;
+    font-weight: 600;
+    color: #111;
+}
+
 .shop-pdp__details-copy {
-    margin: 0 0 10px;
+    margin: 0;
     font-size: 14px;
     line-height: 1.55;
     color: #333;
     white-space: pre-wrap;
 }
 
-.shop-pdp__story {
-    margin: 0 0 12px;
+.shop-pdp__details-copy--clamp {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    white-space: normal;
 }
 
 .shop-pdp__details-section + .shop-pdp__details-section {
