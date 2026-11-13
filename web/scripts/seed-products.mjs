@@ -47,6 +47,7 @@ try {
       name: item.name,
       slug: item.slug,
       description: item.description || null,
+      product_story: item.product_story || null,
       price: item.price,
       price_max: item.price_max ?? null,
       compare_at_price: item.compare_at_price ?? null,
@@ -75,7 +76,7 @@ try {
     if (productId) {
       await connection.query(
         `UPDATE products SET
-          category_id=:category_id, name=:name, description=:description, price=:price, price_max=:price_max,
+          category_id=:category_id, name=:name, description=:description, product_story=:product_story, price=:price, price_max=:price_max,
           compare_at_price=:compare_at_price, stock_qty=:stock_qty, sku=:sku, badge=:badge, grade_label=:grade_label,
           collection_key=:collection_key, shown_caption=:shown_caption, free_shipping=:free_shipping,
           details_sections=:details_sections, dimensions=:dimensions, faqs=:faqs,
@@ -89,12 +90,12 @@ try {
     } else {
       const [result] = await connection.query(
         `INSERT INTO products (
-          category_id, name, slug, description, price, price_max, compare_at_price, stock_qty, sku, badge, grade_label,
+          category_id, name, slug, description, product_story, price, price_max, compare_at_price, stock_qty, sku, badge, grade_label,
           collection_key, shown_caption, free_shipping, details_sections, dimensions, faqs,
           related_searches, related_category_slugs, ask_prompts, paired_slugs, collection_slugs, similar_slugs,
           still_deciding, is_active
         ) VALUES (
-          :category_id, :name, :slug, :description, :price, :price_max, :compare_at_price, :stock_qty, :sku, :badge, :grade_label,
+          :category_id, :name, :slug, :description, :product_story, :price, :price_max, :compare_at_price, :stock_qty, :sku, :badge, :grade_label,
           :collection_key, :shown_caption, :free_shipping, :details_sections, :dimensions, :faqs,
           :related_searches, :related_category_slugs, :ask_prompts, :paired_slugs, :collection_slugs, :similar_slugs,
           :still_deciding, :is_active

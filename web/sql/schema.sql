@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS products (
   name VARCHAR(255) NOT NULL,
   slug VARCHAR(200) NOT NULL,
   description TEXT NULL,
+  product_story LONGTEXT NULL,
   price DECIMAL(12,2) NOT NULL DEFAULT 0,
   price_max DECIMAL(12,2) NULL,
   compare_at_price DECIMAL(12,2) NULL,
@@ -183,4 +184,16 @@ CREATE TABLE IF NOT EXISTS site_media (
   path VARCHAR(512) NULL,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   KEY idx_site_media_section (section)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS homepage_shop_tiles (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  showcase_slug VARCHAR(120) NOT NULL,
+  name VARCHAR(200) NOT NULL,
+  href VARCHAR(500) NOT NULL,
+  image VARCHAR(500) NULL,
+  sort_order INT NOT NULL DEFAULT 0,
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_shop_tiles_showcase (showcase_slug, sort_order, id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

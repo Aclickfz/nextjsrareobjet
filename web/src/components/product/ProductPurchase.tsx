@@ -43,6 +43,49 @@ function priceLabel(product: Product) {
   );
 }
 
+function ProductStoryDetails({
+  story,
+  productType
+}: {
+  story: string;
+  productType: string;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const canToggle = Boolean(story || productType);
+
+  if (!canToggle) return null;
+
+  return (
+    <div className={`shop-pdp__story-card${expanded ? ' is-open' : ''}`}>
+      {story ? (
+        <article className="shop-pdp__story-block">
+          <span className="shop-pdp__story-label">Product Story</span>
+          <p className={`shop-pdp__details-copy${expanded ? '' : ' shop-pdp__details-copy--clamp'}`}>{story}</p>
+        </article>
+      ) : null}
+
+      {productType ? (
+        <div className={`shop-pdp__story-extra${expanded ? ' is-open' : ''}`} aria-hidden={!expanded}>
+          <article className="shop-pdp__story-block shop-pdp__story-block--type">
+            <span className="shop-pdp__story-label">Product Type</span>
+            <p className="shop-pdp__details-copy">{productType}</p>
+          </article>
+        </div>
+      ) : null}
+
+      <button
+        type="button"
+        className="shop-pdp__see-more"
+        aria-expanded={expanded}
+        onClick={() => setExpanded((value) => !value)}
+      >
+        <span>{expanded ? 'See less' : 'See more'}</span>
+        <i className={`bx ${expanded ? 'bx-chevron-up' : 'bx-chevron-down'}`} aria-hidden="true" />
+      </button>
+    </div>
+  );
+}
+
 export function ProductPurchase({ product }: { product: Product }) {
   const pdp = product.pdp;
   const images = product.images?.length ? product.images : [{ path: '/assets/images/img2.jpeg' }];
@@ -51,6 +94,9 @@ export function ProductPurchase({ product }: { product: Product }) {
   const [openPanel, setOpenPanel] = useState<'details' | 'dimensions' | null>(null);
   const toast = useToast();
   const [pending, setPending] = useState(false);
+  const productStory = (pdp?.product_story || '').trim();
+  const productType = (product.description || '').trim();
+  const detailSections = (pdp?.details_sections || []).filter((section) => section.items?.length);
 
   useEffect(() => {
     rememberRecent({
@@ -61,8 +107,6 @@ export function ProductPurchase({ product }: { product: Product }) {
       image: images[0]?.path
     });
   }, [product.id]);
-
-  const caption = pdp?.shown_caption || null;
 
   async function add(buyNow: boolean) {
     if (pending) return;
@@ -107,7 +151,6 @@ export function ProductPurchase({ product }: { product: Product }) {
                 <div className="purchasing_big__img">
                   <WishlistButton productId={product.id} />
                   <ProductImageViewer images={images} active={active} onChange={setActive} name={product.name} />
-                  {caption ? <p className="shop-pdp__caption">{caption}</p> : null}
                 </div>
               </div>
 
@@ -167,15 +210,21 @@ export function ProductPurchase({ product }: { product: Product }) {
                 </button>
                 {openPanel === 'details' ? (
                   <div className="shop-pdp__acc-body">
-                    {product.description ? <p>{product.description}</p> : null}
-                    {(pdp?.details_sections || []).map((section) => (
-                      <div key={section.title}>
-                        <h3>{section.title}</h3>
-                        <ul>
-                          {section.items.map((item) => <li key={item}>{item}</li>)}
-                        </ul>
+                    <ProductStoryDetails story={productStory} productType={productType} />
+                    {detailSections.length ? (
+                      <div className="shop-pdp__specs">
+                        {detailSections.map((section) => (
+                          <div key={section.title} className="shop-pdp__details-section">
+                            <h3>{section.title}</h3>
+                            <ul>
+                              {section.items.map((item) => (
+                                <li key={item}>{item}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    ) : null}
                   </div>
                 ) : null}
 

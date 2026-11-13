@@ -48,6 +48,8 @@ export async function dashboardData() {
 
 async function saveProductActionImpl(formData: FormData) {
   await requireAdmin();
+  const { ensureProductStoryColumn } = await import('@/repositories/catalog.repository');
+  await ensureProductStoryColumn();
   validateProductForm(formData);
   const id = Number(formData.get('id') || 0);
   const name = String(formData.get('name') || '').trim();
@@ -67,6 +69,7 @@ async function saveProductActionImpl(formData: FormData) {
     name,
     slug,
     description: String(formData.get('description') || '') || null,
+    product_story: String(formData.get('product_story') || '') || null,
     price: Number(formData.get('price') || 0),
     price_max: formData.get('price_max') ? Number(formData.get('price_max')) : null,
     compare_at_price: formData.get('compare_at_price') ? Number(formData.get('compare_at_price')) : null,
@@ -98,7 +101,7 @@ async function saveProductActionImpl(formData: FormData) {
         ? { ...productFields, id }
         : { ...productFields, shown_caption, id };
     await getPool().execute(
-      `UPDATE products SET sort_order=:sort_order, category_id=:category_id, name=:name, slug=:slug, description=:description, price=:price, price_max=:price_max,
+      `UPDATE products SET sort_order=:sort_order, category_id=:category_id, name=:name, slug=:slug, description=:description, product_story=:product_story, price=:price, price_max=:price_max,
        compare_at_price=:compare_at_price, stock_qty=:stock_qty, sku=:sku, badge=:badge, grade_label=:grade_label,
        collection_key=:collection_key, free_shipping=:free_shipping${captionSql},
        details_sections=:details_sections, dimensions=:dimensions, faqs=:faqs,
@@ -111,12 +114,12 @@ async function saveProductActionImpl(formData: FormData) {
   } else {
     const [result] = await getPool().execute<ResultSetHeader>(
       `INSERT INTO products (
-        sort_order, category_id, name, slug, description, price, price_max, compare_at_price, stock_qty, sku, badge, grade_label,
+        sort_order, category_id, name, slug, description, product_story, price, price_max, compare_at_price, stock_qty, sku, badge, grade_label,
         collection_key, shown_caption, free_shipping, details_sections, dimensions, faqs,
         related_searches, related_category_slugs, ask_prompts, paired_slugs, collection_slugs, similar_slugs,
         still_deciding, is_active
       ) VALUES (
-        :sort_order, :category_id, :name, :slug, :description, :price, :price_max, :compare_at_price, :stock_qty, :sku, :badge, :grade_label,
+        :sort_order, :category_id, :name, :slug, :description, :product_story, :price, :price_max, :compare_at_price, :stock_qty, :sku, :badge, :grade_label,
         :collection_key, :shown_caption, :free_shipping, :details_sections, :dimensions, :faqs,
         :related_searches, :related_category_slugs, :ask_prompts, :paired_slugs, :collection_slugs, :similar_slugs,
         :still_deciding, :is_active
@@ -483,4 +486,56 @@ async function saveCategoryImageActionImpl(formData: FormData) {
 
 export async function saveCategoryImageAction(data: FormData): Promise<AdminActionResult | void> {
   return runAdminAction(saveCategoryImageActionImpl, data);
+}
+
+async function saveShopTileActionImpl(formData: FormData) {
+  await requireAdmin();
+  validateAdminUpload(formData);
+  const { getShopTile, saveShopTile } = await import('@/repositories/shop-tiles.repository');
+  const id = nonNegativeInteger(formData.get('id') || 0);
+  const showcase_slug = String(formData.get('showcase_slug') || '').trim();
+  const name = String(formData.get('name') || '').trim();
+  const href = String(formData.get('href') || '').trim();
+  if (!showcase_slug) throw new AdminValidationError('Choose a showcase section.');
+  if (!name) throw new AdminValidationError('Enter a tile name.');
+  if (!href) throw new AdminValidationError('Enter a link URL.');
+  const existing = id ? await getShopTile(id) : null;
+  if (id && !existing) throw new AdminValidationError('Shop tile not found.');
+  const uploaded = await storeUpload(formData.get('image_file'), 'homepage');
+  const image = uploaded || existing?.image || null;
+  if (!image) throw new AdminValidationError('Choose an image for this tile.');
+  if (uploaded && existing?.image && existing.image !== uploaded && isManagedUploadKey(existing.image)) {
+    await removeUpload(existing.image);
+  }
+  await saveShopTile({
+    id: id || undefined,
+    showcase_slug,
+    name,
+    href,
+    image,
+    sort_order: nonNegativeInteger(formData.get('sort_order') || 0),
+    is_active: formData.get('is_active') === '0' ? 0 : 1
+  });
+  revalidatePath('/');
+  revalidatePath('/admin/shop-categories');
+}
+
+async function deleteShopTileActionImpl(formData: FormData) {
+  await requireAdmin();
+  const { deleteShopTile, getShopTile } = await import('@/repositories/shop-tiles.repository');
+  const id = nonNegativeInteger(formData.get('id'));
+  const existing = await getShopTile(id);
+  if (!existing) throw new AdminValidationError('Shop tile not found.');
+  await deleteShopTile(id);
+  if (existing.image && isManagedUploadKey(existing.image)) await removeUpload(existing.image);
+  revalidatePath('/');
+  revalidatePath('/admin/shop-categories');
+}
+
+export async function saveShopTileAction(data: FormData): Promise<AdminActionResult | void> {
+  return runAdminAction(saveShopTileActionImpl, data);
+}
+
+export async function deleteShopTileAction(data: FormData): Promise<AdminActionResult | void> {
+  return runAdminAction(deleteShopTileActionImpl, data);
 }

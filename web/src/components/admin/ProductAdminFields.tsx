@@ -39,7 +39,25 @@ export function ProductAdminFields({
         <AdminCheckbox name="free_shipping" value="1" defaultChecked={Boolean(Number(product?.free_shipping || 0))} />
         Free shipping
       </label>
-      <label>Description<AdminTextarea name="description" rows={4} defaultValue={String(product?.description || '')} /></label>
+      <label>
+        Product Story
+        <AdminTextarea
+          name="product_story"
+          rows={5}
+          defaultValue={String(product?.product_story || '')}
+          placeholder="Shown first in Product Details (2 lines). See more expands this and reveals Product Type."
+        />
+      </label>
+      <label>
+        Product Type
+        <AdminTextarea
+          name="description"
+          rows={5}
+          defaultValue={String(product?.description || '')}
+          placeholder="Shown only after the user clicks See more under Product Story"
+        />
+      </label>
+      <p className="admin-help">Storefront: Product Story (2 lines) → See more → full story + Product Type → Details sections.</p>
       {isEdit ? (
         <label>Storefront
           <AdminSelect name="is_active" defaultValue={String(product?.is_active ?? 1)}>

@@ -28,6 +28,7 @@ export type ProductPdpFields = {
   price_max?: number | null;
   collection_key?: string | null;
   shown_caption?: string | null;
+  product_story?: string | null;
   free_shipping?: number | boolean | null;
   details_sections?: DetailSection[] | string | null;
   dimensions?: DimensionRow[] | string | null;
@@ -56,6 +57,7 @@ export function normalizePdp(product: ProductPdpFields) {
     price_max: product.price_max != null ? Number(product.price_max) : null,
     collection_key: product.collection_key || null,
     shown_caption: product.shown_caption || null,
+    product_story: product.product_story || null,
     free_shipping: Boolean(Number(product.free_shipping || 0)),
     details_sections: parseJsonField<DetailSection[]>(product.details_sections, []),
     dimensions: parseJsonField<DimensionRow[]>(product.dimensions, []),

@@ -1,55 +1,53 @@
 import { ArrowRight } from 'lucide-react';
 import { assetImage, imgSrc } from '@/lib/utils';
 import { HOMEPAGE_SHOWCASES, type HomepageShowcase } from '@/lib/homepage-showcases';
-import { showcaseBannerSlotKey, showcaseTileSlotKey } from '@/lib/site-media-slots';
-import { navigationCategories } from '@/repositories/catalog.repository';
+import { showcaseBannerSlotKey } from '@/lib/site-media-slots';
+import { listShopTiles } from '@/repositories/shop-tiles.repository';
 import { CategorySlider, type SliderCategory } from './CategorySlider';
 import styles from './CategoryShowcases.module.css';
 
-type CategoryRow = Awaited<ReturnType<typeof navigationCategories>>[number];
+function tileImage(path: string | null) {
+  if (!path) return assetImage('img2.jpeg');
+  if (path.startsWith('assets/')) return assetImage(path.replace(/^assets\/images\//, ''));
+  return imgSrc(path);
+}
 
-function sliderItems(
-  config: HomepageShowcase,
-  rows: CategoryRow[],
-  media: Record<string, string>
-): SliderCategory[] {
-  const href = `/categories/${config.slug}`;
-  const fallback = config.fallback.map(([name, image], index) => {
-    const tilePath = media[showcaseTileSlotKey(config.slug, index)];
-    return { name, href, image: tilePath ? imgSrc(tilePath) : assetImage(image) };
-  });
-  const parent = rows.find((row) => row.slug === config.slug);
-  const children = parent ? rows.filter((row) => row.parent_id === parent.id) : [];
-  if (children.length < 3) return fallback;
-  return children.map((row, i) => ({
-    name: row.name,
-    href: `/categories/${row.slug}`,
-    image: row.image ? imgSrc(row.image) : fallback[i % fallback.length].image
+async function sliderItems(config: HomepageShowcase): Promise<SliderCategory[]> {
+  try {
+    const tiles = await listShopTiles(config.slug, true);
+    if (tiles.length) {
+      return tiles.map((tile) => ({
+        name: tile.name,
+        href: tile.href || `/categories/${config.slug}`,
+        image: tileImage(tile.image)
+      }));
+    }
+  } catch {
+    // Fall back to static showcase config when DB is unavailable.
+  }
+  return config.fallback.map(([name, image]) => ({
+    name,
+    href: `/categories/${config.slug}`,
+    image: assetImage(image)
   }));
 }
 
 export async function CategoryShowcases({ media = {} }: { media?: Record<string, string> }) {
-  let rows: CategoryRow[] = [];
-  try {
-    rows = await navigationCategories();
-  } catch {
-    rows = [];
-  }
+  const sections = await Promise.all(
+    HOMEPAGE_SHOWCASES.map(async (config) => ({
+      config,
+      items: await sliderItems(config),
+      bannerSrc: media[showcaseBannerSlotKey(config.slug)]
+        ? imgSrc(media[showcaseBannerSlotKey(config.slug)])
+        : assetImage(config.banner.image)
+    }))
+  );
 
   return (
     <>
-      {HOMEPAGE_SHOWCASES.map((config) => {
-        const override = media[showcaseBannerSlotKey(config.slug)];
-        const bannerSrc = override ? imgSrc(override) : assetImage(config.banner.image);
-        return (
-          <CategoryShowcase
-            key={config.slug}
-            config={config}
-            items={sliderItems(config, rows, media)}
-            bannerSrc={bannerSrc}
-          />
-        );
-      })}
+      {sections.map(({ config, items, bannerSrc }) => (
+        <CategoryShowcase key={config.slug} config={config} items={items} bannerSrc={bannerSrc} />
+      ))}
     </>
   );
 }
