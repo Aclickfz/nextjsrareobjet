@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS products (
   name VARCHAR(255) NOT NULL,
   slug VARCHAR(200) NOT NULL,
   description TEXT NULL,
+  product_story LONGTEXT NULL,
   price DECIMAL(12,2) NOT NULL DEFAULT 0,
   price_max DECIMAL(12,2) NULL,
   compare_at_price DECIMAL(12,2) NULL,

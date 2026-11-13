@@ -142,7 +142,28 @@ export async function listProductsBySlugs(slugs: string[], excludeId?: number) {
   return products.sort((a, b) => (order.get(a.slug) ?? 0) - (order.get(b.slug) ?? 0));
 }
 
+let productStoryColumnReady: Promise<void> | null = null;
+
+export async function ensureProductStoryColumn() {
+  if (!productStoryColumnReady) {
+    productStoryColumnReady = (async () => {
+      const columns = await query<{ COLUMN_NAME: string }[]>(
+        `SELECT COLUMN_NAME FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'products' AND COLUMN_NAME = 'product_story'`
+      );
+      if (!columns.length) {
+        await query('ALTER TABLE products ADD COLUMN product_story LONGTEXT NULL AFTER description');
+      }
+    })().catch((error) => {
+      productStoryColumnReady = null;
+      throw error;
+    });
+  }
+  await productStoryColumnReady;
+}
+
 export async function getProduct(slugOrId: string) {
+  await ensureProductStoryColumn();
   const isId = /^\d+$/.test(slugOrId);
   const rows = await query<ProductRow[]>(
     `SELECT p.*, c.name AS category_name, c.slug AS category_slug

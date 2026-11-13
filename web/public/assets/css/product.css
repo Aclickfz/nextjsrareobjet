@@ -1055,6 +1055,41 @@
     margin: 0;
 }
 
+.shop-pdp__details-copy {
+    margin: 0 0 10px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: #333;
+    white-space: pre-wrap;
+}
+
+.shop-pdp__story {
+    margin: 0 0 12px;
+}
+
+.shop-pdp__details-section + .shop-pdp__details-section {
+    margin-top: 4px;
+}
+
+.shop-pdp__see-more {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 4px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #111;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+
+.shop-pdp__see-more:hover {
+    opacity: 0.75;
+}
+
 .shop-pdp__dims > div {
     display: grid;
     grid-template-columns: 180px 1fr;

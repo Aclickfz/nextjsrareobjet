@@ -43,6 +43,30 @@ function priceLabel(product: Product) {
   );
 }
 
+const STORY_PREVIEW_LENGTH = 220;
+
+function ProductStoryBlock({ story }: { story: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const needsToggle = story.length > STORY_PREVIEW_LENGTH;
+  const text = !needsToggle || expanded ? story : `${story.slice(0, STORY_PREVIEW_LENGTH).trimEnd()}…`;
+
+  return (
+    <div className="shop-pdp__story">
+      <p className="shop-pdp__details-copy">{text}</p>
+      {needsToggle ? (
+        <button
+          type="button"
+          className="shop-pdp__see-more"
+          aria-expanded={expanded}
+          onClick={() => setExpanded((value) => !value)}
+        >
+          {expanded ? 'See less' : 'See more'}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 export function ProductPurchase({ product }: { product: Product }) {
   const pdp = product.pdp;
   const images = product.images?.length ? product.images : [{ path: '/assets/images/img2.jpeg' }];
@@ -51,6 +75,8 @@ export function ProductPurchase({ product }: { product: Product }) {
   const [openPanel, setOpenPanel] = useState<'details' | 'dimensions' | null>(null);
   const toast = useToast();
   const [pending, setPending] = useState(false);
+  const productStory = (pdp?.product_story || '').trim();
+  const detailSections = (pdp?.details_sections || []).filter((section) => section.items?.length);
 
   useEffect(() => {
     rememberRecent({
@@ -167,12 +193,15 @@ export function ProductPurchase({ product }: { product: Product }) {
                 </button>
                 {openPanel === 'details' ? (
                   <div className="shop-pdp__acc-body">
-                    {product.description ? <p>{product.description}</p> : null}
-                    {(pdp?.details_sections || []).map((section) => (
-                      <div key={section.title}>
+                    {product.description ? <p className="shop-pdp__details-copy">{product.description}</p> : null}
+                    {productStory ? <ProductStoryBlock story={productStory} /> : null}
+                    {detailSections.map((section) => (
+                      <div key={section.title} className="shop-pdp__details-section">
                         <h3>{section.title}</h3>
                         <ul>
-                          {section.items.map((item) => <li key={item}>{item}</li>)}
+                          {section.items.map((item) => (
+                            <li key={item}>{item}</li>
+                          ))}
                         </ul>
                       </div>
                     ))}

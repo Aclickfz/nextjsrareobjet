@@ -40,6 +40,16 @@ export function ProductAdminFields({
         Free shipping
       </label>
       <label>Description<AdminTextarea name="description" rows={4} defaultValue={String(product?.description || '')} /></label>
+      <label>
+        Product story
+        <AdminTextarea
+          name="product_story"
+          rows={5}
+          defaultValue={String(product?.product_story || '')}
+          placeholder="Shown between description and details sections on the product page"
+        />
+      </label>
+      <p className="admin-help">Appears under Description and above Details sections. Long text uses See more / See less on the storefront.</p>
       {isEdit ? (
         <label>Storefront
           <AdminSelect name="is_active" defaultValue={String(product?.is_active ?? 1)}>
