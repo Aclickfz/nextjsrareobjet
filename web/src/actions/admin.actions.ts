@@ -90,8 +90,13 @@ async function saveProductActionImpl(formData: FormData) {
     is_active: formData.get('is_active') === '0' ? 0 : 1
   };
   let productId = id;
+  const { shown_caption, ...productFields } = data;
   if (id) {
-    const captionSql = data.shown_caption === undefined ? '' : ', shown_caption=:shown_caption';
+    const captionSql = shown_caption === undefined ? '' : ', shown_caption=:shown_caption';
+    const updateParams =
+      shown_caption === undefined
+        ? { ...productFields, id }
+        : { ...productFields, shown_caption, id };
     await getPool().execute(
       `UPDATE products SET sort_order=:sort_order, category_id=:category_id, name=:name, slug=:slug, description=:description, price=:price, price_max=:price_max,
        compare_at_price=:compare_at_price, stock_qty=:stock_qty, sku=:sku, badge=:badge, grade_label=:grade_label,
@@ -101,7 +106,7 @@ async function saveProductActionImpl(formData: FormData) {
        paired_slugs=:paired_slugs, collection_slugs=:collection_slugs, similar_slugs=:similar_slugs,
        still_deciding=:still_deciding, is_active=:is_active
        WHERE id=:id`,
-      { ...data, id }
+      updateParams
     );
   } else {
     const [result] = await getPool().execute<ResultSetHeader>(
@@ -116,7 +121,7 @@ async function saveProductActionImpl(formData: FormData) {
         :related_searches, :related_category_slugs, :ask_prompts, :paired_slugs, :collection_slugs, :similar_slugs,
         :still_deciding, :is_active
       )`,
-      { ...data, shown_caption: data.shown_caption ?? null }
+      { ...productFields, shown_caption: shown_caption ?? null }
     );
     productId = result.insertId;
   }
