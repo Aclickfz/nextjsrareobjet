@@ -61,12 +61,35 @@ export function AdminActionForm({ action, success = 'Changes saved.', successPat
       if (successPath) router.push(successPath);
       router.refresh();
     } catch (error) {
-      if (isRedirectError(error)) {
-        const destination = getURLFromRedirectError(error);
-        if (destination) { if (!successPath || destination === successPath) toast.success(success); router.push(destination); router.refresh(); }
-      } else {
-        showError('Unable to complete this action. Please try again. If you are uploading images, keep each below 50 MB and the combined upload below 190 MB.');
+      const digest = typeof error === 'object' && error && 'digest' in error
+        ? String((error as { digest: unknown }).digest)
+        : '';
+      const redirected = isRedirectError(error) || digest.startsWith('NEXT_REDIRECT');
+      if (redirected) {
+        const destination = isRedirectError(error)
+          ? getURLFromRedirectError(error)
+          : decodeURIComponent(digest.split(';')[2] || '');
+        if (destination) {
+          if (!successPath || destination === successPath) toast.success(success);
+          router.push(destination);
+          router.refresh();
+        } else if (successPath) {
+          toast.success(success);
+          router.push(successPath);
+          router.refresh();
+        } else {
+          toast.success(success);
+          router.refresh();
+        }
+        return;
       }
+      const raw = error instanceof Error ? error.message : '';
+      const oversized = /body|size|large|190|50\s*MB|Payload/i.test(`${raw} ${digest}`);
+      showError(
+        oversized || !raw || raw === 'An error occurred in the Server Components render.'
+          ? 'Unable to complete this action. Please try again. If you are uploading images, keep each below 50 MB and the combined upload below 190 MB.'
+          : raw
+      );
     } finally { busy.current = false; setPending(false); }
   }
   return <AdminFormContext.Provider value={{ pending, fieldErrors }}>

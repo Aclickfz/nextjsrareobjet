@@ -160,7 +160,8 @@ async function saveProductActionImpl(formData: FormData) {
   revalidatePath('/admin/products');
   revalidatePath(`/products/${slug}`);
   revalidatePath('/', 'layout');
-  redirect(`/admin/products/${productId}`);
+  // New products need the generated id; edits rely on the form successPath to avoid false client errors.
+  if (!id) redirect(`/admin/products/${productId}`);
 }
 
 async function deleteProductGalleryImageActionImpl(formData: FormData) {
@@ -385,6 +386,14 @@ async function saveCustomerActionImpl(formData: FormData) {
   revalidatePath('/admin/customers');
 }
 
+function isNextRedirect(error: unknown) {
+  if (isRedirectError(error)) return true;
+  return typeof error === 'object'
+    && error !== null
+    && 'digest' in error
+    && String((error as { digest: unknown }).digest).startsWith('NEXT_REDIRECT');
+}
+
 // Return expected errors explicitly: production Server Actions redact thrown messages.
 async function runAdminAction(action: (data: FormData) => Promise<void>, data: FormData): Promise<AdminActionResult | void> {
   try {
@@ -392,9 +401,13 @@ async function runAdminAction(action: (data: FormData) => Promise<void>, data: F
     validateAdminUpload(data);
     await action(data);
   } catch (error) {
-    if (isRedirectError(error)) throw error;
+    if (isNextRedirect(error)) throw error;
     if (error instanceof AdminValidationError) return { error: error.message, fieldErrors: error.fieldErrors };
     console.error('Admin action failed', error);
+    const detail = error instanceof Error ? error.message : '';
+    if (/Bind parameters must not contain undefined|ER_BAD_FIELD_ERROR|ER_NO_SUCH_TABLE/i.test(detail)) {
+      return { error: detail };
+    }
     return { error: 'Unable to save these changes. Please try again.' };
   }
 }
@@ -508,7 +521,7 @@ async function saveShopTileActionImpl(formData: FormData) {
     await removeUpload(existing.image);
   }
   await saveShopTile({
-    id: id || undefined,
+    ...(id ? { id } : {}),
     showcase_slug,
     name,
     href,
