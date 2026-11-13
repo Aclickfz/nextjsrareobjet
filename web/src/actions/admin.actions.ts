@@ -2,7 +2,7 @@
 
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { AdminValidationError, type AdminActionResult } from '@/lib/admin-action-result';
-import { validateAdminUpload, validateProductForm } from '@/lib/admin-validation';
+import { MAX_ADMIN_IMAGE_BYTES, validateAdminUpload, validateProductForm } from '@/lib/admin-validation';
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -75,7 +75,7 @@ async function saveProductActionImpl(formData: FormData) {
     badge: String(formData.get('badge') || '') || null,
     grade_label: String(formData.get('grade_label') || '') || null,
     collection_key: String(formData.get('collection_key') || '') || null,
-    shown_caption: String(formData.get('shown_caption') || '') || null,
+    shown_caption: formData.has('shown_caption') ? String(formData.get('shown_caption') || '') || null : undefined,
     free_shipping: formData.get('free_shipping') === '1' ? 1 : 0,
     details_sections: readJson('details_sections'),
     dimensions: readJson('dimensions'),
@@ -91,10 +91,11 @@ async function saveProductActionImpl(formData: FormData) {
   };
   let productId = id;
   if (id) {
+    const captionSql = data.shown_caption === undefined ? '' : ', shown_caption=:shown_caption';
     await getPool().execute(
       `UPDATE products SET sort_order=:sort_order, category_id=:category_id, name=:name, slug=:slug, description=:description, price=:price, price_max=:price_max,
        compare_at_price=:compare_at_price, stock_qty=:stock_qty, sku=:sku, badge=:badge, grade_label=:grade_label,
-       collection_key=:collection_key, shown_caption=:shown_caption, free_shipping=:free_shipping,
+       collection_key=:collection_key, free_shipping=:free_shipping${captionSql},
        details_sections=:details_sections, dimensions=:dimensions, faqs=:faqs,
        related_searches=:related_searches, related_category_slugs=:related_category_slugs, ask_prompts=:ask_prompts,
        paired_slugs=:paired_slugs, collection_slugs=:collection_slugs, similar_slugs=:similar_slugs,
@@ -115,7 +116,7 @@ async function saveProductActionImpl(formData: FormData) {
         :related_searches, :related_category_slugs, :ask_prompts, :paired_slugs, :collection_slugs, :similar_slugs,
         :still_deciding, :is_active
       )`,
-      data
+      { ...data, shown_caption: data.shown_caption ?? null }
     );
     productId = result.insertId;
   }
@@ -132,7 +133,8 @@ async function saveProductActionImpl(formData: FormData) {
       { product_id: productId, path: uploaded }
     );
   }
-  const gallery = formData.getAll('gallery');
+  // Preserve the client FileList order as gallery sort_order (1, 2, 3…).
+  const gallery = formData.getAll('gallery').filter((file): file is File => file instanceof File && file.size > 0);
   const sortRows = await query<{ next_sort: number }[]>(
     'SELECT COALESCE(MAX(sort_order), 0) + 1 AS next_sort FROM product_images WHERE product_id = :product_id AND is_primary = 0',
     { product_id: productId }
@@ -254,7 +256,7 @@ function isManagedUploadKey(relative: string) {
 
 async function storeUpload(file: FormDataEntryValue | null, folder: string) {
   if (!(file instanceof File) || file.size === 0) return null;
-  if (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) throw new AdminValidationError('Images only, max 5MB');
+  if (!file.type.startsWith('image/') || file.size > MAX_ADMIN_IMAGE_BYTES) throw new AdminValidationError('Images only, max 50MB');
   const prefix = UPLOAD_PREFIX[folder];
   if (!prefix) throw new AdminValidationError('Unknown upload folder');
   const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
@@ -435,7 +437,7 @@ async function saveHomepageMediaActionImpl(formData: FormData) {
   const meta = siteMediaSlotByKey(slotKey);
   if (!meta) throw new AdminValidationError('Unknown homepage media slot');
   const uploaded = await storeUpload(formData.get('image_file'), 'homepage');
-  if (!uploaded) throw new AdminValidationError('Choose an image to upload (max 5MB)');
+  if (!uploaded) throw new AdminValidationError('Choose an image to upload (max 50MB)');
   const previous = await getSiteMediaPath(slotKey);
   await updateSiteMediaPath(slotKey, uploaded);
   if (
@@ -461,7 +463,7 @@ async function saveCategoryImageActionImpl(formData: FormData) {
   const existing = categories.find((c) => c.id === id);
   if (!existing) throw new AdminValidationError('Category not found');
   const uploaded = await storeUpload(formData.get('image_file'), 'categories');
-  if (!uploaded) throw new AdminValidationError('Choose an image to upload (max 5MB)');
+  if (!uploaded) throw new AdminValidationError('Choose an image to upload (max 50MB)');
   if (existing.image && existing.image !== uploaded && (
     existing.image.startsWith('category/')
     || existing.image.startsWith('uploads/categories/')

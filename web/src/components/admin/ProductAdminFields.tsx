@@ -1,7 +1,7 @@
 import { AdminInput, AdminTextarea, AdminSelect, AdminCheckbox } from '@/components/admin/AdminControls';
 import { ProductContentFields } from './ProductContentFields';
 import { CategoryPicker } from './CategoryPicker';
-import { ProductGalleryImage } from './ProductGalleryImage';
+import { ProductImageUploads } from './ProductImageUploads';
 import type { CategoryNode } from '@/lib/catalog-tree';
 import type { ReactNode } from 'react';
 
@@ -12,7 +12,7 @@ export function ProductAdminFields({
 }: {
   product?: Record<string, string | number | null>;
   categories: CategoryNode[];
-  images?: { id: number; path: string; is_primary: number }[];
+  images?: { id: number; path: string; is_primary: number; sort_order?: number }[];
 }) {
   const isEdit = Boolean(product?.id);
   return (
@@ -35,7 +35,6 @@ export function ProductAdminFields({
         <label>Grade<AdminInput name="grade_label" defaultValue={String(product?.grade_label || '')} placeholder="Contract Grade" /></label>
         <label>Collection key<AdminInput name="collection_key" defaultValue={String(product?.collection_key || '')} placeholder="montclair" /></label>
       </div>
-      <label>Shown caption (optional)<AdminTextarea name="shown_caption" rows={4} defaultValue={String(product?.shown_caption || '')} placeholder="Shown in Rustic Chenille..." /></label>
       <label className="form-check">
         <AdminCheckbox name="free_shipping" value="1" defaultChecked={Boolean(Number(product?.free_shipping || 0))} />
         Free shipping
@@ -52,24 +51,36 @@ export function ProductAdminFields({
 
       <ProductContentFields product={product} />
 
-      {images?.length ? (
-        <div className="product-gallery-grid">
-          {images.map((image) => (
-            <ProductGalleryImage key={image.id} image={image} productId={Number(product?.id)} />
-          ))}
-        </div>
-      ) : null}
-      <label>{isEdit ? 'Replace main image' : 'Main image'}<AdminInput name="image" type="file" accept="image/*" /></label>
-      <label>{isEdit ? 'Add gallery images' : 'Gallery images'}<AdminInput name="gallery" type="file" accept="image/*" multiple /></label>
+      <ProductImageUploads
+        isEdit={isEdit}
+        productId={product?.id != null ? Number(product.id) : undefined}
+        images={images}
+      />
     </>
   );
 }
 
-export function ProductAdminShell({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
+export function ProductAdminShell({
+  title,
+  subtitle,
+  actions,
+  children
+}: {
+  title: string;
+  subtitle: string;
+  actions?: ReactNode;
+  children: ReactNode;
+}) {
   return (
     <>
-      <div className="page-head"><div><h2>{title}</h2><p>{subtitle}</p></div></div>
-      <div className="panel">{children}</div>
+      <div className="page-head">
+        <div>
+          <h2>{title}</h2>
+          <p>{subtitle}</p>
+        </div>
+        {actions ? <div className="page-head-actions">{actions}</div> : null}
+      </div>
+      <div className="panel panel-form">{children}</div>
     </>
   );
 }

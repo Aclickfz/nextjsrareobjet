@@ -1,6 +1,11 @@
 import { z } from 'zod';
 import { AdminValidationError } from './admin-action-result';
 
+/** Max size for a single admin image upload. */
+export const MAX_ADMIN_IMAGE_BYTES = 50 * 1024 * 1024;
+/** Max combined multipart payload for one admin form submit (leaves headroom under bodySizeLimit). */
+export const MAX_ADMIN_UPLOAD_TOTAL_BYTES = 190 * 1024 * 1024;
+
 const optionalMoney = z.preprocess(value => value === '' || value == null ? undefined : value, z.coerce.number().finite().nonnegative('Enter a positive amount or zero.').optional());
 const productSchema = z.object({
   name: z.string().trim().min(1, 'Enter a product name.').max(200, 'Use at most 200 characters.'),
@@ -18,11 +23,15 @@ export function validateAdminUpload(form: FormData) {
   for (const [name, value] of form.entries()) {
     if (value instanceof File) {
       total += value.size;
-      if (value.size && (!value.type.startsWith('image/') || value.size > 5 * 1024 * 1024)) fields[name] = ['Choose image files no larger than 5 MB each.'];
+      if (value.size && (!value.type.startsWith('image/') || value.size > MAX_ADMIN_IMAGE_BYTES)) {
+        fields[name] = ['Choose image files no larger than 50 MB each.'];
+      }
     } else total += new TextEncoder().encode(value).length;
   }
   // Leave room for multipart boundaries and Server Action metadata.
-  if (total > 45 * 1024 * 1024) throw new AdminValidationError('The combined upload is too large. Keep this form below 45 MB; save additional gallery images separately.');
+  if (total > MAX_ADMIN_UPLOAD_TOTAL_BYTES) {
+    throw new AdminValidationError('The combined upload is too large. Keep this form below 190 MB; save additional gallery images separately.');
+  }
   if (Object.keys(fields).length) throw new AdminValidationError('Check the selected images.', fields);
 }
 

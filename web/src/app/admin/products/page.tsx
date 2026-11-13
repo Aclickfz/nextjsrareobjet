@@ -30,6 +30,7 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
      WHERE ${filters.join(' AND ')} ORDER BY p.sort_order ASC, p.id ASC LIMIT 100`,
     params
   );
+
   return (
     <>
       <div className="page-head">
@@ -37,37 +38,75 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
           <h2>Products</h2>
           <p>Create, edit, and hide catalog items by category.</p>
         </div>
-        <AdminButton asChild><Link className="tw:text-white" href="/admin/products/new">Add product</Link></AdminButton>
+        <div className="page-head-actions">
+          <AdminButton asChild>
+            <Link className="tw:text-white" href="/admin/products/new">
+              Add product
+            </Link>
+          </AdminButton>
+        </div>
       </div>
+
       <AdminFilterForm className="filters" key={`${q || ''}-${category || ''}`}>
         <AdminInput type="search" name="q" aria-label="Search products" defaultValue={q || ''} placeholder="Search name or SKU" />
         <AdminSelect name="category" aria-label="Filter by category" defaultValue={category || ''}>
           <option value="">All categories</option>
-          {categories.map((item) => <option key={item.id} value={item.id}>{categoryPath(categories, item.id).map(c => c.name).join(" / ")}</option>)}
+          {categories.map((item) => (
+            <option key={item.id} value={item.id}>
+              {categoryPath(categories, item.id)
+                .map((c) => c.name)
+                .join(' / ')}
+            </option>
+          ))}
         </AdminSelect>
-        <AdminButton type="submit">Filter</AdminButton>
+        <div className="filters-actions">
+          <AdminButton type="submit">Filter</AdminButton>
+        </div>
       </AdminFilterForm>
+
       <div className="panel">
         <table className="admin-table">
-          <thead><tr><th></th><th>Product</th><th>SKU</th><th>Price</th><th>Stock</th><th>Status</th><th></th></tr></thead>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Product</th>
+              <th>SKU</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
           <tbody>
             {products.map((product) => (
               <tr key={product.id}>
                 <td>{product.image ? <img className="thumb" src={imgSrc(product.image)} alt="" /> : <span className="thumb" />}</td>
-                <td>{product.name}<div className="muted">{product.category_name || 'Uncategorized'}</div></td>
+                <td>
+                  {product.name}
+                  <div className="muted">{product.category_name || 'Uncategorized'}</div>
+                </td>
                 <td>{product.sku || '—'}</td>
                 <td>{money(Number(product.price))}</td>
                 <td>{product.stock_qty}</td>
-                <td><span className={product.is_active ? 'pill' : 'pill off'}>{product.is_active ? 'Live' : 'Hidden'}</span></td>
+                <td>
+                  <span className={product.is_active ? 'pill' : 'pill off'}>{product.is_active ? 'Live' : 'Hidden'}</span>
+                </td>
                 <td>
                   <div className="row-actions">
                     <Link href={`/admin/products/${product.id}`}>Edit</Link>
                     <ActionForm action={deleteProductAction} success="Product deleted." confirmMessage={`Delete "${product.name}" permanently? This cannot be undone.`}>
                       <AdminInput type="hidden" name="id" value={product.id} />
-                      <AdminButton variant="destructive" size="sm" type="submit">Delete</AdminButton>
+                      <AdminButton variant="ghost" type="submit">
+                        Delete
+                      </AdminButton>
                     </ActionForm>
                     {product.is_active ? (
-                      <ActionForm action={deactivateProductAction} success="Product hidden."><AdminInput type="hidden" name="id" value={product.id} /><AdminButton variant="destructive" size="sm" type="submit">Hide</AdminButton></ActionForm>
+                      <ActionForm action={deactivateProductAction} success="Product hidden.">
+                        <AdminInput type="hidden" name="id" value={product.id} />
+                        <AdminButton variant="outline" type="submit">
+                          Hide
+                        </AdminButton>
+                      </ActionForm>
                     ) : null}
                   </div>
                 </td>
