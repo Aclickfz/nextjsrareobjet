@@ -8,11 +8,21 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAdminForm, AdminFieldError } from './AdminForm';
 
-export function AdminInput({ name, type, ...props }: ComponentProps<typeof Input>) {
+export function AdminInput({ name, type, className, ...props }: ComponentProps<typeof Input>) {
   const { fieldErrors } = useAdminForm();
   const id = useId();
   if (type === 'hidden') return <input type="hidden" name={name} {...props} />;
-  return <><Input {...props} name={name} type={type} aria-invalid={Boolean(name && fieldErrors[name])} aria-describedby={name && fieldErrors[name] ? id : props['aria-describedby']} /><AdminFieldError name={name} id={id} /></>;
+  return <>
+    <Input
+      {...props}
+      name={name}
+      type={type}
+      className={type === 'file' ? `admin-file-input${className ? ` ${className}` : ''}` : className}
+      aria-invalid={Boolean(name && fieldErrors[name])}
+      aria-describedby={name && fieldErrors[name] ? id : props['aria-describedby']}
+    />
+    <AdminFieldError name={name} id={id} />
+  </>;
 }
 export function AdminTextarea({ name, ...props }: ComponentProps<typeof Textarea>) {
   const { fieldErrors } = useAdminForm();

@@ -25,7 +25,7 @@ const cardStyle: CSSProperties = {
 function BannerForm({ row, title }: { row: SiteMediaRow; title: string }) {
   return (
     <ActionForm
-      className="admin-form"
+      className="admin-form admin-form-wide"
       action={saveHomepageMediaAction}
       success={`${title} updated.`}
       style={{ ...cardStyle, maxWidth: 'none', padding: 16 }}
@@ -53,7 +53,7 @@ function BannerForm({ row, title }: { row: SiteMediaRow; title: string }) {
             Replace banner
             <AdminInput type="file" name="image_file" accept="image/*" required />
           </label>
-          <div>
+          <div className="admin-form-actions compact">
             <AdminButton type="submit">Save banner</AdminButton>
           </div>
         </div>
@@ -65,7 +65,7 @@ function BannerForm({ row, title }: { row: SiteMediaRow; title: string }) {
 function ShopTileForm({ row, title }: { row: SiteMediaRow; title: string }) {
   return (
     <ActionForm
-      className="admin-form"
+      className="admin-form admin-form-wide"
       action={saveHomepageMediaAction}
       success={`${title} updated.`}
       style={{ ...cardStyle, maxWidth: 'none' }}
@@ -89,7 +89,9 @@ function ShopTileForm({ row, title }: { row: SiteMediaRow; title: string }) {
         Replace
         <AdminInput type="file" name="image_file" accept="image/*" required />
       </label>
-      <AdminButton type="submit">Save</AdminButton>
+      <div className="admin-form-actions compact">
+        <AdminButton type="submit">Save</AdminButton>
+      </div>
     </ActionForm>
   );
 }
@@ -97,7 +99,7 @@ function ShopTileForm({ row, title }: { row: SiteMediaRow; title: string }) {
 function ShopCategoryForm({ category }: { category: CategoryNode }) {
   return (
     <ActionForm
-      className="admin-form"
+      className="admin-form admin-form-wide"
       action={saveCategoryImageAction}
       success={`${category.name} image updated.`}
       style={{ ...cardStyle, maxWidth: 'none' }}
@@ -121,9 +123,11 @@ function ShopCategoryForm({ category }: { category: CategoryNode }) {
         Replace
         <AdminInput type="file" name="image_file" accept="image/*" required />
       </label>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+      <div className="admin-form-actions compact">
+        <AdminButton asChild variant="outline">
+          <a href={`/admin/categories?id=${category.id}`}>Edit</a>
+        </AdminButton>
         <AdminButton type="submit">Save</AdminButton>
-        <a href={`/admin/categories?id=${category.id}`} style={{ fontSize: 12 }}>Edit</a>
       </div>
     </ActionForm>
   );
@@ -132,7 +136,7 @@ function ShopCategoryForm({ category }: { category: CategoryNode }) {
 function MediaSlotForm({ row, title }: { row: SiteMediaRow; title?: string }) {
   return (
     <ActionForm
-      className="admin-form"
+      className="admin-form admin-form-wide"
       action={saveHomepageMediaAction}
       success={`${title || row.label} updated.`}
       style={{
@@ -171,7 +175,7 @@ function MediaSlotForm({ row, title }: { row: SiteMediaRow; title?: string }) {
           Replace image
           <AdminInput type="file" name="image_file" accept="image/*" required />
         </label>
-        <div>
+        <div className="admin-form-actions compact">
           <AdminButton type="submit">Save image</AdminButton>
         </div>
       </div>

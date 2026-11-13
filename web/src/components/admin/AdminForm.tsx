@@ -65,7 +65,7 @@ export function AdminActionForm({ action, success = 'Changes saved.', successPat
         const destination = getURLFromRedirectError(error);
         if (destination) { if (!successPath || destination === successPath) toast.success(success); router.push(destination); router.refresh(); }
       } else {
-        showError('Unable to complete this action. Please try again. If you are uploading images, keep each below 5 MB and the combined upload below 9 MB.');
+        showError('Unable to complete this action. Please try again. If you are uploading images, keep each below 50 MB and the combined upload below 190 MB.');
       }
     } finally { busy.current = false; setPending(false); }
   }
@@ -81,9 +81,9 @@ export function AdminActionForm({ action, success = 'Changes saved.', successPat
   </AdminFormContext.Provider>;
 }
 
-export function AdminButton({ children, loadingText = 'Please wait…', disabled, type = 'button', ...props }: ComponentProps<typeof Button> & { loadingText?: string }) {
+export function AdminButton({ children, loadingText = 'Please wait…', disabled, type = 'button', size = 'sm', ...props }: ComponentProps<typeof Button> & { loadingText?: string }) {
   const { pending } = useAdminForm();
-  return <Button {...props} type={type} disabled={disabled || pending} aria-busy={type === 'submit' && pending}>
+  return <Button {...props} type={type} size={size} disabled={disabled || pending} aria-busy={type === 'submit' && pending}>
     {type === 'submit' && pending ? <><LoaderCircle className="tw:animate-spin" aria-hidden="true" />{loadingText}</> : children}
   </Button>;
 }
