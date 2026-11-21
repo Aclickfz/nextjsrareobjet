@@ -1260,6 +1260,10 @@
     font-size: 14px;
 }
 
+.shop-pdp__dims > div.shop-pdp__dims-full {
+    grid-template-columns: 1fr;
+}
+
 .shop-pdp__dims > div:nth-child(odd) {
     background: #f5f5f5;
 }
