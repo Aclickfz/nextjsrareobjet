@@ -43,7 +43,7 @@ function priceLabel(product: Product) {
   );
 }
 
-function productTypeRows(text: string) {
+function productTypeRows(text: string, defaultLabel = 'Product Type') {
   const lines = text
     .split(/\r?\n/)
     .map((line) => line.trim())
@@ -54,13 +54,13 @@ function productTypeRows(text: string) {
       return { label: '', value: line };
     });
   // Plain text (e.g. "Luxury Upholstered Sofa") → one Dimensions-style row.
-  if (lines.length === 1 && !lines[0].label) {
-    return [{ label: 'Product Type', value: lines[0].value }];
+  if (defaultLabel && lines.length === 1 && !lines[0].label) {
+    return [{ label: defaultLabel, value: lines[0].value }];
   }
-  if (lines.length > 1 && lines.every((row) => !row.label)) {
-    return [{ label: 'Product Type', value: lines.map((row) => row.value).join(' ') }];
+  if (defaultLabel && lines.length > 1 && lines.every((row) => !row.label)) {
+    return [{ label: defaultLabel, value: lines.map((row) => row.value).join(' ') }];
   }
-  return lines.map((row) => (row.label ? row : { label: 'Product Type', value: row.value }));
+  return lines.map((row) => (row.label || !defaultLabel ? row : { label: defaultLabel, value: row.value }));
 }
 
 function ProductStoryDetails({
@@ -241,7 +241,7 @@ export function ProductPurchase({ product }: { product: Product }) {
                           <div key={section.title} className="shop-pdp__details-section">
                             <h3>{section.title}</h3>
                             <div className="shop-pdp__dims">
-                              {productTypeRows(section.items.join('\n')).map((row, index) => (
+                              {productTypeRows(section.items.join('\n'), '').map((row, index) => (
                                 <div key={index} className={row.label ? undefined : 'shop-pdp__dims-full'}>
                                   {row.label ? <strong>{row.label}</strong> : null}
                                   <span>{row.value}</span>
