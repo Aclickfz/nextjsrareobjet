@@ -32,7 +32,7 @@ export function ProductImageUploads({
   images?: SavedImage[];
   isEdit: boolean;
 }) {
-  const { fieldErrors, pending } = useAdminForm();
+  const { fieldErrors, pending, savedCount } = useAdminForm();
   const mainId = useId();
   const galleryId = useId();
   const mainInputRef = useRef<HTMLInputElement>(null);
@@ -55,6 +55,17 @@ export function ProductImageUploads({
     if (mainPreviewRef.current) URL.revokeObjectURL(mainPreviewRef.current);
     for (const item of pendingGalleryRef.current) URL.revokeObjectURL(item.preview);
   }, []);
+
+  useEffect(() => {
+    if (!savedCount) return;
+    if (mainPreviewRef.current) URL.revokeObjectURL(mainPreviewRef.current);
+    for (const item of pendingGalleryRef.current) URL.revokeObjectURL(item.preview);
+    setMainPreview(null);
+    setMainName('');
+    setPendingGallery([]);
+    if (mainInputRef.current) mainInputRef.current.value = '';
+    syncInput(galleryInputRef.current, []);
+  }, [savedCount]);
 
   function onMainChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
