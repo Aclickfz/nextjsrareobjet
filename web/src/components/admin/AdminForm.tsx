@@ -31,6 +31,7 @@ export function AdminActionForm({ action, success = 'Changes saved.', successPat
   const [savedCount, setSavedCount] = useState(0);
   const busy = useRef(false);
   const feedbackRef = useRef<HTMLDivElement>(null);
+  const markSaved = () => setSavedCount((count) => count + 1);
   const showError = (message: string, fields: Record<string, string[]> = {}) => {
     setFieldErrors(fields);
     setFeedback({ message, tone: 'error' });
@@ -57,7 +58,7 @@ export function AdminActionForm({ action, success = 'Changes saved.', successPat
     try {
       const result = await action(data);
       if (result?.error) { showError(result.error, result.fieldErrors); return; }
-      setSavedCount(count => count + 1);
+      markSaved();
       toast.success(success);
       setFeedback({ message: success, tone: 'success' });
       if (successPath) router.push(successPath);
@@ -68,7 +69,7 @@ export function AdminActionForm({ action, success = 'Changes saved.', successPat
         : '';
       const redirected = isRedirectError(error) || digest.startsWith('NEXT_REDIRECT');
       if (redirected) {
-        setSavedCount(count => count + 1);
+        markSaved();
         const destination = isRedirectError(error)
           ? getURLFromRedirectError(error)
           : decodeURIComponent(digest.split(';')[2] || '');

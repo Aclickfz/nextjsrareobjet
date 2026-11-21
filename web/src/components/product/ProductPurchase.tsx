@@ -43,26 +43,6 @@ function priceLabel(product: Product) {
   );
 }
 
-function productTypeRows(text: string) {
-  const lines = text
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const colon = line.indexOf(':');
-      if (colon > 0 && colon < 40) return { label: line.slice(0, colon).trim(), value: line.slice(colon + 1).trim() };
-      return { label: '', value: line };
-    });
-  // Plain text (e.g. "Luxury Upholstered Sofa") → one Dimensions-style row.
-  if (lines.length === 1 && !lines[0].label) {
-    return [{ label: 'Product Type', value: lines[0].value }];
-  }
-  if (lines.length > 1 && lines.every((row) => !row.label)) {
-    return [{ label: 'Product Type', value: lines.map((row) => row.value).join(' ') }];
-  }
-  return lines.map((row) => (row.label ? row : { label: 'Product Type', value: row.value }));
-}
-
 function ProductStoryDetails({
   story,
   productType
@@ -70,30 +50,38 @@ function ProductStoryDetails({
   story: string;
   productType: string;
 }) {
-  if (!story && !productType) return null;
-  const typeRows = productType ? productTypeRows(productType) : [];
+  const [expanded, setExpanded] = useState(false);
+  const canToggle = Boolean(story || productType);
+
+  if (!canToggle) return null;
 
   return (
-    <div className="shop-pdp__story-card is-open">
+    <div className={`shop-pdp__story-card${expanded ? ' is-open' : ''}`}>
       {story ? (
         <article className="shop-pdp__story-block">
           <span className="shop-pdp__story-label">Product Story</span>
-          <p className="shop-pdp__details-copy">{story}</p>
+          <p className={`shop-pdp__details-copy${expanded ? '' : ' shop-pdp__details-copy--clamp'}`}>{story}</p>
         </article>
       ) : null}
 
-      {typeRows.length ? (
-        <div className="shop-pdp__story-extra is-open">
-          <div className="shop-pdp__dims">
-            {typeRows.map((row, index) => (
-              <div key={index}>
-                <strong>{row.label}</strong>
-                <span>{row.value}</span>
-              </div>
-            ))}
-          </div>
+      {productType ? (
+        <div className={`shop-pdp__story-extra${expanded ? ' is-open' : ''}`} aria-hidden={!expanded}>
+          <article className="shop-pdp__story-block shop-pdp__story-block--type">
+            <span className="shop-pdp__story-label">Product Type</span>
+            <p className="shop-pdp__details-copy">{productType}</p>
+          </article>
         </div>
       ) : null}
+
+      <button
+        type="button"
+        className="shop-pdp__see-more"
+        aria-expanded={expanded}
+        onClick={() => setExpanded((value) => !value)}
+      >
+        <span>{expanded ? 'See less' : 'See more'}</span>
+        <i className={`bx ${expanded ? 'bx-chevron-up' : 'bx-chevron-down'}`} aria-hidden="true" />
+      </button>
     </div>
   );
 }
@@ -103,7 +91,7 @@ export function ProductPurchase({ product }: { product: Product }) {
   const images = product.images?.length ? product.images : [{ path: '/assets/images/img2.jpeg' }];
   const [active, setActive] = useState(0);
   const [qty, setQty] = useState(1);
-  const [openPanel, setOpenPanel] = useState<'description' | 'details' | 'dimensions' | null>(null);
+  const [openPanel, setOpenPanel] = useState<'details' | 'dimensions' | null>(null);
   const toast = useToast();
   const [pending, setPending] = useState(false);
   const productStory = (pdp?.product_story || '').trim();
@@ -202,6 +190,7 @@ export function ProductPurchase({ product }: { product: Product }) {
                       <button type="button" className="quantity-button" aria-label="Increase quantity" onClick={() => setQty((value) => Math.min(99, value + 1))}>+</button>
                     </div>
                   </div>
+                  <p className="price">{priceLabel(product)}</p>
                 </div>
               </div>
 
@@ -215,39 +204,23 @@ export function ProductPurchase({ product }: { product: Product }) {
               </div>
 
               <div className="shop-pdp__accordion">
-                {productStory || productType ? (
-                  <>
-                    <button type="button" className="shop-pdp__acc-head" aria-expanded={openPanel === 'description'} onClick={() => setOpenPanel(openPanel === 'description' ? null : 'description')}>
-                      <span>Product Description</span>
-                      <i className={`bx ${openPanel === 'description' ? 'bx-chevron-up' : 'bx-chevron-down'}`} aria-hidden="true" />
-                    </button>
-                    {openPanel === 'description' ? (
-                      <div className="shop-pdp__acc-body">
-                        <ProductStoryDetails story={productStory} productType={productType} />
-                      </div>
-                    ) : null}
-                  </>
-                ) : null}
-
                 <button type="button" className="shop-pdp__acc-head" aria-expanded={openPanel === 'details'} onClick={() => setOpenPanel(openPanel === 'details' ? null : 'details')}>
                   <span>Product Details</span>
                   <i className={`bx ${openPanel === 'details' ? 'bx-chevron-up' : 'bx-chevron-down'}`} aria-hidden="true" />
                 </button>
                 {openPanel === 'details' ? (
                   <div className="shop-pdp__acc-body">
+                    <ProductStoryDetails story={productStory} productType={productType} />
                     {detailSections.length ? (
                       <div className="shop-pdp__specs">
                         {detailSections.map((section) => (
                           <div key={section.title} className="shop-pdp__details-section">
                             <h3>{section.title}</h3>
-                            <div className="shop-pdp__dims">
-                              {productTypeRows(section.items.join('\n')).map((row, index) => (
-                                <div key={index} className={row.label ? undefined : 'shop-pdp__dims-full'}>
-                                  {row.label ? <strong>{row.label}</strong> : null}
-                                  <span>{row.value}</span>
-                                </div>
+                            <ul>
+                              {section.items.map((item) => (
+                                <li key={item}>{item}</li>
                               ))}
-                            </div>
+                            </ul>
                           </div>
                         ))}
                       </div>

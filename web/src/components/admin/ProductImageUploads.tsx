@@ -67,6 +67,13 @@ export function ProductImageUploads({
     syncInput(galleryInputRef.current, []);
   }, [savedCount]);
 
+  function clearMainSelection() {
+    if (mainPreview) URL.revokeObjectURL(mainPreview);
+    setMainPreview(null);
+    setMainName('');
+    if (mainInputRef.current) mainInputRef.current.value = '';
+  }
+
   function onMainChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (mainPreview) URL.revokeObjectURL(mainPreview);
@@ -156,6 +163,13 @@ export function ProductImageUploads({
             <div className="admin-main-preview">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={mainPreview} alt="Selected main image preview" />
+            </div>
+          ) : null}
+          {mainName ? (
+            <div className="admin-form-actions compact">
+              <AdminButton type="button" variant="outline" size="sm" disabled={pending} onClick={clearMainSelection}>
+                Clear main image
+              </AdminButton>
             </div>
           ) : null}
         </div>
