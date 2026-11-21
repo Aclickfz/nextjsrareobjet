@@ -11,8 +11,8 @@ import { Alert } from '@/components/ui/alert';
 import { AdminValidationError, type AdminActionResult } from '@/lib/admin-action-result';
 import { validateAdminUpload, validateProductForm } from '@/lib/admin-validation';
 
-type FormContext = { pending: boolean; fieldErrors: Record<string, string[]> };
-const AdminFormContext = createContext<FormContext>({ pending: false, fieldErrors: {} });
+type FormContext = { pending: boolean; fieldErrors: Record<string, string[]>; savedCount: number };
+const AdminFormContext = createContext<FormContext>({ pending: false, fieldErrors: {}, savedCount: 0 });
 export const useAdminForm = () => useContext(AdminFormContext);
 
 type Props = Omit<ComponentProps<'form'>, 'action' | 'encType' | 'method'> & {
@@ -28,6 +28,7 @@ export function AdminActionForm({ action, success = 'Changes saved.', successPat
   const [pending, setPending] = useState(false);
   const [feedback, setFeedback] = useState<{ message: string; tone: 'error' | 'success' }>();
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const [savedCount, setSavedCount] = useState(0);
   const busy = useRef(false);
   const feedbackRef = useRef<HTMLDivElement>(null);
   const showError = (message: string, fields: Record<string, string[]> = {}) => {
@@ -56,6 +57,7 @@ export function AdminActionForm({ action, success = 'Changes saved.', successPat
     try {
       const result = await action(data);
       if (result?.error) { showError(result.error, result.fieldErrors); return; }
+      setSavedCount(count => count + 1);
       toast.success(success);
       setFeedback({ message: success, tone: 'success' });
       if (successPath) router.push(successPath);
@@ -66,6 +68,7 @@ export function AdminActionForm({ action, success = 'Changes saved.', successPat
         : '';
       const redirected = isRedirectError(error) || digest.startsWith('NEXT_REDIRECT');
       if (redirected) {
+        setSavedCount(count => count + 1);
         const destination = isRedirectError(error)
           ? getURLFromRedirectError(error)
           : decodeURIComponent(digest.split(';')[2] || '');
@@ -92,7 +95,7 @@ export function AdminActionForm({ action, success = 'Changes saved.', successPat
       );
     } finally { busy.current = false; setPending(false); }
   }
-  return <AdminFormContext.Provider value={{ pending, fieldErrors }}>
+  return <AdminFormContext.Provider value={{ pending, fieldErrors, savedCount }}>
     <form {...props} aria-busy={pending} onSubmit={submit} onInvalid={event => {
       const target = event.target as HTMLInputElement;
       if (target.name) setFieldErrors(current => ({ ...current, [target.name]: [target.validationMessage] }));
@@ -114,7 +117,7 @@ export function AdminButton({ children, loadingText = 'Please wait…', disabled
 export function AdminFilterForm({ children, ...props }: Omit<ComponentProps<'form'>, 'action' | 'onSubmit' | 'method'>) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  return <AdminFormContext.Provider value={{ pending, fieldErrors: {} }}><form {...props} method="get" onSubmit={event => {
+  return <AdminFormContext.Provider value={{ pending, fieldErrors: {}, savedCount: 0 }}><form {...props} method="get" onSubmit={event => {
     event.preventDefault();
     if (pending) return;
     const query = new URLSearchParams();

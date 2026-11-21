@@ -43,6 +43,18 @@ function priceLabel(product: Product) {
   );
 }
 
+function productTypeRows(text: string) {
+  return text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const colon = line.indexOf(':');
+      if (colon > 0 && colon < 40) return { label: line.slice(0, colon).trim(), value: line.slice(colon + 1).trim() };
+      return { label: '', value: line };
+    });
+}
+
 function ProductStoryDetails({
   story,
   productType
@@ -50,38 +62,32 @@ function ProductStoryDetails({
   story: string;
   productType: string;
 }) {
-  const [expanded, setExpanded] = useState(false);
-  const canToggle = Boolean(story || productType);
-
-  if (!canToggle) return null;
+  if (!story && !productType) return null;
 
   return (
-    <div className={`shop-pdp__story-card${expanded ? ' is-open' : ''}`}>
+    <div className="shop-pdp__story-card is-open">
       {story ? (
         <article className="shop-pdp__story-block">
           <span className="shop-pdp__story-label">Product Story</span>
-          <p className={`shop-pdp__details-copy${expanded ? '' : ' shop-pdp__details-copy--clamp'}`}>{story}</p>
+          <p className="shop-pdp__details-copy">{story}</p>
         </article>
       ) : null}
 
       {productType ? (
-        <div className={`shop-pdp__story-extra${expanded ? ' is-open' : ''}`} aria-hidden={!expanded}>
+        <div className="shop-pdp__story-extra is-open">
           <article className="shop-pdp__story-block shop-pdp__story-block--type">
             <span className="shop-pdp__story-label">Product Type</span>
-            <p className="shop-pdp__details-copy">{productType}</p>
+            <div className="shop-pdp__dims">
+              {productTypeRows(productType).map((row, index) => (
+                <div key={index} className={row.label ? undefined : 'shop-pdp__dims-full'}>
+                  {row.label ? <strong>{row.label}</strong> : null}
+                  <span>{row.value}</span>
+                </div>
+              ))}
+            </div>
           </article>
         </div>
       ) : null}
-
-      <button
-        type="button"
-        className="shop-pdp__see-more"
-        aria-expanded={expanded}
-        onClick={() => setExpanded((value) => !value)}
-      >
-        <span>{expanded ? 'See less' : 'See more'}</span>
-        <i className={`bx ${expanded ? 'bx-chevron-up' : 'bx-chevron-down'}`} aria-hidden="true" />
-      </button>
     </div>
   );
 }
@@ -91,7 +97,7 @@ export function ProductPurchase({ product }: { product: Product }) {
   const images = product.images?.length ? product.images : [{ path: '/assets/images/img2.jpeg' }];
   const [active, setActive] = useState(0);
   const [qty, setQty] = useState(1);
-  const [openPanel, setOpenPanel] = useState<'details' | 'dimensions' | null>(null);
+  const [openPanel, setOpenPanel] = useState<'description' | 'details' | 'dimensions' | null>(null);
   const toast = useToast();
   const [pending, setPending] = useState(false);
   const productStory = (pdp?.product_story || '').trim();
@@ -190,7 +196,6 @@ export function ProductPurchase({ product }: { product: Product }) {
                       <button type="button" className="quantity-button" aria-label="Increase quantity" onClick={() => setQty((value) => Math.min(99, value + 1))}>+</button>
                     </div>
                   </div>
-                  <p className="price">{priceLabel(product)}</p>
                 </div>
               </div>
 
@@ -204,13 +209,26 @@ export function ProductPurchase({ product }: { product: Product }) {
               </div>
 
               <div className="shop-pdp__accordion">
+                {productStory || productType ? (
+                  <>
+                    <button type="button" className="shop-pdp__acc-head" aria-expanded={openPanel === 'description'} onClick={() => setOpenPanel(openPanel === 'description' ? null : 'description')}>
+                      <span>Product Description</span>
+                      <i className={`bx ${openPanel === 'description' ? 'bx-chevron-up' : 'bx-chevron-down'}`} aria-hidden="true" />
+                    </button>
+                    {openPanel === 'description' ? (
+                      <div className="shop-pdp__acc-body">
+                        <ProductStoryDetails story={productStory} productType={productType} />
+                      </div>
+                    ) : null}
+                  </>
+                ) : null}
+
                 <button type="button" className="shop-pdp__acc-head" aria-expanded={openPanel === 'details'} onClick={() => setOpenPanel(openPanel === 'details' ? null : 'details')}>
                   <span>Product Details</span>
                   <i className={`bx ${openPanel === 'details' ? 'bx-chevron-up' : 'bx-chevron-down'}`} aria-hidden="true" />
                 </button>
                 {openPanel === 'details' ? (
                   <div className="shop-pdp__acc-body">
-                    <ProductStoryDetails story={productStory} productType={productType} />
                     {detailSections.length ? (
                       <div className="shop-pdp__specs">
                         {detailSections.map((section) => (
