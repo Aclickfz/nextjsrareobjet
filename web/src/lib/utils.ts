@@ -46,22 +46,57 @@ function isS3StyleKey(clean: string) {
   return /^(products|category|banner|assets|uploads|orders)\//.test(clean);
 }
 
+/** Strip host from stored S3 / CloudFront / MEDIA_BASE URLs → object key. */
+export function mediaObjectKey(path: string) {
+  const raw = String(path || '').trim();
+  if (!raw) return '';
+  if (raw.startsWith('/api/media/')) return raw.slice('/api/media/'.length).replace(/^\/+/, '');
+  if (/^https?:\/\//i.test(raw)) {
+    try {
+      const parsed = new URL(raw);
+      const key = parsed.pathname.replace(/^\/+/, '');
+      if (!isS3StyleKey(key)) return '';
+      const base = mediaBaseUrl();
+      if (base) {
+        try {
+          if (parsed.host === new URL(base).host) return key;
+        } catch {
+          /* ignore bad MEDIA_BASE */
+        }
+      }
+      if (/\.amazonaws\.com$/i.test(parsed.host) || /\.cloudfront\.net$/i.test(parsed.host)) return key;
+      return '';
+    } catch {
+      return '';
+    }
+  }
+  return raw.replace(/^\.\//, '').replace(/^\/+/, '');
+}
+
 /**
  * Resolves product/homepage image paths.
  * Default: `/api/media/...` so private S3 buckets still display (app streams with AWS credentials).
- * Set NEXT_PUBLIC_MEDIA_DIRECT=1 to use NEXT_PUBLIC_MEDIA_BASE_URL (public bucket / CloudFront) instead.
+ * Full S3 URLs stored in the DB are rewritten the same way (direct bucket links often 403).
+ * Set NEXT_PUBLIC_MEDIA_DIRECT=1 only when the bucket / CloudFront is public.
  */
 export function imgSrc(path?: string | null) {
   if (!path) return imgSrc('assets/images/img2.jpeg');
-  if (/^https?:\/\//i.test(path) || path.startsWith('data:') || path.startsWith('blob:')) return path;
+  if (path.startsWith('data:') || path.startsWith('blob:')) return path;
   if (path.startsWith('/api/media/')) return path;
-  const clean = path.replace(/^\.\//, '').replace(/^\/+/, '');
+
+  const clean = mediaObjectKey(path);
+  if (!clean) {
+    if (/^https?:\/\//i.test(path)) return path;
+    return `/${String(path).replace(/^\/+/, '')}`;
+  }
+
   if (isS3StyleKey(clean)) {
     const direct = process.env.NEXT_PUBLIC_MEDIA_DIRECT === '1';
     const base = mediaBaseUrl();
     if (direct && base) return `${base}/${clean}`;
     return `/api/media/${clean}`;
   }
+
   const base = mediaBaseUrl();
   if (base) return `${base}/${clean}`;
   return `/${clean}`;

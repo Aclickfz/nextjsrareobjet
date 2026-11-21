@@ -44,7 +44,7 @@ function priceLabel(product: Product) {
 }
 
 function productTypeRows(text: string) {
-  return text
+  const lines = text
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter(Boolean)
@@ -53,6 +53,14 @@ function productTypeRows(text: string) {
       if (colon > 0 && colon < 40) return { label: line.slice(0, colon).trim(), value: line.slice(colon + 1).trim() };
       return { label: '', value: line };
     });
+  // Plain text (e.g. "Luxury Upholstered Sofa") → one Dimensions-style row.
+  if (lines.length === 1 && !lines[0].label) {
+    return [{ label: 'Product Type', value: lines[0].value }];
+  }
+  if (lines.length > 1 && lines.every((row) => !row.label)) {
+    return [{ label: 'Product Type', value: lines.map((row) => row.value).join(' ') }];
+  }
+  return lines.map((row) => (row.label ? row : { label: 'Product Type', value: row.value }));
 }
 
 function ProductStoryDetails({
@@ -63,6 +71,7 @@ function ProductStoryDetails({
   productType: string;
 }) {
   if (!story && !productType) return null;
+  const typeRows = productType ? productTypeRows(productType) : [];
 
   return (
     <div className="shop-pdp__story-card is-open">
@@ -73,19 +82,16 @@ function ProductStoryDetails({
         </article>
       ) : null}
 
-      {productType ? (
+      {typeRows.length ? (
         <div className="shop-pdp__story-extra is-open">
-          <article className="shop-pdp__story-block shop-pdp__story-block--type">
-            <span className="shop-pdp__story-label">Product Type</span>
-            <div className="shop-pdp__dims">
-              {productTypeRows(productType).map((row, index) => (
-                <div key={index} className={row.label ? undefined : 'shop-pdp__dims-full'}>
-                  {row.label ? <strong>{row.label}</strong> : null}
-                  <span>{row.value}</span>
-                </div>
-              ))}
-            </div>
-          </article>
+          <div className="shop-pdp__dims">
+            {typeRows.map((row, index) => (
+              <div key={index}>
+                <strong>{row.label}</strong>
+                <span>{row.value}</span>
+              </div>
+            ))}
+          </div>
         </div>
       ) : null}
     </div>

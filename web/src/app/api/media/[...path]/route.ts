@@ -70,7 +70,15 @@ function tryLocal(key: string) {
 
 export async function GET(_request: Request, { params }: Params) {
   const segments = (await params).path || [];
-  const key = segments.map((part) => decodeURIComponent(part)).join('/');
+  let key = segments.map((part) => decodeURIComponent(part)).join('/');
+  // DB rows sometimes store a full S3 URL; recover the object key.
+  if (/^https?:\/\//i.test(key)) {
+    try {
+      key = new URL(key).pathname.replace(/^\/+/, '');
+    } catch {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    }
+  }
   if (!key || key.includes('..') || !isManagedMediaKey(key)) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
