@@ -289,9 +289,16 @@ async function storeUpload(file: FormDataEntryValue | null, folder: string) {
 }
 
 async function removeUpload(filePath: string) {
-  const relative = filePath
-    .replace(/^https?:\/\/[^/]+\//i, '')
-    .replace(/^\/+/, '');
+  let relative = filePath.trim();
+  if (/^https?:\/\//i.test(relative)) {
+    try {
+      relative = new URL(relative).pathname.replace(/^\/+/, '');
+    } catch {
+      relative = relative.replace(/^https?:\/\/[^/]+\//i, '').replace(/^\/+/, '');
+    }
+  } else {
+    relative = relative.replace(/^\/+/, '');
+  }
   if (!isManagedUploadKey(relative)) return;
   if (s3Configured()) {
     try { await deleteFromS3(relative); } catch { /* best-effort cleanup */ }

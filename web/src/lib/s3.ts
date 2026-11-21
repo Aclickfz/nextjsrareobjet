@@ -70,10 +70,20 @@ export async function uploadToS3(
   return s3ObjectUrl(clean);
 }
 
+function objectKeyFrom(keyOrUrl: string) {
+  const raw = keyOrUrl.trim();
+  if (/^https?:\/\//i.test(raw)) {
+    try {
+      return new URL(raw).pathname.replace(/^\/+/, '');
+    } catch {
+      return raw.replace(/^https?:\/\/[^/]+\//i, '').replace(/^\/+/, '');
+    }
+  }
+  return raw.replace(/^\/+/, '');
+}
+
 export async function deleteFromS3(keyOrUrl: string) {
-  const key = keyOrUrl
-    .replace(/^https?:\/\/[^/]+\//i, '')
-    .replace(/^\/+/, '');
+  const key = objectKeyFrom(keyOrUrl);
   if (!isManagedMediaKey(key)) return;
   await client().send(new DeleteObjectCommand({
     Bucket: bucket(),
@@ -82,7 +92,7 @@ export async function deleteFromS3(keyOrUrl: string) {
 }
 
 export async function getS3Object(key: string) {
-  const clean = key.replace(/^\/+/, '');
+  const clean = objectKeyFrom(key);
   if (!isManagedMediaKey(clean)) throw new Error('Invalid media key');
   const result = await client().send(new GetObjectCommand({
     Bucket: bucket(),
