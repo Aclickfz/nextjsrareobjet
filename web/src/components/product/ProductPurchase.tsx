@@ -234,11 +234,14 @@ export function ProductPurchase({ product }: { product: Product }) {
                         {detailSections.map((section) => (
                           <div key={section.title} className="shop-pdp__details-section">
                             <h3>{section.title}</h3>
-                            <ul>
-                              {section.items.map((item) => (
-                                <li key={item}>{item}</li>
+                            <div className="shop-pdp__dims">
+                              {productTypeRows(section.items.join('\n')).map((row, index) => (
+                                <div key={index} className={row.label ? undefined : 'shop-pdp__dims-full'}>
+                                  {row.label ? <strong>{row.label}</strong> : null}
+                                  <span>{row.value}</span>
+                                </div>
                               ))}
-                            </ul>
+                            </div>
                           </div>
                         ))}
                       </div>
