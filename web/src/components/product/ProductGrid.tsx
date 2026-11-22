@@ -98,12 +98,12 @@ export function ProductGrid({
               const tags = [product.badge || (onSale ? 'Sale' : '')].filter(Boolean) as string[];
               return (
                 <div className="col-xl-3 col-md-4 col-sm-6" key={product.id}>
-                  <div className="card__inner shop-card">
+                  <div className={`card__inner shop-card${tags[0] ? ' shop-card--badged' : ''}`}>
                     <div className="card--img">
                       {tags[0] ? <span className="shop-card__badge">{tags[0]}</span> : null}
                       <Link href={`/products/${product.slug}`}>
                         <div className="media_hover">
-                          <img decoding="async" loading="lazy" src={imgSrc(image)} className="img-fluid" alt={product.name} />
+                          <img decoding="async" loading="lazy" src={imgSrc(image)} className="img-fluid shop-card__img" alt={product.name} />
                         </div>
                       </Link>
                       <div className="favorites">

@@ -379,7 +379,22 @@ async function orderStatusActionImpl(formData: FormData) {
   const admin = await requireAdmin();
   const id = Number(formData.get('id'));
   const status = String(formData.get('status') || '');
-  await updateOrderStatus(id, status, admin.id, formData.get('mark_paid') === '1');
+  const markPaid = formData.get('mark_paid') === '1';
+  const { loadOrder } = await import('@/repositories/order.repository');
+  const before = await loadOrder(id, null, true);
+  const previousPayment = String(before?.payment_status || '').toLowerCase();
+  const updated = await updateOrderStatus(id, status, admin.id, markPaid);
+  const nextPayment = String(updated?.payment_status || '').toLowerCase();
+  // Send invoice email when payment finishes (unpaid → paid).
+  if (updated && previousPayment !== 'paid' && nextPayment === 'paid') {
+    try {
+      const { sendOrderConfirmationEmail, storeOrderConfirmationOnS3 } = await import('@/lib/order-email');
+      await sendOrderConfirmationEmail(updated);
+      if (updated.user_id) await storeOrderConfirmationOnS3(updated, Number(updated.user_id));
+    } catch {
+      // Status update already succeeded; email is best-effort.
+    }
+  }
   revalidatePath('/admin/orders');
   revalidatePath(`/admin/orders/${id}`);
 }
