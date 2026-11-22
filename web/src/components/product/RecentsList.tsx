@@ -72,9 +72,13 @@ export function RecentsList({ variant = 'page' }: { variant?: 'page' | 'rail' })
                 <Link href={`/products/${product.slug}`}>
                   <img src={imgSrc(product.image)} className="img-fluid" alt={product.name} />
                 </Link>
-                <div className="card__inner_content">
-                  <Link href={`/products/${product.slug}`}>{product.name}</Link>
-                  <span>{money(product.price)}</span>
+                <div className="card__inner_content shop-card__meta">
+                  <Link href={`/products/${product.slug}`} className="shop-card__title">{product.name}</Link>
+                  <div className="shop-card__price-row">
+                    <span className="shop-card__price">
+                      <span className="shop-card__current">{money(product.price)}</span>
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

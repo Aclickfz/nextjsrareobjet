@@ -28,19 +28,15 @@ type Product = {
   pdp?: ReturnType<typeof normalizePdp>;
 };
 
-function priceLabel(product: Product) {
+function priceMeta(product: Product) {
   const min = Number(product.price);
   const max = product.pdp?.price_max != null ? Number(product.pdp.price_max) : null;
   const compare = product.compare_at_price ? Number(product.compare_at_price) : 0;
   const highs = [max, compare].filter((value): value is number => value != null && value > min);
   const highest = highs.length ? Math.max(...highs) : null;
-  if (highest == null) return money(min);
-  return (
-    <>
-      <s>{money(highest)}</s>
-      {money(min)}
-    </>
-  );
+  const onSale = highest != null;
+  const savePct = onSale ? Math.round(((highest - min) / highest) * 100) : 0;
+  return { min, highest, onSale, savePct };
 }
 
 function productTypeRows(text: string, defaultLabel = 'Product Type') {
@@ -109,6 +105,8 @@ export function ProductPurchase({ product }: { product: Product }) {
   const productStory = (pdp?.product_story || '').trim();
   const productType = (product.description || '').trim();
   const detailSections = (pdp?.details_sections || []).filter((section) => section.items?.length);
+  const pricing = priceMeta(product);
+  const tags = [product.grade_label, product.badge].filter(Boolean) as string[];
 
   useEffect(() => {
     rememberRecent({
@@ -186,15 +184,35 @@ export function ProductPurchase({ product }: { product: Product }) {
 
           <div className="col-lg-5">
             <div className="purchasing_wrapper__content product_content shop-pdp__buy">
-              {product.grade_label ? <p className="shop-pdp__badge">{product.grade_label}</p> : null}
-              {product.badge ? <p className="shop-pdp__badge shop-pdp__badge--soft">{product.badge}</p> : null}
-              <h1>{product.name}</h1>
-              <p className="price">{priceLabel(product)}</p>
-              {pdp?.free_shipping ? <p className="shop-pdp__ship">Free Shipping</p> : null}
+              <header className="shop-pdp__header">
+                {tags.length ? (
+                  <div className="shop-pdp__tags" aria-label="Product labels">
+                    {tags.map((tag) => (
+                      <span key={tag} className="shop-pdp__tag">{tag}</span>
+                    ))}
+                  </div>
+                ) : null}
+                <h1 className="shop-pdp__title">{product.name}</h1>
+                <div className="shop-pdp__price-row">
+                  <p className={`shop-pdp__price${pricing.onSale ? ' is-sale' : ''}`}>
+                    {pricing.onSale ? <s className="shop-pdp__compare">{money(pricing.highest)}</s> : null}
+                    <span className="shop-pdp__current">{money(pricing.min)}</span>
+                  </p>
+                  {pricing.onSale && pricing.savePct > 0 ? (
+                    <span className="shop-pdp__save">Save {pricing.savePct}%</span>
+                  ) : null}
+                </div>
+                {pdp?.free_shipping ? (
+                  <p className="shop-pdp__ship">
+                    <i className="bx bx-package" aria-hidden="true" />
+                    <span>Free Shipping</span>
+                  </p>
+                ) : null}
+              </header>
 
               <div className="purchase_type">
                 <div className="purchase_type__select shop-pdp__qty-row">
-                  <h6>quantity:</h6>
+                  <h6>Quantity</h6>
                   <div className="purchase--input">
                     <div className="purchase-quantity">
                       <button type="button" className="quantity-button" aria-label="Decrease quantity" onClick={() => setQty((value) => Math.max(1, value - 1))}>−</button>

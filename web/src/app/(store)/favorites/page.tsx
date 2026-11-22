@@ -29,27 +29,48 @@ export default async function FavoritesPage() {
           </div>
           <p className="shop-plp__count">{items.length} {items.length === 1 ? 'item' : 'items'}</p>
           <div className="row" id="product-grid">
-            {items.map((product) => (
-              <div className="col-xl-3 col-md-4 col-sm-6" key={product.id}>
-                <div className="card__inner shop-card">
-                  <div className="card--img">
-                    <Link href={`/products/${product.slug}`}>
-                      <img decoding="async" loading="lazy" src={imgSrc(product.images?.[0]?.path)} className="img-fluid" alt={product.name} />
-                    </Link>
-                    <div className="favorites">
-                      <WishlistButton productId={product.id} />
+            {items.map((product) => {
+              const price = Number(product.price);
+              const compare = product.compare_at_price ? Number(product.compare_at_price) : 0;
+              const onSale = compare > price;
+              const savePct = onSale ? Math.round(((compare - price) / compare) * 100) : 0;
+              const tags = [product.badge || (onSale ? 'Sale' : '')].filter(Boolean) as string[];
+              return (
+                <div className="col-xl-3 col-md-4 col-sm-6" key={product.id}>
+                  <div className="card__inner shop-card">
+                    <div className="card--img">
+                      {tags[0] ? <span className="shop-card__badge">{tags[0]}</span> : null}
+                      <Link href={`/products/${product.slug}`}>
+                        <img decoding="async" loading="lazy" src={imgSrc(product.images?.[0]?.path)} className="img-fluid" alt={product.name} />
+                      </Link>
+                      <div className="favorites">
+                        <WishlistButton productId={product.id} />
+                      </div>
                     </div>
-                  </div>
-                  <div className="card__inner_content">
-                    <Link href={`/products/${product.slug}`}>{product.name}</Link>
-                    <span>{money(Number(product.price))}</span>
-                    <div className="catalog-cart-action">
-                      <AddToCartButton productId={product.id} productName={product.name} stockQty={product.stock_qty} />
+                    <div className="card__inner_content shop-card__meta">
+                      {tags.length ? (
+                        <div className="shop-card__tags" aria-label="Product labels">
+                          {tags.map((tag) => (
+                            <span key={tag} className="shop-card__tag">{tag}</span>
+                          ))}
+                        </div>
+                      ) : null}
+                      <Link href={`/products/${product.slug}`} className="shop-card__title">{product.name}</Link>
+                      <div className="shop-card__price-row">
+                        <span className={`shop-card__price${onSale ? ' is-sale' : ''}`}>
+                          {onSale ? <s className="shop-card__compare">{money(compare)}</s> : null}
+                          <span className="shop-card__current">{money(price)}</span>
+                        </span>
+                        {onSale && savePct > 0 ? <span className="shop-card__save">Save {savePct}%</span> : null}
+                      </div>
+                      <div className="catalog-cart-action">
+                        <AddToCartButton productId={product.id} productName={product.name} stockQty={product.stock_qty} />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           {!items.length ? (
             <p className="ui-status" role="status">

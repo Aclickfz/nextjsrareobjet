@@ -26,12 +26,16 @@ function cardPrice(product: CardProduct) {
   const max = product.pdp?.price_max ?? product.price_max;
   const compare = product.compare_at_price ? Number(product.compare_at_price) : 0;
   const onSale = compare > min;
-  const range = max != null && Number(max) > min ? `${money(min)} – ${money(Number(max))}` : money(min);
+  const savePct = onSale ? Math.round(((compare - min) / compare) * 100) : 0;
+  const current = max != null && Number(max) > min ? `${money(min)} – ${money(Number(max))}` : money(min);
   return (
-    <span className="shop-rail__price">
-      {onSale ? <s>{money(compare)}</s> : null}
-      <strong className={onSale ? 'is-sale' : ''}>{range}</strong>
-    </span>
+    <div className="shop-card__price-row">
+      <span className={`shop-card__price${onSale ? ' is-sale' : ''}`}>
+        {onSale ? <s className="shop-card__compare">{money(compare)}</s> : null}
+        <span className="shop-card__current">{current}</span>
+      </span>
+      {onSale && savePct > 0 ? <span className="shop-card__save">Save {savePct}%</span> : null}
+    </div>
   );
 }
 
@@ -44,23 +48,39 @@ function ProductRail({ title, products }: { title: string; products: CardProduct
           <h2>{title}</h2>
         </div>
         <div className="shop-rail__track">
-          {products.map((product) => (
-            <article className="shop-rail__card" key={product.id}>
-              <div className="shop-rail__media">
-                {(product.badge || '').toLowerCase().includes('best') ? <span className="shop-rail__badge">Bestseller</span> : null}
-                {product.badge && !(product.badge || '').toLowerCase().includes('best') ? <span className="shop-rail__badge">{product.badge}</span> : null}
-                <WishlistButton productId={product.id} />
-                <Link href={`/products/${product.slug}`}>
-                  <img decoding="async" loading="lazy" src={imgSrc(product.images?.[0]?.path)} alt={product.name} />
-                </Link>
-              </div>
-              <Link href={`/products/${product.slug}`} className="shop-rail__meta">
-                <span>{product.name}</span>
-                {cardPrice(product)}
-                {(product.pdp?.free_shipping || product.free_shipping) ? <em>Free Shipping</em> : null}
-              </Link>
-            </article>
-          ))}
+          {products.map((product) => {
+            const tags = [
+              (product.badge || '').toLowerCase().includes('best') ? 'Bestseller' : product.badge || ''
+            ].filter(Boolean) as string[];
+            return (
+              <article className="shop-rail__card shop-card" key={product.id}>
+                <div className="shop-rail__media">
+                  {tags[0] ? <span className="shop-rail__badge">{tags[0]}</span> : null}
+                  <WishlistButton productId={product.id} />
+                  <Link href={`/products/${product.slug}`}>
+                    <img decoding="async" loading="lazy" src={imgSrc(product.images?.[0]?.path)} alt={product.name} />
+                  </Link>
+                </div>
+                <div className="shop-rail__meta shop-card__meta">
+                  {tags.length ? (
+                    <div className="shop-card__tags" aria-label="Product labels">
+                      {tags.map((tag) => (
+                        <span key={tag} className="shop-card__tag">{tag}</span>
+                      ))}
+                    </div>
+                  ) : null}
+                  <Link href={`/products/${product.slug}`} className="shop-card__title">{product.name}</Link>
+                  {cardPrice(product)}
+                  {(product.pdp?.free_shipping || product.free_shipping) ? (
+                    <p className="shop-card__ship">
+                      <i className="bx bx-package" aria-hidden="true" />
+                      <span>Free Shipping</span>
+                    </p>
+                  ) : null}
+                </div>
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>
