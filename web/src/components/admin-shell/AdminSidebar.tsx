@@ -33,7 +33,7 @@ export function AdminSidebar() {
               <Link href="/admin/dashboard" onClick={closeOnMobile}>
                 <div className="bg-primary text-primary-foreground flex size-8 shrink-0 items-center justify-center rounded-md text-sm font-bold">J</div>
                 <div className="flex flex-col items-start leading-tight">
-                  <span className="text-lg font-semibold text-nowrap">JustAclick</span>
+                  <span className="text-lg font-semibold text-nowrap">Rare Objet</span>
                   <span className="text-xs font-light text-nowrap">Commerce CRM</span>
                 </div>
               </Link>

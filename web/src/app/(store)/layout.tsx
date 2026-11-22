@@ -15,17 +15,17 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
   title: {
-    default: 'Furniture, Lighting & Home Decor | JustAclick',
-    template: '%s | JustAclick'
+    default: 'Furniture, Lighting & Home Decor | Rare Objet',
+    template: '%s | Rare Objet'
   },
-  description: 'Explore JustAclick furniture, lighting, tabletop collections and home decor, with inspiration for your space.',
+  description: 'Explore Rare Objet furniture, lighting, tabletop collections and home decor, with inspiration for your space.',
   openGraph: {
-    title: 'Furniture, Lighting & Home Decor | JustAclick',
-    description: 'Explore JustAclick furniture, lighting, tabletop collections and home decor, with inspiration for your space.',
+    title: 'Furniture, Lighting & Home Decor | Rare Objet',
+    description: 'Explore Rare Objet furniture, lighting, tabletop collections and home decor, with inspiration for your space.',
     type: 'website',
-    siteName: 'JustAclick'
+    siteName: 'Rare Objet'
   },
-  twitter: { card: 'summary_large_image', title: 'JustAclick', description: 'Furniture, lighting and home decor.' }
+  twitter: { card: 'summary_large_image', title: 'Rare Objet', description: 'Furniture, lighting and home decor.' }
 };
 
 const styles = [
@@ -110,7 +110,7 @@ async function StoreShell({ children }: { children: React.ReactNode }) {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'Organization',
-            name: 'JustAclick',
+            name: 'Rare Objet',
             url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
           })
         }}
@@ -121,7 +121,7 @@ async function StoreShell({ children }: { children: React.ReactNode }) {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'WebSite',
-            name: 'JustAclick',
+            name: 'Rare Objet',
             url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
             potentialAction: {
               '@type': 'SearchAction',

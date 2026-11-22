@@ -1,4 +1,4 @@
-﻿import { imgSrc } from '@/lib/utils';
+import { imgSrc } from '@/lib/utils';
 import { SITE_MEDIA_SLOTS } from '@/lib/site-media-slots';
 import { getSiteMediaMap } from '@/repositories/site-media.repository';
 import { HeroVideoBanner } from './HeroVideoBanner';
@@ -53,7 +53,7 @@ export async function HomeMain() {
 
                             <h2>table tops</h2>
                             <span><i className='bx bx-x'></i></span>
-                            <h3>JustAclick</h3>
+                            <h3>Rare Objet</h3>
                             <h4>functional. accessible. beautiful.</h4>
                             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime ea tempora debitis.
                                 Dolorum dolorem consequuntur, temporibus eveniet, doloribus facere repudiandae aperiam
@@ -96,7 +96,7 @@ export async function HomeMain() {
 
                             <h2>Table Tops and Kitchenware</h2>
                             <span><i className='bx bx-x'></i></span>
-                            <h3>JustAclick</h3>
+                            <h3>Rare Objet</h3>
                             <h4>functional. accessible. beautiful.</h4>
                             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime ea tempora debitis.
                                 Dolorum dolorem consequuntur, temporibus eveniet, doloribus facere repudiandae aperiam

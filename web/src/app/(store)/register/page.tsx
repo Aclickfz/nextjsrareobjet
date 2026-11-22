@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { AuthShell } from '@/components/account/AuthShell';
 import { RegisterForm } from '@/components/account/AuthForms';
 
-export const metadata: Metadata = { title: 'Create account', description: 'Create your JustAclick account to save favourites and manage your shopping experience.' };
+export const metadata: Metadata = { title: 'Create account', description: 'Create your Rare Objet account to save favourites and manage your shopping experience.' };
 
 export default async function RegisterPage({ searchParams }: { searchParams: Promise<{ next?: string; verified?: string; reset?: string }> }) {
   const { next } = await searchParams;

@@ -29,7 +29,7 @@ export async function sendAuthEmail(email: string, token: string, purpose: 'veri
   const link = url.toString().replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
   const transport = nodemailer.createTransport(smtp);
   const result = await transport.sendMail({
-    from, to: email, subject: `${title} - JustAclick`,
+    from, to: email, subject: `${title} - Rare Objet`,
     text: `${title}: ${url.toString()}\nThis link expires in ${expiry}. If you did not request it, ignore this email.`,
     html: `<h1>${title}</h1><p><a href="${link}" style="display:inline-block;padding:14px 22px;background:#131313;color:white;border-radius:6px">${title}</a></p><p>This link expires in ${expiry}. If you did not request it, ignore this email.</p>`
   });

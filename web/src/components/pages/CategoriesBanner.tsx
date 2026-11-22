@@ -129,7 +129,7 @@ export function CategoriesBanner() {
 
                                                 <h2>table tops</h2>
                                                 <span><i className='bx bx-x'></i></span>
-                                                <h3>JustAclick</h3>
+                                                <h3>Rare Objet</h3>
                                                 <h4>functional. accessible. beautiful.</h4>
                                                 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime ea
                                                     tempora debitis.
@@ -193,7 +193,7 @@ export function CategoriesBanner() {
                     <p>Great style and impeccable taste are timeless. Even so, adding small touches of fresh inspiration
                         to a space – be it a popular living room, a sophisticated dining room, a relaxing bedroom, a
                         professional home office or an impressive exterior – lets you rekindle the home’s delightful
-                        ambience, and offers big decor payoffs for minor investments in space. JustAclick is
+                        ambience, and offers big decor payoffs for minor investments in space. Rare Objet is
                         constantly innovating so that we can bring our customers exciting new pieces perfect for
                         enhancing any existing design layout or creating inspiration for audacious changes. The result
                         is sure to impress guests and family, but more importantly, allow individuals to express their
