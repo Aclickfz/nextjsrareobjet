@@ -53,10 +53,26 @@ function productTypeRows(text: string, defaultLabel = 'Product Type') {
   if (defaultLabel && lines.length === 1 && !lines[0].label) {
     return [{ label: defaultLabel, value: lines[0].value }];
   }
-  if (defaultLabel && lines.length > 1 && lines.every((row) => !row.label)) {
-    return [{ label: defaultLabel, value: lines.map((row) => row.value).join(' ') }];
+  // Unlabeled lines → pair as label | value on the same row (e.g. "Product Type 1" + description).
+  if (lines.length > 1 && lines.every((row) => !row.label)) {
+    const paired: { label: string; value: string }[] = [];
+    for (let i = 0; i < lines.length; i += 2) {
+      if (i + 1 < lines.length) paired.push({ label: lines[i].value, value: lines[i + 1].value });
+      else paired.push({ label: defaultLabel || '', value: lines[i].value });
+    }
+    return paired;
   }
   return lines.map((row) => (row.label || !defaultLabel ? row : { label: defaultLabel, value: row.value }));
+}
+
+/** Details section: title + single plain item → one label|value row; otherwise keep section heading. */
+function detailSectionView(section: { title: string; items: string[] }) {
+  const rows = productTypeRows(section.items.join('\n'), '');
+  const title = (section.title || '').trim();
+  if (title && rows.length === 1 && !rows[0].label) {
+    return { showTitle: false, rows: [{ label: title, value: rows[0].value }] };
+  }
+  return { showTitle: Boolean(title), rows };
 }
 
 function ProductStoryDetails({
@@ -257,19 +273,22 @@ export function ProductPurchase({ product }: { product: Product }) {
                   <div className="shop-pdp__acc-body">
                     {detailSections.length ? (
                       <div className="shop-pdp__specs">
-                        {detailSections.map((section) => (
-                          <div key={section.title} className="shop-pdp__details-section">
-                            <h3>{section.title}</h3>
-                            <div className="shop-pdp__dims">
-                              {productTypeRows(section.items.join('\n'), '').map((row, index) => (
-                                <div key={index} className={row.label ? undefined : 'shop-pdp__dims-full'}>
-                                  {row.label ? <strong>{row.label}</strong> : null}
-                                  <span>{row.value}</span>
-                                </div>
-                              ))}
+                        {detailSections.map((section) => {
+                          const view = detailSectionView(section);
+                          return (
+                            <div key={section.title} className="shop-pdp__details-section">
+                              {view.showTitle ? <h3>{section.title}</h3> : null}
+                              <div className="shop-pdp__dims">
+                                {view.rows.map((row, index) => (
+                                  <div key={index} className={row.label ? undefined : 'shop-pdp__dims-full'}>
+                                    {row.label ? <strong>{row.label}</strong> : null}
+                                    <span>{row.value}</span>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     ) : null}
                   </div>

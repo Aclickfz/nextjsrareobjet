@@ -1629,8 +1629,25 @@
 
 @media (max-width: 767px) {
     .shop-pdp__dims > div {
+        grid-template-columns: minmax(88px, 36%) 1fr;
+        gap: 6px 8px;
+        padding: 8px 10px;
+        font-size: 12px;
+        line-height: 1.35;
+        align-items: start;
+    }
+
+    .shop-pdp__dims > div.shop-pdp__dims-full {
         grid-template-columns: 1fr;
-        gap: 4px;
+    }
+
+    .shop-pdp__dims > div strong,
+    .shop-pdp__dims > div span {
+        word-break: break-word;
+    }
+
+    .shop-pdp__details-section h3 {
+        font-size: 14px;
     }
 }
 
