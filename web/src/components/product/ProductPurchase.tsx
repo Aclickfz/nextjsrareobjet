@@ -195,7 +195,9 @@ export function ProductPurchase({ product }: { product: Product }) {
                 <h1 className="shop-pdp__title">{product.name}</h1>
                 <div className="shop-pdp__price-row">
                   <p className={`shop-pdp__price${pricing.onSale ? ' is-sale' : ''}`}>
-                    {pricing.onSale ? <s className="shop-pdp__compare">{money(pricing.highest)}</s> : null}
+                    {pricing.onSale && pricing.highest != null ? (
+                      <s className="shop-pdp__compare">{money(pricing.highest)}</s>
+                    ) : null}
                     <span className="shop-pdp__current">{money(pricing.min)}</span>
                   </p>
                   {pricing.onSale && pricing.savePct > 0 ? (
