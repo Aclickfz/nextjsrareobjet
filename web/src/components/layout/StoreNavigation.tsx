@@ -13,44 +13,168 @@ import { AnnouncementTicker } from './AnnouncementTicker';
 
 type Props = { categories: CategoryNode[]; navigation: { name: string; slug: string }[]; cart: number; wishlist: number; user: { name: string; role: string } | null };
 
+type SearchHit = { id: number; name: string; slug: string };
+type FlatHit = { kind: 'category' | 'product'; id: number; name: string; slug: string; href: string };
+
 function ProductSearch() {
   const [q, setQ] = useState('');
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState('');
-  const [results, setResults] = useState<{ id: number; name: string; slug: string }[]>([]);
+  const [products, setProducts] = useState<SearchHit[]>([]);
+  const [categories, setCategories] = useState<SearchHit[]>([]);
   const [active, setActive] = useState(-1);
   const input = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const flat: FlatHit[] = [
+    ...categories.map((item) => ({ kind: 'category' as const, ...item, href: `/categories/${item.slug}` })),
+    ...products.map((item) => ({ kind: 'product' as const, ...item, href: `/products/${item.slug}` }))
+  ];
+
   useEffect(() => {
     let cancelled = false;
     if (q.trim().length < 2) return;
     const timer = setTimeout(async () => {
       try {
         const data = await searchSuggestions(q);
-        if (!cancelled) { setResults(data.products); setStatus(data.error ? 'Suggestions unavailable. Press Enter to search.' : data.products.length ? '' : 'No matching products. Try another search.'); }
-      } catch { if (!cancelled) setStatus('Suggestions unavailable. Press Enter to search.'); }
+        if (cancelled) return;
+        setProducts(data.products);
+        setCategories(data.categories);
+        const empty = !data.products.length && !data.categories.length;
+        setStatus(
+          data.error
+            ? 'Suggestions unavailable. Press Enter to search.'
+            : empty
+              ? 'No matching categories or products. Try another search.'
+              : ''
+        );
+      } catch {
+        if (!cancelled) setStatus('Suggestions unavailable. Press Enter to search.');
+      }
     }, 300);
-    return () => { cancelled = true; clearTimeout(timer); };
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [q]);
+
   const visible = open && q.trim().length >= 2;
-  return <div className={styles.search} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false); }}>
-    <form action="/search" role="search" onSubmit={event => {
-      setOpen(false);
-      if (active >= 0 && results[active]) { event.preventDefault(); router.push(`/products/${results[active].slug}`); }
-    }}>
-      <button type="submit" aria-label="Search products"><Search size={20} /></button>
-      <input ref={input} type="search" name="q" maxLength={100} placeholder="Search" aria-label="Search products" role="combobox" aria-autocomplete="list" aria-expanded={visible} aria-controls="header-search-results" aria-activedescendant={visible && active >= 0 ? `header-result-${active}` : undefined} autoComplete="off" value={q} onFocus={() => setOpen(true)} onChange={event => { setQ(event.target.value); setOpen(true); setResults([]); setActive(-1); setStatus('Searching…'); }} onKeyDown={event => {
-        if (event.key === 'Escape') { setOpen(false); setActive(-1); }
-        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') { event.preventDefault(); setOpen(true); setActive(index => results.length ? (index + (event.key === 'ArrowDown' ? 1 : -1) + results.length) % results.length : -1); }
-      }} />
-      {q && <button type="button" aria-label="Clear search" onClick={() => { setQ(''); setResults([]); setActive(-1); input.current?.focus(); }}><X size={17} /></button>}
-    </form>
-    {visible && <div className={styles.suggestions}>
-      <p role="status">{status || 'Suggested products'}</p>
-      <ul role="listbox" id="header-search-results" aria-label="Suggested products">{results.map((item, index) => <li key={item.id} role="option" id={`header-result-${index}`} aria-selected={active === index}><Link className={active === index ? styles.selected : ''} href={`/products/${item.slug}`} onClick={() => setOpen(false)}>{item.name}<ArrowUpRight size={15} /></Link></li>)}</ul>
-      <Link className={styles.allResults} href={`/search?q=${encodeURIComponent(q)}`} onClick={() => setOpen(false)}>View all results <ArrowUpRight size={15} /></Link>
-    </div>}
-  </div>;
+  const activeId = visible && active >= 0 ? `header-result-${active}` : undefined;
+
+  return (
+    <div className={styles.search} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false); }}>
+      <form
+        action="/search"
+        role="search"
+        onSubmit={(event) => {
+          setOpen(false);
+          if (active >= 0 && flat[active]) {
+            event.preventDefault();
+            router.push(flat[active].href);
+          }
+        }}
+      >
+        <button type="submit" aria-label="Search products and categories"><Search size={20} /></button>
+        <input
+          ref={input}
+          type="search"
+          name="q"
+          maxLength={100}
+          placeholder="Search"
+          aria-label="Search products and categories"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded={visible}
+          aria-controls="header-search-results"
+          aria-activedescendant={activeId}
+          autoComplete="off"
+          value={q}
+          onFocus={() => setOpen(true)}
+          onChange={(event) => {
+            setQ(event.target.value);
+            setOpen(true);
+            setProducts([]);
+            setCategories([]);
+            setActive(-1);
+            setStatus('Searching…');
+          }}
+          onKeyDown={(event) => {
+            if (event.key === 'Escape') {
+              setOpen(false);
+              setActive(-1);
+            }
+            if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+              event.preventDefault();
+              setOpen(true);
+              setActive((index) =>
+                flat.length ? (index + (event.key === 'ArrowDown' ? 1 : -1) + flat.length) % flat.length : -1
+              );
+            }
+          }}
+        />
+        {q ? (
+          <button
+            type="button"
+            aria-label="Clear search"
+            onClick={() => {
+              setQ('');
+              setProducts([]);
+              setCategories([]);
+              setActive(-1);
+              input.current?.focus();
+            }}
+          >
+            <X size={17} />
+          </button>
+        ) : null}
+      </form>
+      {visible ? (
+        <div className={styles.suggestions}>
+          <p role="status">{status || (flat.length ? 'Suggestions' : 'Searching…')}</p>
+          <div id="header-search-results">
+            {categories.length ? (
+              <div className={styles.suggestionGroup}>
+                <p className={styles.suggestionLabel}>Categories</p>
+                <ul role="listbox" aria-label="Suggested categories">
+                  {categories.map((item) => {
+                    const index = flat.findIndex((hit) => hit.kind === 'category' && hit.id === item.id);
+                    return (
+                      <li key={`c-${item.id}`} role="option" id={`header-result-${index}`} aria-selected={active === index}>
+                        <Link className={active === index ? styles.selected : ''} href={`/categories/${item.slug}`} onClick={() => setOpen(false)}>
+                          {item.name}
+                          <ArrowUpRight size={15} />
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : null}
+            {products.length ? (
+              <div className={styles.suggestionGroup}>
+                <p className={styles.suggestionLabel}>Products</p>
+                <ul role="listbox" aria-label="Suggested products">
+                  {products.map((item) => {
+                    const index = flat.findIndex((hit) => hit.kind === 'product' && hit.id === item.id);
+                    return (
+                      <li key={`p-${item.id}`} role="option" id={`header-result-${index}`} aria-selected={active === index}>
+                        <Link className={active === index ? styles.selected : ''} href={`/products/${item.slug}`} onClick={() => setOpen(false)}>
+                          {item.name}
+                          <ArrowUpRight size={15} />
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : null}
+          </div>
+          <Link className={styles.allResults} href={`/search?q=${encodeURIComponent(q)}`} onClick={() => setOpen(false)}>
+            View all results <ArrowUpRight size={15} />
+          </Link>
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 export function StoreNavigation({ categories, navigation, cart, wishlist, user }: Props) {

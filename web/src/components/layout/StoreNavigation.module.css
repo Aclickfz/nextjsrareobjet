@@ -34,8 +34,10 @@
 .search input { min-width: 0; width: 100%; border: 0; background: transparent; color: #222; padding: 10px 0; font-size: 13px; outline-offset: -2px !important; }
 .search input::-webkit-search-cancel-button { display: none; }
 .suggestions, .accountPanel { position: absolute; top: calc(100% + 8px); background: #fff; border: 1px solid #e6e6e6; box-shadow: 0 12px 25px #00000012; z-index: 3; }
-.suggestions { left: 0; right: 0; padding: 14px; }
-.suggestions p { font-size: 12px; color: #666; margin: 0 0 8px; }
+.suggestions { left: 0; right: 0; padding: 14px; max-height: min(70vh, 420px); overflow-y: auto; }
+.suggestions > p[role="status"] { font-size: 12px; color: #666; margin: 0 0 8px; }
+.suggestionGroup + .suggestionGroup { margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
+.suggestionLabel { margin: 0 0 4px; padding: 0 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #888; }
 .suggestions ul { padding: 0; margin: 0; list-style: none; }
 .suggestions a { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 8px; font-size: 13px; }
 .suggestions a:hover, .selected { background: #f7f6f2; }

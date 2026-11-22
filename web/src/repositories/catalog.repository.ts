@@ -183,6 +183,26 @@ export async function listCategories() {
   );
 }
 
+export async function searchCategories(q: string, limit = 6) {
+  const term = q.trim();
+  if (term.length < 2) return [];
+  return query<{ id: number; name: string; slug: string }[]>(
+    `SELECT c.id, c.name, c.slug
+     FROM categories c
+     LEFT JOIN categories parent ON parent.id = c.parent_id
+     LEFT JOIN categories grandparent ON grandparent.id = parent.parent_id
+     LEFT JOIN categories greatgrandparent ON greatgrandparent.id = grandparent.parent_id
+     WHERE c.is_active = 1
+       AND (parent.id IS NULL OR parent.is_active = 1)
+       AND (grandparent.id IS NULL OR grandparent.is_active = 1)
+       AND (greatgrandparent.id IS NULL OR greatgrandparent.is_active = 1)
+       AND (c.name LIKE :q OR c.slug LIKE :q)
+     ORDER BY c.sort_order ASC, c.name ASC
+     LIMIT ${Math.min(12, Math.max(1, limit))}`,
+    { q: `%${term}%` }
+  );
+}
+
 export const STORE_NAV = [
   { name: 'New Arrivals', slug: 'new' },
   { name: 'Furniture', slug: 'furniture' },

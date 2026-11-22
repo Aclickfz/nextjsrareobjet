@@ -51,7 +51,7 @@ export function ProductImageViewer({
         onMouseLeave={() => setLens(null)}
         onClick={() => { setScale(1); setOpen(true); }}
       >
-        <img src={src} className="img-fluid" alt={name} />
+        <img src={src} className="img-fluid" alt={name} decoding="async" fetchPriority="high" />
         {lens ? (
           <>
             <span className="pdp-zoom__lens" style={{ left: `${lens.x * 100}%`, top: `${lens.y * 100}%` }} aria-hidden="true" />
@@ -97,7 +97,8 @@ export function ProductImageViewer({
               <img
                 src={src}
                 alt={`${name} view ${active + 1}`}
-                style={scale > 1 ? { width: `${scale * 100}%`, maxWidth: 'none', maxHeight: 'none' } : undefined}
+                decoding="async"
+                style={scale > 1 ? { width: `${scale * 100}%`, maxWidth: 'none', maxHeight: 'none', imageRendering: 'auto' } : { imageRendering: 'auto' }}
               />
             </div>
             <div className="pdp-lightbox__tools">

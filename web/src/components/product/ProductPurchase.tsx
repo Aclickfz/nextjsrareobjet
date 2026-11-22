@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { addToCartAction } from '@/actions/cart.actions';
@@ -39,6 +39,10 @@ function priceMeta(product: Product) {
   return { min, highest, onSale, savePct };
 }
 
+function looksLikeLabel(text: string) {
+  return text.length > 0 && text.length <= 48 && !/[.!?]$/.test(text) && (text.match(/,/g) || []).length < 2;
+}
+
 function productTypeRows(text: string, defaultLabel = 'Product Type') {
   const lines = text
     .split(/\r?\n/)
@@ -49,30 +53,31 @@ function productTypeRows(text: string, defaultLabel = 'Product Type') {
       if (colon > 0 && colon < 40) return { label: line.slice(0, colon).trim(), value: line.slice(colon + 1).trim() };
       return { label: '', value: line };
     });
-  // Plain text (e.g. "Luxury Upholstered Sofa") → one Dimensions-style row.
   if (defaultLabel && lines.length === 1 && !lines[0].label) {
     return [{ label: defaultLabel, value: lines[0].value }];
   }
-  // Unlabeled lines → pair as label | value on the same row (e.g. "Product Type 1" + description).
   if (lines.length > 1 && lines.every((row) => !row.label)) {
-    const paired: { label: string; value: string }[] = [];
-    for (let i = 0; i < lines.length; i += 2) {
-      if (i + 1 < lines.length) paired.push({ label: lines[i].value, value: lines[i + 1].value });
-      else paired.push({ label: defaultLabel || '', value: lines[i].value });
+    if (looksLikeLabel(lines[0].value)) {
+      return [{ label: lines[0].value, value: lines.slice(1).map((row) => row.value).join(' ') }];
     }
-    return paired;
+    if (defaultLabel) {
+      return [{ label: defaultLabel, value: lines.map((row) => row.value).join(' ') }];
+    }
   }
   return lines.map((row) => (row.label || !defaultLabel ? row : { label: defaultLabel, value: row.value }));
 }
 
-/** Details section: title + single plain item → one label|value row; otherwise keep section heading. */
-function detailSectionView(section: { title: string; items: string[] }) {
+/** Details section → heading + description blocks (same pattern as Product Story). */
+function detailSectionBlocks(section: { title: string; items: string[] }) {
   const rows = productTypeRows(section.items.join('\n'), '');
   const title = (section.title || '').trim();
-  if (title && rows.length === 1 && !rows[0].label) {
-    return { showTitle: false, rows: [{ label: title, value: rows[0].value }] };
+  if (title && rows.length && rows.every((row) => !row.label)) {
+    return [{ heading: title, body: rows.map((row) => row.value).join('\n\n') }];
   }
-  return { showTitle: Boolean(title), rows };
+  return rows.map((row) => ({
+    heading: row.label || title || 'Details',
+    body: row.value
+  }));
 }
 
 function ProductStoryDetails({
@@ -96,14 +101,12 @@ function ProductStoryDetails({
 
       {typeRows.length ? (
         <div className="shop-pdp__story-extra is-open">
-          <div className="shop-pdp__dims">
-            {typeRows.map((row, index) => (
-              <div key={index}>
-                <strong>{row.label}</strong>
-                <span>{row.value}</span>
-              </div>
-            ))}
-          </div>
+          {typeRows.map((row, index) => (
+            <article key={index} className={`shop-pdp__story-block${story || index > 0 ? ' shop-pdp__story-block--type' : ''}`}>
+              <span className="shop-pdp__story-label">{row.label || 'Product Type'}</span>
+              <p className="shop-pdp__details-copy">{row.value}</p>
+            </article>
+          ))}
         </div>
       ) : null}
     </div>
@@ -118,11 +121,14 @@ export function ProductPurchase({ product }: { product: Product }) {
   const [openPanel, setOpenPanel] = useState<'description' | 'details' | 'dimensions' | null>(null);
   const toast = useToast();
   const [pending, setPending] = useState(false);
+  const [showStickyCta, setShowStickyCta] = useState(false);
+  const orderNowRef = useRef<HTMLDivElement>(null);
   const productStory = (pdp?.product_story || '').trim();
   const productType = (product.description || '').trim();
   const detailSections = (pdp?.details_sections || []).filter((section) => section.items?.length);
   const pricing = priceMeta(product);
   const tags = [product.grade_label, product.badge].filter(Boolean) as string[];
+  const stockOut = product.stock_qty < 1;
 
   useEffect(() => {
     rememberRecent({
@@ -133,6 +139,28 @@ export function ProductPurchase({ product }: { product: Product }) {
       image: images[0]?.path
     });
   }, [product.id]);
+
+  useEffect(() => {
+    const el = orderNowRef.current;
+    if (!el) return;
+    let inView = true;
+    const mq = window.matchMedia('(max-width: 991px)');
+    const sync = () => setShowStickyCta(mq.matches && !inView);
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        inView = entry.isIntersecting;
+        sync();
+      },
+      { threshold: 0, rootMargin: '0px' }
+    );
+    io.observe(el);
+    mq.addEventListener('change', sync);
+    sync();
+    return () => {
+      io.disconnect();
+      mq.removeEventListener('change', sync);
+    };
+  }, []);
 
   async function add(buyNow: boolean) {
     if (pending) return;
@@ -152,7 +180,7 @@ export function ProductPurchase({ product }: { product: Product }) {
   }
 
   return (
-    <section className="purchasing_wrapper global_section shop-pdp">
+    <section className={`purchasing_wrapper global_section shop-pdp${showStickyCta ? ' shop-pdp--sticky-cta' : ''}`}>
       <div className="container">
         <nav className="shop-crumb" aria-label="Breadcrumb">
           {product.category_slug ? (
@@ -164,7 +192,7 @@ export function ProductPurchase({ product }: { product: Product }) {
         <div className="row shop-pdp__layout">
           <div className="col-lg-7">
             <div className="purchasing_wrapper__left">
-              <div className="purchasing_img">
+              <div className="purchasing_img shop-pdp__gallery">
                 <div className="purchasing_small__img">
                   {images.map((image, index) => (
                     <div className={`vertical_img${index === active ? ' is-active' : ''}`} key={image.path + index}>
@@ -241,11 +269,11 @@ export function ProductPurchase({ product }: { product: Product }) {
                 </div>
               </div>
 
-              <div className="order-now" data-react-action="true">
-                <button type="button" className="global_btn" disabled={pending || product.stock_qty < 1} onClick={() => add(false)}>
+              <div className="order-now" data-react-action="true" ref={orderNowRef}>
+                <button type="button" className="global_btn" disabled={pending || stockOut} onClick={() => add(false)}>
                   {pending ? 'Adding...' : 'Add to cart'}
                 </button>
-                <button type="button" className="global_btn shop-pdp__secondary" disabled={pending || product.stock_qty < 1} onClick={() => add(true)}>
+                <button type="button" className="global_btn shop-pdp__secondary" disabled={pending || stockOut} onClick={() => add(true)}>
                   Buy now
                 </button>
               </div>
@@ -273,22 +301,16 @@ export function ProductPurchase({ product }: { product: Product }) {
                   <div className="shop-pdp__acc-body">
                     {detailSections.length ? (
                       <div className="shop-pdp__specs">
-                        {detailSections.map((section) => {
-                          const view = detailSectionView(section);
-                          return (
-                            <div key={section.title} className="shop-pdp__details-section">
-                              {view.showTitle ? <h3>{section.title}</h3> : null}
-                              <div className="shop-pdp__dims">
-                                {view.rows.map((row, index) => (
-                                  <div key={index} className={row.label ? undefined : 'shop-pdp__dims-full'}>
-                                    {row.label ? <strong>{row.label}</strong> : null}
-                                    <span>{row.value}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          );
-                        })}
+                        {detailSections.map((section) => (
+                          <div key={section.title} className="shop-pdp__details-section">
+                            {detailSectionBlocks(section).map((block, index) => (
+                              <article key={`${block.heading}-${index}`} className="shop-pdp__story-block">
+                                <span className="shop-pdp__story-label">{block.heading}</span>
+                                <p className="shop-pdp__details-copy">{block.body}</p>
+                              </article>
+                            ))}
+                          </div>
+                        ))}
                       </div>
                     ) : null}
                   </div>
@@ -330,6 +352,21 @@ export function ProductPurchase({ product }: { product: Product }) {
               ) : null}
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className={`shop-pdp__sticky-cta${showStickyCta ? ' is-visible' : ''}`} aria-hidden={!showStickyCta}>
+        <div className="shop-pdp__sticky-cta-price">
+          <span className="shop-pdp__sticky-cta-label">{product.name}</span>
+          <strong>{money(pricing.min)}</strong>
+        </div>
+        <div className="shop-pdp__sticky-cta-actions">
+          <button type="button" className="global_btn" disabled={pending || stockOut || !showStickyCta} onClick={() => add(false)}>
+            {pending ? 'Adding...' : 'Add to cart'}
+          </button>
+          <button type="button" className="global_btn shop-pdp__secondary" disabled={pending || stockOut || !showStickyCta} onClick={() => add(true)}>
+            Buy now
+          </button>
         </div>
       </div>
     </section>
