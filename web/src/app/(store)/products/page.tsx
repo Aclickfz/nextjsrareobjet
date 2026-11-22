@@ -3,7 +3,7 @@ import { ProductGrid } from '@/components/product/ProductGrid';
 import { listProducts } from '@/services/product.service';
 
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'Shop', description: 'Browse JustAclick furniture and home decor.' };
+export const metadata: Metadata = { title: 'Shop', description: 'Browse Rare Objet furniture and home decor.' };
 
 export default async function ProductsPage({ searchParams }: { searchParams: Promise<{ q?: string; sort?: string; category?: string; page?: string; min?: string; max?: string; stock?: string }> }) {
   const params = await searchParams;

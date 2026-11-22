@@ -8,7 +8,7 @@ const announcements = [
   { text: 'Festive Sale Live: Flat 10% Off: Auto applied On Checkout', Icon: Tag },
   { text: 'Discover Our Latest Arrivals', Icon: Sparkles },
   { text: 'Furniture, Lighting & Decor For Your Home', Icon: ShoppingBag },
-  { text: 'Find Your Next Favourite At JustAclick', Icon: Heart },
+  { text: 'Find Your Next Favourite At Rare Objet', Icon: Heart },
 ];
 
 export function AnnouncementTicker() {

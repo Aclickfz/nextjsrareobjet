@@ -50,7 +50,7 @@ export function ContactMain() {
                 </div>
                 <div className="mail-add">
                     <strong>Mailing Address</strong>
-                    <p>JustAclick</p>
+                    <p>Rare Objet</p>
                     <p> 151 Union St.</p>
                     <p>San Francisco, CA 94111</p>
                 </div>

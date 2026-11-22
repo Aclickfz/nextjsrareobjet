@@ -5,7 +5,7 @@ export function AuthShell({ title, description, mode = 'recovery', children }: {
   return <main id="main-content" className="auth-page" tabIndex={-1}>
     <div className="auth-frame">
       <aside className="auth-story">
-        <Link href="/" className="auth-brand">JustAclick<span>THOUGHTFULLY CURATED LIVING</span></Link>
+        <Link href="/" className="auth-brand">Rare Objet<span>THOUGHTFULLY CURATED LIVING</span></Link>
         <div className="auth-story-copy"><span className="auth-kicker">MAKE YOURSELF AT HOME</span><h2>A little inspiration.<br /> A space that’s yours.</h2><p>Beautiful pieces, saved favourites, and the details that make a house your home.</p></div>
         <div className="auth-story-footer"><span>Furniture · Lighting · Living</span><span aria-hidden="true">↗</span></div>
       </aside>

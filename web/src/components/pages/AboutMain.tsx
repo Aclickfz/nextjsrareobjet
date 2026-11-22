@@ -18,7 +18,7 @@ export function AboutMain() {
         <section className="about-us global_section">
             <div className="container-fluid">
                 <div className="about-us-content">
-                    <h3>about JustAclick</h3>
+                    <h3>about Rareobjet</h3>
                     <p>Kalista is an indigenously curated label with a contemporary take on refined Indian clothing.
                         Designed for the progressive and innovative woman of today, who is ready to break the monotony
                         and experiment with color and style, our design philosophy is truly eclectic, with a generous

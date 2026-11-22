@@ -15,7 +15,7 @@ import './legacy.css';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: { default: 'Admin | JustAclick', template: '%s | JustAclick Admin' },
+  title: { default: 'Admin | Rare Objet', template: '%s | Rare Objet Admin' },
   robots: { index: false, follow: false }
 };
 
@@ -42,7 +42,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 <AdminHeader user={{ name: user.name, email: user.email }} />
                 <main className="admin-shell admin-main mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 sm:px-6">{children}</main>
                 <footer className="text-muted-foreground mx-auto w-full max-w-[1440px] border-t px-4 py-4 text-sm sm:px-6">
-                  © {new Date().getFullYear()} JustAclick Commerce CRM
+                  © {new Date().getFullYear()} Rare Objet Commerce CRM
                 </footer>
               </SidebarInset>
             </SidebarProvider>
